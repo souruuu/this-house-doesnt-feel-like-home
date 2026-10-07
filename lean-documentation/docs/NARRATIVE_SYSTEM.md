@@ -6,67 +6,82 @@ Source of Truth ของ Ink/inkjs integration และสัญญาระ�
 
 Ink จัด dialogue, choices, flow และจุดกลับเส้นหลัก inkjs เป็น runtime ใน browser; `NarrativeController` เป็นทางเข้าระบบเดียว React และ Phaser ไม่เดิน `Story` เอง
 
-**ห้าม Ink เป็นเจ้าของ authoritative persistent game state** ได้แก่ relationship, Promise, Memory/permissions, flags และ Album การเก็บ Ink state ใช้คืน narrative cursor, visits/turns และ branch context; ถ้ามี mirror ของ durable variables ใน Ink ต้อง sync จาก Zustand และไม่มี writer อีกชุด
+**ห้าม Ink เป็นเจ้าของ authoritative persistent game state** ได้แก่ relationship, Promise, Memory/permissions, flags และ Album การเก็บ Ink state ใช้คืน narrative cursor, visits/turns และ branch context ห้าม mirror authoritative state ทั้งก้อนใน Ink หรือใช้ Ink เป็น writer อีกชุด
 
-Branch ที่ต้องใช้ durable facts อ่าน projection/query ที่ controller จัดให้ ไม่ใช้ตัวแปร Ink ที่เปลี่ยนเองแล้วค่อยคัดทั้งก้อนไปทับ store รูปแบบ binding/read-only query ต้องยืนยันใน N-02
+Branch ที่ต้องใช้ durable facts อ่านผ่าน **read-only `NarrativeQueryPort` หรือ abstraction เทียบเท่า** ที่ controller จัดให้ เช่น `hasPromise`, `hasMemory`, `hasPermission`, `getFlag` Query อ่าน authoritative state จาก Zustand เท่านั้น ไม่เปิด mutation ให้ Ink และไม่คัดตัวแปร Ink ทั้งก้อนไปทับ store หลัง load ต้องให้ query อ่าน session ที่ restore แล้วก่อนเดิน branch ต่อ
 
 เหตุการณ์หลักกลับมารวมภายในวัน variant เปลี่ยนถ้อยคำ ระยะห่าง การเข้าร่วม สิ่งของ และผลภายหลัง ไม่มี tree แยกไม่จำกัดเพราะทุกคำตอบต้องได้ฉากเฉพาะ
 
 ## File organization
 
-ต้องแยก entry point, เนื้อหาแต่ละวัน, reusable narrative helpers และ generated output เพื่อให้เขียน/ตรวจได้ตาม scene ต้นฉบับ ยังไม่มีชื่อ path/knot final; ตัวอย่างโครงด้านล่างเป็น **ตัวอย่างจัดไฟล์สำหรับ N-02** ไม่ใช่สิ่งที่ล็อกในแชท
+โครง source **LOCKED:** one Ink file per day, shared helpers และ technical fixture แยกสำหรับ M1 ตามโครงนี้ Generated narrative output ต้องแยกจาก source; fixture ไม่ใช่ release story และห้ามปนใน release entry/build
 
 ```text
 narrative/
-  main.ink                 entry point / includes
-  prologue.ink             บทนำและ Notice entry
-  days/day01.ink ...        ต่อวัน; Prototype ใช้ day01–day03
-  shared/                  helpers/queries ที่ไม่เป็น state authority
-  epilogues/               Full Game; ไม่ include ไฟล์ที่ยังไม่มี
+  main.ink
+  prologue.ink
+  days/
+    day01.ink
+    day02.ink
+    ...
+    day07.ink
+  shared/
+    helpers.ink
+  fixtures/
+    technical_fixture.ink
 ```
 
-Compile เป็น story JSON แล้วโหลดผ่าน Vite import หรือ static resource ใน build ไม่ใช้ compiler ใน UI ของผู้เล่น บันทึกคู่ compiler/runtime และ story content version ที่ใช้สร้าง JSON; pipeline ต้อง fail เมื่อ compile/validation ผิด
+Prototype ใช้ Day 1–3 ตาม scope; ไม่สร้างบท Day 4–7 หรือ include ไฟล์ที่ยังไม่มีเพียงเพื่อเติมโครง Compile เป็น story JSON แล้วโหลดผ่าน Vite import หรือ static resource ใน build ไม่ใช้ compiler ใน UI ของผู้เล่น Script contract ล็อกเป็น `npm run narrative:compile` และ `npm run narrative:validate`; pipeline ต้อง fail เมื่อ compile/validation ผิด Exact executable และ minor/patch ของ compiler/runtime เป็นงานตรวจ compatibility **M0/A-01** ใน [ARCHITECTURE](../ARCHITECTURE.md) บันทึกคู่ที่ใช้และ identity ของ build/schema/story ตาม [GAME_STATE](GAME_STATE.md)
 
 ใช้ Scene IDs จาก map เช่น `D1-A`, `D2-A`, `D3-C` เป็น design identity ให้ mapping ไปชื่อ Ink knot ที่ถูก syntax ตรวจย้อนกลับได้ เช่น `d1_a` เป็นเพียงตัวอย่าง ไม่ reuse IDs จากบทเก่าที่ map ระบุว่าเปลี่ยนแล้ว
 
-## Tag schema เชิงความหมาย
+## Initial tag contract — LOCKED
 
-ตารางนี้กำหนดความหมายที่ต้องมีตามคำขอ Exact grammar, registry และ validation severity ยังเปิดใน N-02 ไม่สร้าง expression/event IDs ใหม่จากอารมณ์ที่คาดเดา
+Initial tag set มีเพียง **`line`, `speaker`, `expression`, `position`, `event`** ไม่เพิ่ม tag เผื่ออนาคตโดยไม่มี requirement ใช้ key/value ตามรูปแบบ `# key:value` ด้านล่าง; expression/stage registries ต้องอ้าง asset contract ไม่สร้าง IDs จากอารมณ์ที่คาดเดา
 
-| Tag | Payload/ความหมาย | ส่งต่อ |
+| Tag | Value/ความหมาย | ส่งต่อ |
 |---|---|---|
+| `line` | Stable Line ID ของทุก dialogue/readable narrative line | Global read-line history, Skip read text only และ identity ของ backlog entry |
 | `speaker` | Character/speaker ID ที่อยู่ใน registry; ให้สัมพันธ์กับ line ที่ออก | React dialogue name; world ใช้ข้อมูลแสดงตัวละครตาม command ที่อนุมัติ |
 | `expression` | Expression ID ของตัวละครที่สัมพันธ์กับ tag; ต้องมี asset/placeholder mapping | `GameBridge` → Phaser sprite |
 | `position` | Named stage position ที่กำหนดใน [UI_ASSET_SPEC](UI_ASSET_SPEC.md) ไม่ส่ง pixel ที่แต่งเองในบท | `GameBridge` → Phaser stage |
-| `event` | Event ID ใน allowlist พร้อม payload ที่ผ่าน schema; ระบุ domain effect หรือ presentation command ชัด | Controller → Zustand domain action หรือ GameBridge |
+| `event` | **Stable Event ID เท่านั้น**; TypeScript EventRegistry เป็นเจ้าของความหมาย | Controller → Zustand domain action หรือ GameBridge ตาม category ของ registry |
 
-ตัวอย่างแสดงรูปแบบเท่านั้น: `# speaker:<character_id>`, `# expression:<expression_id>`, `# position:<stage_id>`, `# event:<registered_event_id>` ตัวคั่น/การ escape/จำนวน tag ต่อ output และ payload syntax ต้องปิด N-02 ก่อนทำ parser final
+รูปแบบ: `# line:<stable_line_id>`, `# speaker:<character_id>`, `# expression:<expression_id>`, `# position:<stage_id>`, `# event:<stable_event_id>` ตัวอย่าง Event ID เชิงแนวคิดจาก decision: `# event:d1_b_evt_004` ไม่ใช่การเพิ่ม release event ของฉากนี้
 
-Tag อาจอยู่กับ line หรือ output ที่ไม่มีข้อความ Controller ต้องประมวลผล tag-only output ด้วย ไม่เพิ่ม line ว่างใน backlog เพื่อให้ event ทำงาน Speaker/presentation context ที่คงข้าม line หรือถูก clear ตอนเปลี่ยน scene ต้องระบุใน contract final
+ห้ามฝัง authoritative game-state payload ลง Ink เช่น `trust:+1`, `promise.commit` พร้อม arbitrary payload หรือ permission state โดยตรง Domain parameters/ความหมายของ event ต้องอยู่ฝั่ง TypeScript และมาจาก scene/domain rules ที่อนุมัติ ไม่ใช้ tag เป็นทางเพิ่ม state values เอง
 
-Event registry ต้องบอกอย่างน้อย: stable ID, category, payload shape, domain action/bridge command, scene ที่อนุญาต, ข้อมูลการรับรู้ของผู้เกี่ยวข้องเมื่อมี relationship effect และวิธีตรวจ duplicate event
+Tag อาจอยู่กับ line หรือ output ที่ไม่มีข้อความ Controller ต้องประมวลผล tag-only output โดยไม่สร้าง backlog line ว่าง `speaker` / `expression` / `position` persist ได้ **ภายใน scene** และต้อง reset presentation context เมื่อเข้า scene ใหม่ ห้ามรั่วข้าม scene Reserved no-speaker value คือ **`speaker:none`**
 
-Unknown IDs, missing payload, expression ที่ไม่มี character/asset หรือ permission reference ที่ไม่มีอยู่ ต้องตรวจใน compile/validate และ runtime guard ห้าม silently เพิ่ม flag/character หรือแสดงผล default ที่มีความหมายทางเรื่องแทน
+ทุก readable line ต้องมี stable Line ID ห้ามใช้เลขตำแหน่งบรรทัดหรือข้อความไทยเป็น identity ID ต้องไม่เปลี่ยนเพียงเพราะแทรก/แก้ข้อความอื่น Global read-line history ใช้ตัดสิน Skip ข้าม New Game/slots; backlog identity ใช้ Line ID เดียวกันแต่ transcript อยู่เฉพาะ run/save/session ปัจจุบันตาม [G-03](GAME_STATE.md#scope--g-03-closed)
+
+## TypeScript EventRegistry และ idempotency
+
+EventRegistry เป็น metadata/dispatch contract ฝั่ง TypeScript ไม่เป็น state store แต่ละ event ต้องมี stable unique ID และ category ที่ตรวจได้ว่าเป็น **domain → Zustand domain action** หรือ **presentation → GameBridge** พร้อมข้อมูล/เงื่อนไขที่ใช้ตรวจ schema, scene context และการรับรู้ของผู้เกี่ยวข้องเมื่อมี relationship effect ไม่มี arbitrary authoritative payload จาก Ink
+
+Durable events ต้องมี stable unique Event ID และ **committed-event ledger หรือกลไกเทียบเท่า** อยู่ใน per-playthrough durable state ตาม [GAME_STATE](GAME_STATE.md) Commit domain effect และเครื่องหมายว่า committed ให้สอดคล้องกัน เพื่อไม่ commit ซ้ำจาก reload, restore, React remount, duplicate interaction result หรือ rerender Registry ไม่เก็บ committed status และ ledger ไม่เป็น global unlock ข้าม run
+
+Unknown event/tag/ID, readable line ที่ไม่มี stable identity, expression ที่ไม่มี character/asset หรือ reference ที่ไม่มีอยู่ ต้อง validation fail หรือ runtime guard ห้าม silently create flag/character หรือ default behavior ที่มีความหมายทางเรื่อง
 
 ## Choice flow
 
-1. Controller sync durable projection สำหรับ branch แล้วเดิน Ink ทีละ output โดยคงลำดับ tags/effects ไม่ใช้ `ContinueMaximally()` ข้าม choice หรือ world interaction ที่ต้องรอ
-2. แปลง output เป็น view model ที่ React แสดง และ world commands ที่ bridge ส่งได้; เพิ่ม read-history ตาม identity ที่ยืนยันใน N-02/G-02
-3. เมื่อมี `currentChoices` ให้หยุด auto-continue และส่ง choices ของ revision ปัจจุบันให้ React ผู้เล่นเป็นคนเลือกเสมอ Auto/Skip ไม่เลือกแทน
-4. เมื่อ UI ส่ง choice ให้ตรวจ revision/index ยังใช้ได้ แล้วเรียก `ChooseChoiceIndex()` ครั้งเดียว ป้องกัน double click และ key repeats ที่เลือก/continue สองครั้ง
-5. Parse/validate events ของ output ถัดไป แล้วส่ง durable changes ผ่าน domain actions; presentation commands ผ่าน bridge
-6. ถ้าเริ่ม hotspot/puzzle ให้ถือเป็น interaction ที่กำลังรอ ไม่เดินเรื่องต่อจนได้ result ที่ตรง session/result contract ที่กำหนด ผลเก่าจาก scene ที่ปิดแล้วต้องไม่มี effect
-7. กลับ branch/rejoin และ snapshot boundary ที่ยืนยันได้ตาม [GAME_STATE](GAME_STATE.md) ไม่ autosave คู่ cursor/state ที่อยู่คนละจังหวะ
+1. Controller ให้ query port อ่าน authoritative state แล้วเดิน Ink ทีละ output ไม่ใช้ `ContinueMaximally()` ข้าม choice หรือ world interaction ที่ต้องรอ
+2. ประมวลผลแบบ deterministic: **parse output → validate tags/IDs/output ทั้งชุด → commit domain events → execute presentation commands → publish line/view model ให้ React → wait for continue/choice/interaction** ห้าม commit state ครึ่งหนึ่งก่อน validation จบ
+3. เมื่อมี `currentChoices` ให้หยุด Auto/Skip และส่ง choices ของ revision ปัจจุบันให้ React ผู้เล่นเป็นคนเลือกเสมอ
+4. เมื่อ UI ส่ง choice ให้ตรวจ revision/index แล้วใช้ **atomic choice transaction:** lock input → Ink advances ด้วย `ChooseChoiceIndex()` ครั้งเดียว → parse → validate → commit domain events → presentation update → checkpoint update → transaction complete → unlock input → autosave if required ป้องกัน double click/key repeats และไม่ให้ SaveCoordinator snapshot กลาง transaction
+5. ถ้าเริ่ม hotspot/puzzle ให้รอ result ที่ตรง session/context ผลเก่าจาก scene ที่ปิดแล้วหรือ duplicate result ต้องไม่มี durable effect ซ้ำ
+6. `SaveCoordinator` snapshot ได้เฉพาะ **Safe Checkpoint** ตาม [G-02](GAME_STATE.md#safe-checkpoint--g-02-closed) ไม่ autosave ทุก line หรือระหว่าง active puzzle หลัง load Auto/Skip off และไม่ replay one-shot commands/SFX
 
 นี่เป็น orchestration contract เพื่อรักษา ownership ไม่ใช่การกำหนด choices หรือผลตัวเลขใหม่
 
 ## Event จาก Ink ไป Zustand / GameBridge
 
 ```text
-Ink output + tags
-  → NarrativeController parse + validate + ตรวจ context
-      → domain event → Zustand action → durable state
-      → presentation event → GameBridge command → Phaser / AudioManager
+Ink output + tags (event = stable ID only)
+  → NarrativeController parse → validate whole output + EventRegistry
+      → commit domain events → Zustand actions + committed-event ledger
+      → execute presentation commands → GameBridge → Phaser / AudioManager
+      → publish line/view model → React → wait
 Phaser interaction result
   → GameBridge event → NarrativeController validate → narrative continuation
 ```
@@ -84,21 +99,23 @@ World facts ไม่ผูกกับ choice reward เช่น ลุงเ�
 ## NarrativeController responsibilities
 
 - เป็นเจ้าของ runtime instance และ flow: continue, choose, waiting interaction, pause และ restore
-- รักษา view model/text/read history ที่สัมพันธ์กับ cursor; React ไม่วิเคราะห์ Ink tags เอง
+- รักษา view model/text/Line ID ที่สัมพันธ์กับ cursor; ใช้ global read-line history แต่ backlog เป็น transcript ของ run ปัจจุบัน React ไม่วิเคราะห์ Ink tags เอง
 - ตรวจ schema, registry, domain preconditions และ interaction context ก่อน effect
-- Sync authoritative projection เข้า narrative ก่อน branch และหลัง load
-- Commit durable event ไม่ซ้ำเมื่อ render, remount, restore หรือได้รับ result ซ้ำ กลไก event identity/ledger ต้องระบุใน N-02/G-02
-- Capture/restore Ink state พร้อม app state ที่จุดเดียวกัน ใช้ API `story.state.ToJson()` / `LoadJson()` ของ runtime ที่ตรวจ compatibility แล้ว ไม่เก็บ `Story` instance ลง Zustand/localStorage
-- Reconstruct presentation จาก checkpoint/scene projection; ไม่ย้อนเล่นคำสั่งที่ทำ relationship ไปแล้ว
+- ให้ narrative อ่าน authoritative state ผ่าน read-only query port ก่อน branch และหลัง load; ไม่ mirror state ทั้งก้อน
+- ใช้ stable Event ID และ committed-event ledger เพื่อไม่ commit durable event ซ้ำ
+- ให้ Ink snapshot/restore ผ่าน interface แก่ `SaveCoordinator` โดยใช้ `story.state.ToJson()` / `LoadJson()` ของ runtime ที่ตรวจ compatibility แล้ว ไม่เป็นเจ้าของ save/load orchestration และไม่เก็บ `Story` instance ลง Zustand/localStorage
+- Reconstruct semantic presentation ตาม checkpoint; dialogue load กลับ line เดิมแบบแสดงข้อความเต็ม Choice load กลับ choice เดิมที่ยังไม่เลือก ไม่ replay one-shot presentation/SFX; BGM/ambient restore แบบ semantic โดยไม่คืน playback timestamp
 - ให้ pause/skip presentation ทำงานโดยไม่เลือกคำตอบหรือสร้าง breach แทนผู้เล่น
 
 Backlog เป็นประวัติอ่าน ไม่ใช่ปุ่ม rewind/undo choice การเพิ่ม rollback gameplay ยังไม่มีการล็อกและไม่รวมใน controls ที่ตกลงแล้ว
 
 API behavior ต้องตรวจจาก [inkjs documentation](https://github.com/y-lohse/inkjs) และ [Ink runtime integration guide](https://github.com/inkle/ink/blob/master/Documentation/RunningYourInk.md) ตามคู่เวอร์ชันที่ใช้
 
-## OPEN QUESTION
+## Decision status
 
-**N-02 — Contract finalization (ก่อน M1 real implementation):** ยังไม่ล็อก compiler path/tool, Ink folder/knot mapping, tag grammar/payload, event allowlist/ordering, speaker-context reset และ stable line/event identity รวมรูปแบบ query/mirror จาก Zustand ต้องจัดเป็น contract ที่ตรวจได้ก่อนใช้กับบทจริง ตัวอย่างในไฟล์นี้ยังไม่ใช่ final grammar; ห้าม invent event ของเรื่องหรือค่าผลลัพธ์จาก parser
+**N-02 — CLOSED.** Source organization, initial tags, stable Line/Event IDs, TypeScript EventRegistry, idempotency, scene context reset, query port และ deterministic processing ล็อกตาม decision รอบนี้ Exact compiler/runtime executable และ minor/patch อยู่ M0/A-01 ไม่เปิด N-02 ซ้ำ Actual release lines/events/domain parameters ยังต้องมาจาก content/domain decisions ที่อนุมัติใน N-03/G-01 ไม่ใช่ให้ Codex แต่งเพื่อเติม registry
+
+## OPEN QUESTION
 
 **N-03 — Content handoff (ก่อน M2 ฉบับ narrative จริง และก่อน M4–M5):** ต้นฉบับเป็น Scene Map และระบุว่ายังไม่มีบทสนทนาเต็ม ใครส่ง/อนุมัติ scene cards, ข้อความ choice และบทไทยที่จะ compile? ชุดเอกสารนี้ไม่แต่งบทแทน ระหว่างรอใช้ technical fixture ที่ติดป้ายและแยกจาก content ส่งประกวดได้
 

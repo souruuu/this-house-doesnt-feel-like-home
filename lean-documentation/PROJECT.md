@@ -5,9 +5,15 @@
 ## แหล่งข้อมูลและสถานะ
 
 - Narrative source: [narrative_map_7_day_Updates.md](sources/narrative_map_7_day_Updates.md)
-- SHA-256 ต้นฉบับ/สำเนา: `B0EC03E7D54A4AAF1D7976D4CD585D8A982D83D415EDABE3F1B272A5DEE04CDB`
+- SHA-256 ของไฟล์ต้นฉบับที่ใช้สร้างชุดเอกสาร: `B0EC03E7D54A4AAF1D7976D4CD585D8A982D83D415EDABE3F1B272A5DEE04CDB`
 - Technical decisions: ยึดเอกสารใน repo ชุด Lean 8 ไฟล์ล่าสุด ไม่ใช้ชุด 14 ไฟล์ที่ถูกปรับแล้ว
 - `OPEN QUESTION` หมายถึงยังไม่มีคำตอบที่ล็อกจากแหล่งข้างต้น ห้ามนำค่าตัวอย่างในเอกสารไปใช้เป็นคำตอบ การจัดรูปแบบ field/path/tag ที่ยังไม่ final ต้องตรวจใน milestone ที่เกี่ยวข้อง
+
+## Technical Documentation Baseline v0.1
+
+**พร้อมสำหรับ Freeze ของ core technical contracts** ตาม decision ล่าสุด: N-02 CLOSED ใน [NARRATIVE_SYSTEM](docs/NARRATIVE_SYSTEM.md), G-02/G-03 CLOSED ใน [GAME_STATE](docs/GAME_STATE.md) และ placeholder-first but style-ready ตาม [UI_ASSET_SPEC](docs/UI_ASSET_SPEC.md) Narrative facts และ scope เดิมคงตาม Updates
+
+Baseline มีทะเบียน OPEN QUESTION สำหรับ toolchain/domain/content/assets/audience/competition ใน [MASTER_PLAN](MASTER_PLAN.md) จึงไม่ใช่การอนุมัติค่า state/บท/visual direction ที่ยังไม่ล็อก และไม่ใช่คำยืนยันว่า implementation หรือ build ผ่านแล้ว คำถามที่ค้างปิดก่อนงานที่พึ่งพาคำตอบ; รอบนี้ไม่เริ่ม M0
 
 ## Concept
 

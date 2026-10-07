@@ -28,6 +28,7 @@ Phaser major 4 เป็นข้อกำหนด ห้าม downgrade เ�
 | Zustand | Authoritative durable game state | Field และ invariants ตาม [GAME_STATE](docs/GAME_STATE.md); React/Phaser อ่านผ่าน selectors และแก้ผ่าน domain actions |
 | Ink/inkjs | Narrative branching/dialogue | ตำแหน่งการอ่านและ branch; ไม่เป็นเจ้าของ authoritative relationship/Promise/Memory/Album |
 | `NarrativeController` | Narrative orchestration | รัน Ink, parse output และรอ choice/world event; ให้ Ink snapshot/restore ผ่าน interface ของ controller |
+| TypeScript `EventRegistry` / read-only `NarrativeQueryPort` | Narrative contracts | Registry ระบุ stable Event ID/category/dispatch ไม่เป็น state store; query port อ่าน authoritative state โดยไม่เปิด mutation ให้ Ink |
 | `GameBridge` | Imperative command/event boundary | ส่งคำสั่งไป Phaser และส่ง interaction result กลับ controller/app; ไม่เป็นที่เก็บ save state |
 | `AudioManager` | Audio orchestration | ครอบ Phaser Sound และใช้ค่าตั้งเสียงจาก app; ไม่มีระบบเสียงอีกชุดใน React |
 | `SaveCoordinator` | Save/load orchestration | รวบรวม durable snapshot จาก Zustand และ Ink snapshot ผ่าน `NarrativeController`; ประสาน validation/restore และเรียก `SaveRepository` |
@@ -36,6 +37,9 @@ Phaser major 4 เป็นข้อกำหนด ห้าม downgrade เ�
 ```mermaid
 flowchart LR
   Ink[Ink / inkjs] --> NC[NarrativeController]
+  NC -->|validate stable IDs / dispatch| ER[TypeScript EventRegistry]
+  NC -->|read-only queries| Q[NarrativeQueryPort]
+  Q -->|read authoritative state| Z[Zustand]
   NC -->|domain actions| Z[Zustand]
   Z -->|selectors| R[React DOM UI]
   R -->|continue / choice| NC
@@ -56,16 +60,16 @@ flowchart LR
   SR --> LS[localStorage]
 ```
 
-ลูกศร state กับคำสั่งมีหน้าที่ต่างกัน เช่น relationship เป็น state; `showCharacter`, `setExpression`, `startPuzzle`, `playSfx` เป็น command ไม่ใช้ boolean ใน store เพื่อยิง effect แล้วรีเซ็ตกลับ ตัวอย่างชื่อเมธอดเป็นการอธิบายขอบเขต; signature/event registry ต้องปิด N-02 ก่อน implementation จริง
+ลูกศร state กับคำสั่งมีหน้าที่ต่างกัน เช่น relationship เป็น state; `showCharacter`, `setExpression`, `startPuzzle`, `playSfx` เป็น command ไม่ใช้ boolean ใน store เพื่อยิง effect แล้วรีเซ็ตกลับ ตัวอย่างชื่อเมธอดเป็นการอธิบายขอบเขต **N-02 CLOSED:** Ink ส่ง stable Event ID เท่านั้น; TypeScript EventRegistry กำหนด domain/presentation dispatch ส่วน stable IDs, query port, ledger และ deterministic order ให้ยึด [NARRATIVE_SYSTEM](docs/NARRATIVE_SYSTEM.md) Actual release event/domain definitions ยังต้องมาจาก N-03/G-01
 
 ## การเชื่อมระบบ
 
 1. UI ขอ continue/choice ผ่าน `NarrativeController` เท่านั้น
-2. Controller อ่าน Ink output; durable event ไป domain actions ของ Zustand; presentation command ไป `GameBridge`
+2. Controller parse และ validate output ทั้งชุดผ่าน EventRegistry ก่อน commit domain events ไป Zustand แล้ว execute presentation commands ผ่าน `GameBridge` และ publish view model ให้ React; Ink อ่าน state ผ่าน read-only query port ไม่ mirror state ทั้งก้อน
 3. Phaser ส่งผล hotspot/puzzle กลับผ่าน bridge; controller ตรวจว่าเป็นผลของ interaction ที่กำลังรอ ก่อนเดิน narrative ต่อ
 4. UI อ่าน view model และ selectors ไม่มี component ที่สร้าง `Story` เอง; Phaser ไม่เปิดอ่านหรือแก้ Ink โดยตรง
 5. `SaveCoordinator` เป็นเจ้าของ save/load flow: ขอ durable snapshot จาก Zustand และ Ink snapshot ผ่าน `NarrativeController`, แล้วส่ง coherent envelope ให้ `SaveRepository`
-6. ตอน load, `SaveCoordinator` ประสานการ validate/migrate และ restore state กับ Ink จาก envelope ก่อน reconstruct world presentation; ไม่ replay side effects ที่ commit ไปแล้ว
+6. `SaveCoordinator` snapshot เฉพาะ Safe Checkpoint ไม่ทำกลาง choice/load transaction หรือ active puzzle; ตอน load ตรวจ validation/migration/compatibility ครบก่อนเปลี่ยน live session แล้ว restore Zustand/Ink, sync queries และ reconstruct semantic world/UI; Auto/Skip off และไม่ replay durable/one-shot presentation events/SFX
 
 รายละเอียดลำดับและ event safety อยู่ใน [NARRATIVE_SYSTEM](docs/NARRATIVE_SYSTEM.md); snapshot/checkpoint อยู่ใน [GAME_STATE](docs/GAME_STATE.md)
 
@@ -78,6 +82,14 @@ Lifecycle ต้องสร้าง bridge/controller/game instance อย่�
 Local-first หมายถึงเก็บใน browser ของผู้เล่น ไม่รับรองการ sync ระหว่างเครื่อง ระหว่าง Vercel/itch.io หรือคนละ origin การล้าง browser storage อาจทำให้ save หาย; ต้องตรวจความพร้อมของ storage และแจ้งเมื่อบันทึกไม่ได้
 
 Abstraction รองรับเปลี่ยน implementation ภายหลัง แต่ไม่ได้รวม cloud implementation ในงานปัจจุบัน
+
+**G-02/G-03 CLOSED:** Safe Checkpoint/version compatibility และ profile versus playthrough scope ให้ยึด [GAME_STATE](docs/GAME_STATE.md) Settings/read-line history เป็น global/profile; Album/Memory/permissions/backlog เป็นของ run/save ปัจจุบัน Profile read history ไม่เป็นแหล่ง narrative truth หรือ global completion system
+
+## Placeholder-first but style-ready
+
+M0–M1 ใช้ placeholder visuals ได้โดยไม่ทำ final visual identity แต่ React UI ต้อง style-ready: reusable components, styling แยกจาก game/narrative logic และ centralized design tokens/CSS variables หรือ abstraction เทียบเท่า หลีกเลี่ยง hardcoded one-off styles ที่เปลี่ยน identity ภายหลังยาก
+
+Placeholder assets ใช้ semantic/stable IDs และ asset manifest เปลี่ยน final art/style ได้โดยไม่แก้ authoritative game state หรือ Ink narrative logic ห้าม Codex invent final visual direction ใน M0 รายละเอียด phase ของ layout/design foundation/artist integration/polish อยู่ใน [MASTER_PLAN](MASTER_PLAN.md) และ [UI_ASSET_SPEC](docs/UI_ASSET_SPEC.md) รอบนี้ไม่สร้าง frontend/custom skill หรือ redesign UI
 
 ## Audio
 
