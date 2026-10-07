@@ -1,0 +1,4 @@
+.gitattributes text eol=lf
+lean-documentation/*.md text eol=lf
+lean-documentation/docs/*.md text eol=lf
+lean-documentation/sources/narrative_map_7_day_Updates.md -text -eol
