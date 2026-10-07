@@ -24,12 +24,12 @@ Source of Truth ของ game viewport, UI, controls, accessibility และ h
 | Main Menu | เล่นต่อ / เริ่มเกมใหม่ / โหลดเกม / อัลบั้ม / ตั้งค่า / เกี่ยวกับเกม |
 | Dialogue | ชื่อผู้พูด ข้อความ choices และ VN controls อ่านง่าย ไม่เปิด hidden relationship values |
 | Gameplay menu / pause | เข้าถึงเล่นต่อ บันทึก โหลด ประวัติข้อความ อัลบั้ม ตั้งค่า และกลับหน้าหลัก |
-| Load / save | Autosave + 3 manual slots แสดงข้อมูลที่มาจาก snapshot จริง; แยกช่องว่างและสถานะอ่านไม่ได้ |
+| Load / save | Autosave + 3 manual slots; save เฉพาะ Safe Checkpoint ไม่ให้ save ระหว่าง active puzzle; แสดงข้อมูล snapshot จริงและแยกช่องว่าง/สถานะอ่านไม่ได้ |
 | Album | สมุดที่รู้จักเด็ก ไม่มี secrets/completion/ending trophies; data rules เป็นของ [GAME_STATE](GAME_STATE.md) |
 | Settings | Text Speed, Instant Text, reduced motion และ volume/mute controls; ค่าตั้งต้นอยู่ U-03 |
 | About / optional information | Credits/ข้อมูลเกม; หน้าข้อมูลช่วยเหลือหลังจบเปิดอ่านเองได้ตาม map และต้องตรวจข้อมูลก่อนเผยแพร่ |
 
-เมื่อไม่มี valid autosave ให้แสดงเล่นต่อเป็น unavailable หรือซ่อนตาม layout ที่ยืนยัน; ห้ามโหลดจาก manual slot แทนโดยไม่บอก การเริ่มเกมใหม่/overwrite/delete save ต้องสื่อผลและรับ intention ชัดเจน ค่าการล้าง Album/read history ต้องปิด G-03 ไม่ตั้งแทนด้วย UI
+เมื่อไม่มี valid autosave ให้แสดงเล่นต่อเป็น unavailable หรือซ่อนตาม layout ที่ยืนยัน; ห้ามโหลดจาก manual slot แทนโดยไม่บอก การเริ่มเกมใหม่/overwrite/delete save ต้องสื่อผลและรับ intention ชัดเจน **G-03 CLOSED:** New Game/เปลี่ยน slot คง global settings/read Line IDs แต่ Album, Memories/permissions และ backlog ต้องเป็นของ playthrough/run/save ปัจจุบัน ไม่รวมข้อมูลจาก run เก่า
 
 ไม่มี Endings Gallery หรือป้าย Good/Bad/True Ending เกี่ยวกับเกมไม่ต้องรวมหน้าสรุปบทเรียนยาวอัตโนมัติ
 
@@ -37,14 +37,16 @@ Source of Truth ของ game viewport, UI, controls, accessibility และ h
 
 | Control | Behavior |
 |---|---|
-| History / Backlog | ดูข้อความที่อ่านแล้ว; ไม่ undo/rewind choices และไม่รัน event ซ้ำ |
+| History / Backlog | Transcript ของ run/save/session ปัจจุบัน มี stable Line ID; ไม่รวมทุก playthrough ไม่ undo/rewind choices และไม่รัน event ซ้ำ |
 | Auto | เดินข้อความตาม timing ที่ตั้งได้/ยืนยัน; หยุดที่ choice, pause หรือ world interaction |
-| Skip read text only | ข้ามเฉพาะข้อความที่เคยอ่านตาม identity/scope ที่ตกลง; หยุดที่ unread text และ choice ไม่เลือกแทน |
+| Skip read text only | ใช้ **global/profile read Line IDs** ข้าม New Game/slots; หยุดที่ unread text และ choice ไม่เลือกแทน ไม่ใช้ตำแหน่งบรรทัดหรือข้อความไทยเป็น identity |
 | Text Speed | ปรับการเปิดเผยตัวอักษรให้ผู้เล่นอ่านสะดวก |
 | Instant Text | แสดงข้อความทันทีโดยคงจังหวะ choice/event ที่ถูกต้อง |
-| Save / Load | เข้าถึงทั้งใน gameplay menu และ UI ที่ออกแบบ; timing ตาม G-02 |
+| Save / Load | เข้าถึงใน gameplay menu/UI เฉพาะเมื่อ safe ตาม G-02 ที่ CLOSED แล้ว; pause จาก active puzzle ยัง save ไม่ได้ |
 
 Auto/Skip/Instant Text ต้องไม่ยิงต่อสองครั้งจากทั้ง keyboard และ pointer การข้ามข้อความหรือ effect ไม่ข้าม domain event ที่ควรเกิด แต่ไม่สร้าง choice/Promise breach/relationship change ขึ้นเอง
+
+หลัง load **Auto/Skip off** Dialogue กลับ line เดิมแสดงข้อความเต็มทันที Choice กลับ choice เดิมที่ยังไม่เลือก ไม่ replay one-shot events/SFX; restore BGM/ambient แบบ semantic ได้โดยไม่คืน playback timestamp รายละเอียด atomic load/checkpoint อยู่ใน [GAME_STATE](GAME_STATE.md)
 
 **Skip presentation** สำหรับ motion/ช่วงนำเสนอหนักเป็นคนละงานกับ Skip read text only: ให้ทางอ่านเนื้อหาคงที่หรือผ่าน effect แล้วพบ choices ที่จำเป็น ไม่มี relationship penalty ไม่เลือกคำตอบในเรื่องแทนผู้เล่น
 
@@ -95,7 +97,21 @@ Expression/pose catalog ต้องมาจาก scene cards ที่ยื�
 
 ลำดับเฉพาะของ props/character/counter/foreground ต้องอยู่ใน scene composition ที่ artist/dev ยืนยัน ไม่ flatten counter ที่ต้องใช้บัง sprite ติดไปกับ background จนปรับ stage ไม่ได้ ไม่มี image layer ใหม่ที่เปิดเผยของที่ยังไม่ได้รับอนุญาต
 
-## Placeholder-first workflow
+## Placeholder-first but style-ready
+
+Placeholder ไม่ขัดกับการเตรียมโครง UI ให้เปลี่ยน style ได้ ใช้ reusable React components, styling แยกจาก game/narrative logic และ centralized design tokens/CSS variables หรือ abstraction เทียบเท่า ไม่ hardcode one-off styles จนต้องแก้ logic เมื่อเปลี่ยน visual identity Final art/style ต้องแทนผ่าน semantic/stable IDs และ asset manifest โดยไม่เปลี่ยน authoritative GameState หรือ Ink logic
+
+| Phase ที่ล็อก | ความพร้อมของ UI/art |
+|---|---|
+| M0–M1 | Placeholder visuals; โครง UI style-ready ไม่ต้องทำ final identity และห้าม invent final visual direction ใน M0 |
+| M2 | Functional game layout; layout/stage/component structure เริ่มใกล้ production ยังใช้ placeholder art ได้ |
+| M3 | Basic design system/reusable UI foundation ยังไม่ต้อง final visual polish |
+| M4–M5 | Content + artist asset integration ตาม contract ที่ยืนยัน |
+| M6 | Final visual polish/readability/responsiveness/animation/final assets |
+
+หลักนี้ไม่ปิด U-01–U-03 หรือให้อำนาจเลือก final font/palette/stage coordinates แทนทีม รอบนี้ไม่ redesign UI และไม่สร้าง frontend/custom skill
+
+### Handoff workflow
 
 1. สร้าง placeholder โดยอ้าง stable asset ID และ stage/layer contract ที่ยืนยัน มี label ชัดว่า placeholder ไม่เป็นข้อเท็จจริงหรือ final design ของตัวละคร
 2. ตรวจ flow, scale, touch/focus, occlusion และ sprite swap ก่อนผลิต final assets

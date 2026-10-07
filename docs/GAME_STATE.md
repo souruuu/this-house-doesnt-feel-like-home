@@ -14,8 +14,10 @@ Zustand เป็น authoritative in-memory durable state เปลี่ยน
 | `memories` | `seen`, `told`, `permission` แยก provenance/owner/scope | Domain actions; queries/Album อ่านเท่าที่รู้จริง |
 | `flags` | ข้อเท็จจริง/การกระทำที่มีผลหรือคุมข้อมูล พร้อมต้นทาง ผู้รับรู้ และผลที่รอ | Domain actions; narrative projection |
 | `album` | ข้อมูลที่ได้รู้จักและงาน/ของที่มีจริง อ้าง memory/Promise/event | Domain actions/projection; React Album |
-| `save` | version, timestamp, durable game snapshot และ Ink snapshot | `SaveCoordinator` จัด capture/validation/restore; `SaveRepository` อ่าน/เขียน envelope |
-| `settings` / read history | การตั้งค่าที่คงข้าม refresh และข้อความที่เคยอ่าน | App/controller; scope ระหว่าง slots/new game ต้องปิด G-03 |
+| Committed-event ledger | Stable unique IDs ของ durable events ที่ commit แล้วใน playthrough นี้ | Domain commit ผ่าน controller; อยู่ใน durable state ไม่อยู่ใน EventRegistry |
+| `save` | Build/schema/story identity, timestamp, GameState/Ink/backlog และ semantic checkpoint | `SaveCoordinator` จัด capture/validation/restore; `SaveRepository` อ่าน/เขียน envelope |
+| Profile settings / read-line IDs | Settings และ global read history ที่คงข้าม New Game/slots | App/controller; profile scope ตาม G-03 ด้านล่าง ไม่เป็น authoritative narrative facts |
+| Current backlog | Transcript ของ run/save/session ปัจจุบัน พร้อม stable Line IDs | Controller; per-save/per-playthrough ไม่รวม transcript จาก run อื่น |
 
 ตัวอย่าง TypeScript ต่อไปนี้แสดง **logical shape** ไม่ใช่ final DTO ที่อนุมัติทุก field ชื่อ ID และ representation อาจปรับเมื่อปิด contract โดยไม่เปลี่ยน semantics ที่ล็อก จุดสำคัญที่ยังไม่ล็อกใช้ `unknown` แทนค่าเริ่มต้นที่เดา
 
@@ -77,18 +79,35 @@ type GameState = {
   memories: Record<string, MemoryRecord>;
   flags: Record<string, FlagRecord>;
   album: Record<CharacterId, AlbumRecord>;
+  committedEventIds: string[]; // unique durable event ledger ต่อ playthrough
+};
+
+type SemanticCheckpoint = {
+  sceneId: SceneId;
+  kind: string; // controlled Safe Checkpoint kind ตาม contract ด้านล่าง
+  lineId?: string; // dialogue checkpoint ต้องมี stable Line ID
+  presentation: Record<string, unknown>; // validated JSON semantic state
+};
+
+type TranscriptEntry = {
+  lineId: string;
+  text: string; // ข้อความที่ runtime แสดงจริง ไม่ใช่บทที่แต่งใน schema
+  speakerId: CharacterId | 'none';
 };
 
 type SaveEnvelope = {
-  version: number;       // schema version; implementation แรกเริ่มที่ 1
+  appBuildVersion: string;
+  saveSchemaVersion: number; // migration identity; implementation แรกเริ่มที่ 1
+  storyCompatibilityVersion: string;
   timestamp: number;     // หน่วยต้องบันทึกให้ชัดเมื่อ implement
   game: GameState;
-  narrative: { inkStateJson: string; storyContentVersion: string };
-  checkpoint: unknown;  // G-02: coherent restore/view/world boundary
+  narrative: { inkStateJson: string };
+  checkpoint: SemanticCheckpoint;
+  backlog: TranscriptEntry[]; // เฉพาะ transcript ของ save/playthrough นี้
 };
 ```
 
-`unknown` ไม่ใช่ใบอนุญาตให้ใส่ JSON อะไรก็ได้ในเกมจริง ต้องแทนด้วย validated types หลังปิดคำถามก่อน implementation ที่พึ่งพา field นั้น ไม่ serialize functions, class instances, textures/audio หรือ store ทั้งก้อน
+`unknown` ใน domain fields ยังต้องปิด G-01; semantic presentation records ต้องใช้ validated JSON types ตาม scene/asset contract ไม่ใช่เก็บ engine objects รูปแบบ field ในตัวอย่างเป็น logical DTO representation โดยไม่กำหนดค่าเริ่มต้น state ใหม่ ห้าม serialize functions, class instances, textures/audio หรือ store ทั้งก้อน
 
 ## Hidden TSPR
 
@@ -149,11 +168,23 @@ Album เปิดหน้าตัวละครเมื่อรู้ช�
 
 Final Shop State/epilogue ใช้เหตุการณ์และสิทธิจริงรายคน/รายสิ่งของ ของที่ฝากยังเป็นของเด็ก ไม่สร้าง ownership transfer จากการเก็บไว้ รายละเอียด ending variants ให้อ้าง map โดยตรง ไม่เก็บค่า `totalScore` หรือ `trueEndingUnlocked`
 
+## Scope — G-03 CLOSED
+
+| Scope ที่ล็อก | ข้อมูล | New Game / load slot อื่น |
+|---|---|---|
+| **Global/profile** | Settings: Text Speed, Volume, Reduced Motion, Instant Text และ preferences ประเภทเดียวกัน; **read Line IDs** สำหรับ Skip read text only | คง settings และประวัติว่าเคยอ่านแล้วใน profile; load save เก่าไม่ย้อนลบ global read history |
+| **Per-save/per-playthrough** | GameState, Ink state, relationships, Promises, Memories, permissions, flags, committed-event ledger, Album และ current progress | Restore เฉพาะ playthrough ของ save นั้น; New Game เริ่ม run ใหม่โดยไม่รวมความรู้/สิทธิจาก run เก่า |
+| **Per-save/per-run/session transcript** | Current backlog พร้อม stable Line IDs | ดู transcript ของ run/save/session ปัจจุบันเท่านั้น ไม่รวมข้อความจากทุก playthrough เป็น backlog เดียว |
+
+Global read history บอกเพียงว่าเคยอ่านข้อความที่มี Line ID นั้น **ไม่ให้ Memory/permission/Album ของ run ปัจจุบันเพิ่มตามไปด้วย** Album ต้องสะท้อนสิ่งที่ run นั้นรู้/ได้รับอนุญาตจริง ไม่มี global ending/epilogue unlock หรือ Endings Gallery
+
+Settings และ read Line IDs เก็บแบบ local-first ผ่าน persistence boundary เดิมโดยแยก scope จาก slot snapshots; ห้าม restore profile ทั้งก้อนจาก save slot แล้วทับ preferences/read history ของ profile ขอบเขตนี้ไม่เพิ่ม backend หรือ persistence system ใหม่
+
 ## Save และ local-first persistence
 
 มี **autosave 1 ช่อง + manual 3 ช่อง** เล่นต่อโหลด autosave ล่าสุดที่ valid โหลดเกมแสดงทั้งสี่ช่อง; slot ว่าง/เสีย/เข้ากันไม่ได้ต้องแยกให้เข้าใจตาม [UI_ASSET_SPEC](UI_ASSET_SPEC.md)
 
-ตัวอย่าง interface ตาม abstraction ที่ล็อก; ชื่อเมธอด/slot tokens เป็น technical representation ไม่กำหนด save timing แทน G-02:
+ตัวอย่าง interface ตาม abstraction ที่ล็อก; ชื่อเมธอด/slot tokens เป็น technical representation Save timing ให้ยึด Safe Checkpoint contract ด้านล่าง:
 
 ```ts
 type SaveSlot = 'autosave' | 'manual-1' | 'manual-2' | 'manual-3';
@@ -166,24 +197,65 @@ interface SaveRepository {
 
 `LocalStorageSaveRepository` เป็น implementation แรก จัด storage keys/serialization ภายใน repository; `SaveCoordinator` capture snapshot จาก Zustand และ `NarrativeController`, แล้ว restore ผ่านทั้งคู่ ไม่ให้ components/Ink/Phaser เรียก localStorage เอง ไม่เก็บ assets ลง save ไม่มี cloud/cross-device sync ใน v1
 
-Snapshot ต้อง capture durable state, Ink cursor, read/presentation checkpoint และ pending interaction ที่เลือกเก็บในจังหวะเดียวกัน ต้องไม่มีช่วงที่บันทึก choice commit แล้วแต่ cursor ยังอยู่ก่อน choice `SaveCoordinator` ประสาน capture/restore ให้ coherent; `SaveRepository` ทำ persistence โดยไม่ตัดสิน story เมื่อ load ให้ `SaveCoordinator` validate/migrate ก่อนเปลี่ยน live session แล้ว restore state และ Ink ใน boundary เดียว จากนั้น sync projection และ reconstruct world/UI ไม่ replay relationship/event ซ้ำ ตัว state/version/metadata ที่ใช้โชว์ slot ต้องมาจาก save ที่ validate แล้ว
+Snapshot ต้อง capture durable state พร้อม committed-event ledger, Ink cursor, current backlog และ semantic checkpoint ที่สัมพันธ์กัน `SaveCoordinator` ประสาน capture/restore ให้ coherent; `SaveRepository` ทำ persistence โดยไม่ตัดสิน story Metadata ที่ใช้โชว์ slot ต้องมาจาก save ที่ validate แล้ว Global settings/read-line history ไม่ถูกย้ายเข้า per-slot GameState
 
-Manual save ระหว่างข้อความ/choice/puzzle และ autosave trigger ยังไม่ล็อก; ดู G-02 ไม่มีการตัดสินให้โหลดแล้วเริ่ม puzzle ใหม่หรือเดินย้อน scene โดยเงียบ ๆ
+## Safe Checkpoint — G-02 CLOSED
+
+Save ได้เฉพาะ **Safe Checkpoint:** Ink, Zustand และ semantic presentation อยู่ใน coherent state เดียวกัน และไม่มี transaction/domain commit/scene transition/interaction result กำลังประมวลผลกลางทาง `SaveCoordinator` ห้าม snapshot กลาง transaction
+
+| ชนิด | Contract ที่ล็อก |
+|---|---|
+| Autosave | ไม่ save ทุก dialogue line; ใช้ meaningful boundaries เช่น scene initialized, important choice transaction complete, durable event สำคัญ commit เสร็จ, ก่อน/หลัง puzzle, scene end และ day transition เฉพาะเมื่อ safe |
+| Manual save | อนุญาตเมื่อ dialogue line รอ Continue, choice รอเลือก, world/point-click idle, pause menu ที่มาจาก safe state หรือก่อน/หลัง puzzle |
+| Active puzzle | **ไม่อนุญาต save** รวม pause ที่เปิดจาก active puzzle; ใช้ checkpoint ก่อน/หลัง puzzle ไม่ serialize active piece/drag/tween หรือ transient puzzle presentation |
+| Choice checkpoint | Load กลับ choice เดิมที่ยังไม่เลือก และไม่มี durable result ของ choice ถูก commit ล่วงหน้า |
+| Dialogue checkpoint | Load กลับ line เดิม พร้อม stable Line ID โดยแสดงข้อความเต็มทันที ไม่เก็บ typewriter cursor/จำนวนตัวอักษรที่เปิดไปแล้ว |
+
+รายการ autosave boundaries ไม่ใช่เหตุให้ invent story event ใหม่ การ commit event สำคัญหรือ transition ต้องเสร็จและ checkpoint coherent ก่อนบันทึกเสมอ
+
+Checkpoint เก็บ **semantic presentation state** ที่จำเป็น เช่น scene ID, Line ID/checkpoint kind, current speaker, character expression, named stage position และ semantic world state รวมข้อมูลที่ต้อง reconstruct line/choice เดิม BGM/ambient เก็บ semantic state ได้โดยไม่เก็บ playback timestamp
+
+ห้าม serialize Phaser instances, React DOM, texture/audio objects, tweens, camera shake progress, drag coordinates หรือ transient animation objects ค่า/IDs ใน checkpoint ต้องมาจาก view/world state ที่ผ่าน validation จริง ไม่แต่ง defaults หรือผล narrative เพื่อให้ restore ผ่าน
+
+### Atomic choice transaction
+
+```text
+user chooses → lock input → Ink advances → parse
+→ validate tags/IDs/output ทั้งชุด → commit domain events + ledger
+→ presentation update → checkpoint update → transaction complete
+→ unlock input → autosave if required
+```
+
+ไม่มี durable result ก่อนผู้เล่นเลือกจริง Validation ต้องครบก่อน commit; snapshot ได้หลัง transaction complete เท่านั้น Durable action และ committed-event marker ต้องไม่แยกเป็น save คนละจังหวะ
+
+### Atomic load transaction
+
+```text
+pause → read SaveEnvelope → validate → migrate → compatibility check
+→ restore Zustand → restore Ink ผ่าน NarrativeController → sync queries
+→ reconstruct world/UI → ready
+```
+
+`SaveCoordinator` ต้องตรวจ envelope และผล migration/compatibility ครบก่อนเปลี่ยน live game session ไม่ publish state/Ink/world ที่ restore ครึ่งหนึ่ง คืน backlog ของ save นี้และให้ read-only queries อ่าน state ที่ restore แล้ว
+
+หลัง load **Auto = off, Skip = off** ห้าม replay durable events หรือ one-shot presentation events/SFX Reconstruct BGM/ambient แบบ semantic ได้ แต่ไม่ restore playback timestamp Dialogue และ choice ต้องคืนตาม checkpoint rules ข้างต้น
 
 ## Versioning และ migration
 
-- มี `version` ตั้งแต่ implementation แรกและ migration chain แบบ `v1 → v2 → …` ที่ทดสอบด้วย fixtures ของ schema เก่า
-- แยก save schema version จาก story content/compiler/runtime compatibility บทหรือ knot เปลี่ยนแม้ shape เดิมก็อาจคืน Ink state เก่าไม่ได้
+- Version identity ใช้ **สามส่วน:** `appBuildVersion` ระบุ build ที่สร้าง save; `saveSchemaVersion` ใช้ migration chain เมื่อ DTO/schema เปลี่ยน; `storyCompatibilityVersion` บอกว่า Ink/story structure ยัง restore snapshot เดิมได้หรือไม่
+- `saveSchemaVersion` มีตั้งแต่ implementation แรกและ migration chain แบบ `v1 → v2 → …` ที่ทดสอบด้วย fixtures ของ schema เก่า Migration DTO ไม่เท่ากับการพิสูจน์ว่า Ink snapshot ยัง compatible
 - Validate JSON/types/IDs และ supported version ก่อน load ไม่ปล่อยค่าขาดกลายเป็น permission/Promise/relationship ที่ดีขึ้นด้วย default
 - Migration ต้องรักษาข้อเท็จจริง/สิทธิเดิม; ถ้าข้อมูลเดิมไม่มีเหตุรองรับให้บอก unsupported/ต้องตัดสินใจ ไม่สร้างเหตุย้อนหลัง
 - Future-version, corrupt หรือ incompatible-story save ต้องแจ้งและเก็บข้อมูลเดิมไว้ ไม่ reset/ลบทิ้งอัตโนมัติ
 - Storage unavailable/quota/error ต้องรายงานว่าบันทึกไม่สำเร็จ ห้าม UI โชว์ว่าบันทึกแล้วเพราะ state ในหน่วยความจำเปลี่ยน
-- Same state model ปลาย Prototype รองรับ Day 4; ไม่รับรองว่า save ทุก build จะย้ายต่อได้จนกำหนด story compatibility ใน G-02
+- Prototype → Full Game ออกแบบ state model ให้ต่อ Day 4 ได้ แต่รองรับ save ข้าม build ต่อเมื่อ **compatibility test ผ่านจริง** ไม่รับรองทุก build ถ้า incompatible ต้องแจ้งชัด เก็บข้อมูลเดิม และไม่ fabricate/migrate story state แบบเดา
+
+## Decision status
+
+**G-02 — CLOSED.** Safe Checkpoint, autosave/manual/puzzle behavior, line/choice restore, semantic presentation, atomic choice/load, post-load controls และสาม version identities ล็อกแล้ว Compatibility ของ build จริงต้องตรวจด้วย tests ไม่ใช่คำถาม policy ที่ยังเปิด
+
+**G-03 — CLOSED.** Settings/read-line history เป็น global/profile; GameState/Ink/Album/permissions และ current backlog เป็น per-save/per-playthrough/session ตาม scope table ไม่มีความรู้หรือ ending unlock รวมข้าม run
 
 ## OPEN QUESTION
 
 **G-01 — Domain rules (ก่อน M3; ส่วนที่ใช้ใน M2 ต้องยืนยันก่อน):** TSPR เก็บเป็นตัวเลขหรือรูปแบบใด ช่วง/ค่าเริ่มต้น/การเปลี่ยนตาม scene/threshold เป็นอะไร? Map ล็อกความหมายและแนวโน้ม แต่ไม่ได้ล็อกสูตร อีกส่วนคือ detailed permission scope/change rules และ payload ของ Promise/event จาก scene cards ต้องอนุมัติก่อนใช้เป็น branching truth ไม่ตั้งค่า 0–100 หรือ +1/−1 เอง
-
-**G-02 — Save/checkpoint compatibility (ก่อน M1 save round-trip และ M3 ระบบจริง):** Autosave ที่ boundaries ใด? Manual save ได้ระหว่าง line/choice/puzzle หรือไม่ และ restore ตรงไหน? จะเก็บ current line, read-text IDs, presentation/pending interactions อย่างไรให้ไม่ replay events? Save ข้ามการเปลี่ยน Ink content/runtime หรือจาก Prototype ไป Full Game รองรับระดับใด? ต้องกำหนดก่อนเปิด save UI ที่อ้างว่าคืนตำแหน่งได้แน่นอน
-
-**G-03 — Profile versus slot scope (ก่อน M3):** Settings, read-text history และ Album เป็นข้อมูลต่อ slot/playthrough หรือ profile ร่วม? เริ่มเกมใหม่/load save เก่ามีผลอย่างไรกับสิ่งที่เคยอ่าน/Album/การตั้งค่า? คำตอบส่งผลต่อ Skip read only และสิทธิข้อมูล ห้ามรวมความรู้จากหลาย playthrough จนเปิดเผยเรื่องที่ยังไม่รู้ใน run ปัจจุบัน

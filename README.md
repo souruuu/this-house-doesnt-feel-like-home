@@ -35,7 +35,7 @@ npm run dev
 | `npm run build` | compile/validate narrative + typecheck + Vite static build ไป `dist/` |
 | `npm run preview` | Vite preview ของ build ที่สร้างแล้ว |
 
-ชื่อ scripts เป็นสัญญาการใช้งานที่เอกสารชุดนี้กำหนดตามคำขอ ไม่ใช่คำยืนยันว่ามี scripts แล้ว วิธี compile Ink ต้องปิด OPEN QUESTION N-02 ใน [docs/NARRATIVE_SYSTEM.md](docs/NARRATIVE_SYSTEM.md) ก่อนนำไปใช้กับเรื่องจริง
+ชื่อ scripts เป็นสัญญาการใช้งาน ไม่ใช่คำยืนยันว่ามี scripts แล้ว **N-02 CLOSED:** source/tag/EventRegistry/query/identity contract อยู่ใน [docs/NARRATIVE_SYSTEM.md](docs/NARRATIVE_SYSTEM.md); exact compiler/runtime executable และ minor/patch ให้ตรวจใน M0/A-01 `narrative:compile`/`narrative:validate` ยังคงเป็น script contract ที่ล็อก
 
 ติดตั้ง browser สำหรับ Playwright ครั้งแรกหลังติดตั้ง dependencies:
 
@@ -77,5 +77,7 @@ npm run preview
 
 ## ก่อนเริ่ม scaffold
 
-เริ่ม shell และโครงโมดูลที่ล็อกแล้วได้ตาม M0 ส่วนสูตร state, checkpoints และ contract รายละเอียดต้องปิดคำถามก่อนทำงานที่พึ่งพาคำตอบ อ่านรายการ OPEN QUESTION ตามระยะงานใน [MASTER_PLAN.md](MASTER_PLAN.md)
+**Technical Documentation Baseline v0.1 — พร้อมสำหรับ Freeze ของ core technical contracts:** N-02, G-02 และ G-03 CLOSED แล้ว Safe Checkpoint และ profile/playthrough scope อยู่ใน [docs/GAME_STATE.md](docs/GAME_STATE.md); โครง placeholder UI ต้อง style-ready ตาม [docs/UI_ASSET_SPEC.md](docs/UI_ASSET_SPEC.md)
+
+Baseline ไม่ได้แปลว่า implementation หรือ production content พร้อมทั้งหมด A-01 ยังต้องตรวจใน M0 ส่วน G-01/N-03/U-01–U-03/P-01–P-02 เป็น OPEN QUESTION ตามงานที่พึ่งพาคำตอบใน [MASTER_PLAN.md](MASTER_PLAN.md) รอบอัปเดตนี้แก้เอกสารเท่านั้น ไม่เริ่ม M0 implementation
 

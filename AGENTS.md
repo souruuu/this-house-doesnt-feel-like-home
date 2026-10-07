@@ -20,6 +20,7 @@
 - ตัวอย่าง schema/tag/path ที่ระบุว่ายังไม่ล็อกเป็นเพียงรูปแบบอธิบาย ห้ามยกระดับเป็นสเปก final เงียบ ๆ
 - ทำตาม ownership และ invariants ในเอกสารที่เกี่ยวข้อง ไม่เปลี่ยน stack/scope หรือเพิ่มบริการภายนอกเอง
 - ใช้ placeholder ตาม asset contract; ไม่รอ final art เพื่อเริ่ม shell/integration ที่ได้รับอนุญาตแล้ว
+- Placeholder UI ต้อง style-ready ตาม [UI_ASSET_SPEC](docs/UI_ASSET_SPEC.md); ห้าม invent final visual direction ใน M0 หรือแก้ narrative/state logic เพื่อเปลี่ยน style
 - งานหลายขั้นตอนให้เขียนแผนสั้นใน milestone ที่เกี่ยวข้อง ระบุคำถามค้างและหลักฐานตรวจ ไม่สร้างชุดเอกสารซ้ำหรือ custom skills เผื่ออนาคต
 - เมื่อแก้สเปก ให้อัปเดตไฟล์เจ้าของเรื่องและ cross-reference; ไม่คัดลอกสเปกไปหลายไฟล์
 - ตรวจงานด้วย scripts และเกณฑ์ milestone ที่ [MASTER_PLAN.md](MASTER_PLAN.md) ระบุ รายงานสิ่งที่ตรวจจริงและข้อจำกัด ห้ามอ้างว่าผ่านเมื่อยังไม่ได้รัน
