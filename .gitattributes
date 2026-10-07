@@ -1,4 +1,10 @@
 .gitattributes text eol=lf
-lean-documentation/*.md text eol=lf
-lean-documentation/docs/*.md text eol=lf
-lean-documentation/sources/narrative_map_7_day_Updates.md -text -eol
+*.md text eol=lf
+*.ink text eol=lf
+*.ts text eol=lf
+*.tsx text eol=lf
+*.css text eol=lf
+*.json text eol=lf
+*.html text eol=lf
+
+sources/narrative_map_7_day_Updates.md -text !eol
