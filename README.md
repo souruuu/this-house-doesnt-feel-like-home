@@ -2,7 +2,7 @@
 
 Interactive Game Website — M0 technical scaffold
 
-**สถานะ:** M0 scaffold บน `feat/m0-project-scaffold` เป็น checkpoint รอ review และ approval ก่อน commit; ยังไม่ปิด M0/A-01 มี confirmed ManagedGame listener ownership defect และ Windows Firefox ยังไม่ผ่าน verification ไม่มี release story, save/domain implementation หรือ final art M1–M7 ยังไม่เริ่ม หลักฐานและข้อจำกัดอยู่ใน [MASTER_PLAN](MASTER_PLAN.md)
+**สถานะ:** M0 WIP checkpoint บน `feat/m0-project-scaffold` commit/push แล้ว เจ้าของให้ Conditional Acceptance เพื่อเตรียม M1 โดยยอมรับ ManagedGame confirmed defect ชั่วคราว; ไม่ถือว่า M0 ผ่าน Definition of Done ครบและ M0/A-01 ยัง OPEN Windows Firefox ยังไม่ผ่าน verification แผน M1 ใช้ technical fixture และรอ approval ก่อน implementation; decision/ข้อจำกัดอยู่ใน [MASTER_PLAN](MASTER_PLAN.md#owner-decision-m0-conditional-acceptance) ไม่มี release story, save/domain implementation หรือ final art
 
 **Checkpoint:** คง implementation และ dependency versions ปัจจุบัน หยุดทดลอง Phaser internals/startup override/failure-injection และไม่มี lifecycle fix ใหม่ ผล probe กับ Phaser 4.2.1 จริงยืนยันว่า ManagedGame ลบ external visibilitychange listener จาก postBoot โดยไม่ตั้งใจ 3/3 รอบ ส่วน pre-READY boot failure เป็น residual risk ที่ยังไม่พิสูจน์ด้วย runtime failure-injection ดูหลักฐานแยกกันใน MASTER_PLAN ไม่เปลี่ยน Definition of Done และไม่ถือว่า checkpoint ผ่าน lifecycle gate
 

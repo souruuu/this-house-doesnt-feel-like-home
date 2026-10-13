@@ -2,9 +2,21 @@
 
 Source of Truth ของลำดับงาน Definition of Done และหลักฐานตรวจ เพื่อไปถึง **Prototype บทนำ + Day 1–3** และ competition package ขอบเขตเกมเต็มอยู่ใน [PROJECT](PROJECT.md); เนื้อหารายฉากอยู่ใน [Narrative Map](sources/narrative_map_7_day_Updates.md)
 
-สถานะ: **M0 scaffold เป็น checkpoint รอ review บน `feat/m0-project-scaffold`; มี confirmed listener ownership defect และ Windows Firefox ยังไม่ผ่าน verification; M1–M7 ยังไม่เริ่ม** ยังไม่ปิด M0/A-01 หรือ quality gates เต็มชุด ไม่มี commit/push ของ scaffold
+สถานะ: **M0 ได้รับ Conditional Acceptance เพื่อเตรียมเดินหน้าสู่ M1; confirmed listener ownership defect ยังไม่แก้ และ Windows Firefox ยังไม่ผ่าน verification** ไม่ถือว่า M0 ผ่าน Definition of Done ครบ; M0/A-01 และ quality gates ที่ยังไม่ผ่านคง OPEN M1 มีแผนรอ approval แต่ยังไม่ implement; M2–M7 ยังไม่เริ่ม Checkpoint `8c6a5ead70fc9239c860d589998afdf9127dc921` commit/push แล้วบน `feat/m0-project-scaffold`; เอกสารรอบนี้ยังไม่ commit/push
 
 ## บันทึกงาน M0 — 2026-10-13
+
+### Owner Decision: M0 Conditional Acceptance
+
+เจ้าของยอมรับความเสี่ยง ManagedGame listener ownership **ชั่วคราว** เพื่อให้เตรียมเดินหน้าสู่ M1 โดยไม่ขยายงาน Phaser ใน M0 Confirmed defect ที่ลบ external visibilitychange listener จาก postBoot ยังไม่แก้และผล probe 3/3 รอบยังเป็นหลักฐานเดิม การยอมรับนี้เป็น owner exception สำหรับการเดินหน้าตามเงื่อนไข ไม่ใช่ผลทดสอบผ่านหรือการเปลี่ยน Definition of Done
+
+- M1 ห้ามเพิ่ม external postBoot visibilitychange listeners หรือเปลี่ยน `window.onfocus`/`window.onblur` handlers โดยไม่กลับมา review และรับ approval ก่อน
+- ต้องกลับมาแก้ confirmed defect **ก่อน production release** หรือ **ทันทีหากพบ regression ใน normal gameplay**; การยอมรับชั่วคราวไม่ยกเว้น release gate
+- Pre-READY internal boot failure คงเป็น residual risk ที่ยังไม่ได้พิสูจน์ แยกจาก confirmed listener ownership defect; ตอนนี้ไม่แก้ ManagedGame/Phaser internals และไม่เพิ่ม failure-injection
+- Firefox project/browser contract คงเดิม Windows Firefox ยังไม่ผ่าน verification และ A-01 ยัง OPEN; ไม่อ้างว่า M0/full E2E ผ่านครบ
+- รอบนี้อนุมัติเฉพาะบันทึก decision และเตรียมแผน M1 ด้วย technical fixture ต้องรอ approval ขั้นถัดไปก่อน implement M1, commit/push เอกสาร หรือ merge
+
+บันทึก checkpoint/verification ด้านล่างเป็นประวัติก่อน decision นี้ ผลตรวจที่ยังไม่ผ่านไม่ถูกเปลี่ยนโดย conditional acceptance
 
 ### Checkpoint review — คง scaffold และแยก remaining blockers
 
@@ -102,6 +114,20 @@ node --input-type=module -e "import { chromium } from '@playwright/test'; const 
 | **M7 — Competition build** | หลัง M6 และปิด P-02; freeze content/config แล้วสร้าง static artifact | ผล build เดียวกันเปิดบน Vercel และ itch.io จริงได้; ZIP เกมมี root `index.html`; save/audio/focus/fullscreen/resize ใน iframe ตรวจผ่าน; final URL/ZIP/version และ verification record พร้อมตามกติกาประกวด; content/help/music information ที่ใช้เผยแพร่ตรวจแล้ว; ไม่มี OPEN QUESTION ที่เปลี่ยน behavior ของ build ค้าง |
 
 M2 เป็นข้อเสนอขอบเขต technical validation จากคู่ฉากที่ล็อก ไม่ใช่การตัดสินใจเพิ่มเนื้อเรื่อง งานบทและ scene cards ยังต้องปิด N-03 ก่อนเรียก vertical slice นี้ว่าฉบับเล่นจริง
+
+## แผน M1 — Technical fixture only; รอ approval ก่อน implementation
+
+ยึด M1 Definition of Done เดิม, [ARCHITECTURE](ARCHITECTURE.md), [NARRATIVE_SYSTEM](docs/NARRATIVE_SYSTEM.md) และ G-02/G-03 ใน [GAME_STATE](docs/GAME_STATE.md) การเดินหน้ามีเงื่อนไขตาม Owner Decision ข้างต้น ไม่เปลี่ยน stack/dependencies, ไม่แตะ Phaser startup และไม่ผลิต release story หรือ final art
+
+1. ขยาย technical fixture ที่แยกจาก release entry ให้ทดสอบ line → choice → branch → rejoin, tag-only output และ stable Line/Event IDs พร้อม fixture references; ไม่มีตัวละคร/scene facts/choices ของเรื่องจริง ไม่ใช้บท Google Doc ห้าวัน และไม่สร้าง Day 1–3 Ink
+2. สร้าง NarrativeController เป็นทางเข้า inkjs เดียว, parse/validate tag set ที่ล็อก และจัด TypeScript EventRegistry แยก domain → Zustand กับ presentation → GameBridge; read-only NarrativeQueryPort อ่าน state ตาม ownership โดยใช้ข้อมูลทดสอบเท่านั้น ไม่กำหนด TSPR/Promise/permission rules แทน G-01
+3. ทำลำดับ validate ทั้ง output → commit domain effect พร้อม per-playthrough ledger → presentation → publish; choice ใช้ revision/index และ transaction lock, world result ตรวจ session/context ป้องกัน double input, stale/duplicate results และ scene-context leakage
+4. เชื่อม React UI เดิมให้เล่น fixture และ capture/restore safe line/choice checkpoints ผ่าน controller/SaveCoordinator/SaveRepository ตาม G-02/G-03; query อ่าน state ที่ restore แล้ว, Auto/Skip off และไม่ replay durable/one-shot effects รักษา profile versus playthrough scope ไม่ขยายเป็น release save-slot UI, puzzle หรือ audio system
+5. เพิ่ม unit/integration tests สำหรับ branch/rejoin, invalid tags/IDs และไม่มี partial commit, ledger/idempotency, checkpoint line/choice round-trip และ scope; browser regression ตรวจ fixture flow กับ normal mount/unmount, subscriptions และ pause/hidden ตาม Owner Decision โดยไม่เพิ่ม external postBoot visibility listeners หรือเปลี่ยน window focus/blur handlers
+
+แผน verification หลังได้รับ approval และ implement: `npm run narrative:compile`, `npm run narrative:validate`, `npm run typecheck`, `npm run lint`, `npm run format:check`, `npm test`, `npm run build` และ `npm run test:e2e:windows-chromium-webkit` รายงาน exit codes/passed/failed/skipped จริง; Firefox ต้องเก็บผลแยกตาม environment ไม่ใช้ subset ปิด full browser gate รอบนี้ยังไม่ได้รันแผนดังกล่าว
+
+คำถามค้าง: G-01/N-03/U-01–U-03 และ P questions คง gate เดิม ใช้ fixture เพื่อพิสูจน์ technical contracts โดยไม่ตัดสินค่าหรือเนื้อหาที่เจ้าของยังไม่ล็อก ManagedGame risk acceptance/Firefox/A-01 ไม่ถูกนับเป็น resolved จากผล M1
 
 ## เนื้อหา Day 1–3 ที่ต้องส่ง
 
