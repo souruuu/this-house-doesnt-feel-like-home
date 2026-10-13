@@ -1,0 +1,9 @@
+{
+  "scope": "technical-fixture-only",
+  "scenes": { "m0.toolchain": "m0_probe" },
+  "speakers": ["none"],
+  "expressions": {},
+  "positions": [],
+  "events": [],
+  "assets": ["m0.world.reference"]
+}

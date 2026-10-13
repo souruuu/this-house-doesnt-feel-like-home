@@ -1,0 +1,20 @@
+/* Neutral M0 tokens only. These do not resolve font/palette/layout decisions U-01–U-03. */
+:root {
+  --color-letterbox: #171717;
+  --color-panel: #fafafa;
+  --color-text: #171717;
+  --color-border: #737373;
+  --color-focus: #171717;
+  --font-ui: system-ui, sans-serif;
+  --text-body: 32px;
+  --text-title: 44px;
+  --space-small: 16px;
+  --space-medium: 32px;
+  --space-large: 48px;
+  --border-width: 2px;
+  --focus-width: 4px;
+  --radius-control: 4px;
+  /* Technical probe placement; no approved dialogue/choice/stage coordinates. */
+  --probe-inset: 64px;
+  --probe-width: 1240px;
+}

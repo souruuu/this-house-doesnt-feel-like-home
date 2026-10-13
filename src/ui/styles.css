@@ -1,0 +1,105 @@
+* {
+  box-sizing: border-box;
+}
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+body {
+  font-family: var(--font-ui);
+  background: var(--color-letterbox);
+  color: var(--color-text);
+}
+button {
+  font: inherit;
+}
+.game-shell {
+  width: 100%;
+  height: 100%;
+  height: 100dvh;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: var(--color-letterbox);
+}
+.viewport-frame {
+  position: relative;
+  overflow: hidden;
+}
+.logical-stage {
+  position: absolute;
+  width: 1920px;
+  height: 1080px;
+  transform-origin: top left;
+}
+.world-host,
+.world-host > div,
+.ui-overlay {
+  position: absolute;
+  inset: 0;
+}
+.world-host canvas {
+  display: block;
+  width: 1920px;
+  height: 1080px;
+}
+.ui-overlay {
+  pointer-events: none;
+  font-size: var(--text-body);
+}
+.ui-panel {
+  position: absolute;
+  left: var(--probe-inset);
+  bottom: var(--probe-inset);
+  width: var(--probe-width);
+  padding: var(--space-medium);
+  background: var(--color-panel);
+  border: var(--border-width) solid var(--color-border);
+  pointer-events: auto;
+}
+.ui-panel h1 {
+  font-size: var(--text-title);
+  margin: 0 0 var(--space-small);
+  font-weight: 600;
+}
+.ui-panel p {
+  margin: var(--space-small) 0;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.ui-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-small);
+}
+.ui-button {
+  padding: var(--space-small) var(--space-medium);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-control);
+  color: var(--color-text);
+  background: var(--color-panel);
+  cursor: pointer;
+}
+.ui-button:focus-visible {
+  outline: var(--focus-width) solid var(--color-focus);
+  outline-offset: var(--focus-width);
+}
+.ui-button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.rotate-prompt {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: var(--space-medium);
+  background: var(--color-panel);
+  text-align: center;
+  font-size: 1.25rem;
+}

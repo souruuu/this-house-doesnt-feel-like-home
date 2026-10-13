@@ -138,6 +138,8 @@ Placeholder ไม่ขัดกับการเตรียมโครง U
 
 ## Artist handoff rules
 
+สถานะรับงาน ณ M0 (2026-10-13): ทีมส่ง JPG background เบื้องต้น 4 variants และ JPG character sheet ที่มี 4 ตัวละครเป็น **references เท่านั้น** Layering/transparency/aspect ratio/sprite mapping/layout ยังไม่อนุมัติ จึงไม่ใส่ใน production manifest หรือ build ไม่อนุมานว่าครบตัวละครใน Narrative Map และไม่สร้าง art ที่ขาด M0 ใช้ technical placeholder ID แยกจาก release IDs; manifest ที่ scaffold ไม่ปิด U-01/U-02
+
 - ใช้ scene/character/object IDs ที่เชื่อมกลับ narrative registry ได้ และระบุ placeholder/final status
 - ส่ง viewport guide, stage anchor/pivot, scale, bounding/crop rules และ draw-order reference ที่ยืนยันใน U-01
 - ส่ง expression/pose manifest ตาม scene cards พร้อม canvas เดียวกันในชุด; ไม่ crop tight ต่อ expression จนตำแหน่งเลื่อน
