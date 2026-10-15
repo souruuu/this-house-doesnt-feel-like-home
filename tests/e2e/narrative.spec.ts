@@ -1,4 +1,21 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
+
+async function ready(page: Page) {
+  await expect(page.locator('[data-runtime-busy]')).toHaveAttribute(
+    'data-runtime-busy',
+    'false',
+  );
+}
+async function start(page: Page) {
+  await expect(page.locator('[data-runtime-phase]')).toHaveAttribute(
+    'data-runtime-phase',
+    'awaiting-decision',
+  );
+  await page
+    .getByRole('button', { name: 'เริ่มรอบทดสอบใหม่', exact: true })
+    .click();
+  await ready(page);
+}
 
 test('fixture branch/rejoin uses keyboard and stable identities without errors', async ({
   page,
@@ -6,12 +23,14 @@ test('fixture branch/rejoin uses keyboard and stable identities without errors',
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
   await page.goto('/');
+  await start(page);
   const region = page.getByRole('region', { name: 'ทดสอบระบบข้อความ' });
   await expect(region).toHaveAttribute('data-line-id', 'fixture_start_001');
   await region.focus();
   await page.keyboard.press('Enter');
   await expect(region).toHaveAttribute('data-fixture-phase', 'choice');
   await expect(region).toHaveAttribute('data-notifications', '1');
+  await ready(page);
   await page.keyboard.press('ArrowDown');
   await expect(
     page.getByRole('button', { name: 'เลือกเส้นทางทดสอบหนึ่ง' }),
@@ -23,6 +42,7 @@ test('fixture branch/rejoin uses keyboard and stable identities without errors',
   await page.keyboard.press('Enter');
   await expect(region).toHaveAttribute('data-line-id', 'fixture_branch_b_001');
   await expect(region).toHaveAttribute('data-effects', '1');
+  await ready(page);
   await expect(region).toHaveAttribute(
     'data-ledger',
     'fixture.domain.branch_b',
@@ -34,6 +54,7 @@ test('fixture branch/rejoin uses keyboard and stable identities without errors',
     'ยืนยันข้อมูลหลังบันทึก',
   );
   await expect(region).toHaveAttribute('data-notifications', '2');
+  await ready(page);
   await page.getByRole('button', { name: 'อ่านต่อ', exact: true }).click();
   await expect(region).toHaveAttribute('data-line-id', 'fixture_end_001');
   await expect(region).toHaveAttribute('data-effects', '2');
@@ -55,6 +76,7 @@ test('StrictMode, double input and UI remount preserve a run; explicit new run i
   page,
 }) => {
   await page.goto('/');
+  await start(page);
   const region = page.getByRole('region', { name: 'ทดสอบระบบข้อความ' });
   await expect(region).toHaveAttribute('data-line-id', 'fixture_start_001');
   await expect(region).toHaveAttribute('data-notifications', '0');
@@ -93,6 +115,8 @@ test('StrictMode, double input and UI remount preserve a run; explicit new run i
   await page
     .getByRole('button', { name: 'เริ่มรอบทดสอบใหม่', exact: true })
     .click();
+  await page.getByRole('button', { name: 'ยืนยันแทนที่', exact: true }).click();
+  await ready(page);
   await expect(region).toHaveAttribute('data-line-id', 'fixture_start_001');
   await expect(region).not.toHaveAttribute('data-session', session ?? '');
   await expect(region).not.toHaveAttribute('data-run', run ?? '');
@@ -115,6 +139,7 @@ test('touch portrait, pause, hidden state and key repeats guard fixture input', 
   );
   await expect(page.locator('.ui-overlay')).toHaveAttribute('inert', '');
   await page.setViewportSize({ width: 844, height: 390 });
+  await start(page);
   const region = page.getByRole('region', { name: 'ทดสอบระบบข้อความ' });
   await expect(region).toHaveAttribute('data-line-id', 'fixture_start_001');
   await region.focus();

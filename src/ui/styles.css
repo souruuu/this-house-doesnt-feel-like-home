@@ -51,6 +51,8 @@ button {
   font-size: var(--text-body);
 }
 .ui-panel {
+  max-height: calc(100% - 2 * var(--probe-inset));
+  overflow-y: auto;
   position: absolute;
   left: var(--probe-inset);
   bottom: var(--probe-inset);

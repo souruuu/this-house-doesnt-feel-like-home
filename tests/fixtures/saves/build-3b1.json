@@ -1,0 +1,1062 @@
+{
+  "producerCommit": "e0b6eefe3bd41ed6574bd13224868ea101b72547",
+  "compiledSha256": "bc61cdd5b2dd01d41f050e577f448c4ac4d785c77edb047d613594d8c7a51cce",
+  "saves": [
+    {
+      "appBuildVersion": "0.0.0+m1-batch-3b-1",
+      "saveSchemaVersion": 1,
+      "storyCompatibilityVersion": "technical-fixture-checkpoint-v1",
+      "scope": "technical-fixture-only",
+      "profileId": "baseline-3b1-profile",
+      "timestamp": 1792098054250,
+      "game": {
+        "runId": "f16ceef1-731e-4e65-a223-020e448820e3",
+        "flags": {
+          "fixture.branch_enabled": true,
+          "fixture.branch_committed": false,
+          "fixture.branch_pending": true
+        },
+        "selectedBranch": null,
+        "effectCount": 0,
+        "committedEventIds": []
+      },
+      "narrative": {
+        "inkStateJson": "{\"flows\":{\"DEFAULT_FLOW\":{\"callstack\":{\"threads\":[{\"callstack\":[{\"cPath\":\"m1_fixture.0.6.b\",\"idx\":9,\"exp\":false,\"type\":0}],\"threadIndex\":0,\"previousContentObject\":\"m1_fixture.0.6.b.8\"}],\"threadCounter\":0},\"outputStream\":[\"^ข้อความทดสอบเริ่มต้น ไม่ใช่บทเกม \",\"#\",\"^line:fixture_start_001 \",\"/#\",\"#\",\"^speaker:none\",\"/#\",\"\\n\"],\"currentChoices\":[]}},\"currentFlowName\":\"DEFAULT_FLOW\",\"variablesState\":{},\"evalStack\":[],\"visitCounts\":{},\"turnIndices\":{},\"turnIdx\":-1,\"storySeed\":11,\"previousRandom\":0,\"inkSaveVersion\":10,\"inkFormatVersion\":21}",
+        "cursorPath": "m1_fixture.0.6.b.9",
+        "checkpoint": {
+          "kind": "line",
+          "presentation": {
+            "sceneId": "fixture.main",
+            "speaker": "none",
+            "expression": null,
+            "position": null
+          },
+          "line": {
+            "id": "fixture_start_001",
+            "text": "ข้อความทดสอบเริ่มต้น ไม่ใช่บทเกม"
+          },
+          "choices": []
+        },
+        "backlog": [
+          {
+            "lineId": "fixture_start_001",
+            "text": "ข้อความทดสอบเริ่มต้น ไม่ใช่บทเกม",
+            "speakerId": "none"
+          }
+        ]
+      }
+    },
+    {
+      "appBuildVersion": "0.0.0+m1-batch-3b-1",
+      "saveSchemaVersion": 1,
+      "storyCompatibilityVersion": "technical-fixture-checkpoint-v1",
+      "scope": "technical-fixture-only",
+      "profileId": "baseline-3b1-profile",
+      "timestamp": 1792098054253,
+      "game": {
+        "runId": "f16ceef1-731e-4e65-a223-020e448820e3",
+        "flags": {
+          "fixture.branch_enabled": true,
+          "fixture.branch_committed": false,
+          "fixture.branch_pending": true
+        },
+        "selectedBranch": null,
+        "effectCount": 0,
+        "committedEventIds": []
+      },
+      "narrative": {
+        "inkStateJson": "{\"flows\":{\"DEFAULT_FLOW\":{\"callstack\":{\"threads\":[{\"callstack\":[{\"exp\":false,\"type\":0}],\"threadIndex\":0,\"previousContentObject\":\"m1_fixture.0.30\"}],\"threadCounter\":2},\"outputStream\":[\"#\",\"^event:fixture.presentation.started\",\"/#\"],\"choiceThreads\":{\"1\":{\"callstack\":[{\"cPath\":\"m1_fixture.0\",\"idx\":21,\"exp\":false,\"type\":0}],\"threadIndex\":1,\"previousContentObject\":\"m1_fixture.0.20\"},\"2\":{\"callstack\":[{\"cPath\":\"m1_fixture.0\",\"idx\":30,\"exp\":false,\"type\":0}],\"threadIndex\":2,\"previousContentObject\":\"m1_fixture.0.29\"}},\"currentChoices\":[{\"text\":\"เลือกเส้นทางทดสอบหนึ่ง\",\"index\":0,\"originalChoicePath\":\"m1_fixture.0.21\",\"originalThreadIndex\":1,\"targetPath\":\"m1_fixture.0.c-0\",\"isInvisibleDefault\":false,\"tags\":[\"line:fixture_choice_a_001\"]},{\"text\":\"เลือกเส้นทางทดสอบสอง\",\"index\":1,\"originalChoicePath\":\"m1_fixture.0.30\",\"originalThreadIndex\":2,\"targetPath\":\"m1_fixture.0.c-1\",\"isInvisibleDefault\":false,\"tags\":[\"line:fixture_choice_b_001\"]}]}},\"currentFlowName\":\"DEFAULT_FLOW\",\"variablesState\":{},\"evalStack\":[],\"visitCounts\":{},\"turnIndices\":{},\"turnIdx\":-1,\"storySeed\":11,\"previousRandom\":0,\"inkSaveVersion\":10,\"inkFormatVersion\":21}",
+        "cursorPath": null,
+        "checkpoint": {
+          "kind": "choice",
+          "presentation": {
+            "sceneId": "fixture.main",
+            "speaker": "none",
+            "expression": null,
+            "position": null
+          },
+          "line": {
+            "id": "fixture_start_001",
+            "text": "ข้อความทดสอบเริ่มต้น ไม่ใช่บทเกม"
+          },
+          "choices": [
+            {
+              "index": 0,
+              "id": "fixture_choice_a_001",
+              "text": "เลือกเส้นทางทดสอบหนึ่ง"
+            },
+            {
+              "index": 1,
+              "id": "fixture_choice_b_001",
+              "text": "เลือกเส้นทางทดสอบสอง"
+            }
+          ]
+        },
+        "backlog": [
+          {
+            "lineId": "fixture_start_001",
+            "text": "ข้อความทดสอบเริ่มต้น ไม่ใช่บทเกม",
+            "speakerId": "none"
+          }
+        ]
+      }
+    },
+    {
+      "appBuildVersion": "0.0.0+m1-batch-3b-1",
+      "saveSchemaVersion": 1,
+      "storyCompatibilityVersion": "technical-fixture-checkpoint-v1",
+      "scope": "technical-fixture-only",
+      "profileId": "baseline-3b1-profile",
+      "timestamp": 1792098054255,
+      "game": {
+        "runId": "f16ceef1-731e-4e65-a223-020e448820e3",
+        "flags": {
+          "fixture.branch_enabled": true,
+          "fixture.branch_committed": true,
+          "fixture.branch_pending": false
+        },
+        "selectedBranch": "a",
+        "effectCount": 1,
+        "committedEventIds": ["fixture.domain.branch_a"]
+      },
+      "narrative": {
+        "inkStateJson": "{\"flows\":{\"DEFAULT_FLOW\":{\"callstack\":{\"threads\":[{\"callstack\":[{\"cPath\":\"fixture_a\",\"idx\":8,\"exp\":false,\"type\":0}],\"threadIndex\":1,\"previousContentObject\":\"fixture_a.7\"}],\"threadCounter\":2},\"outputStream\":[\"^ข้อความจากเส้นทางทดสอบหนึ่ง \",\"#\",\"^line:fixture_branch_a_001 \",\"/#\",\"#\",\"^event:fixture.domain.branch_a\",\"/#\",\"\\n\"],\"currentChoices\":[]}},\"currentFlowName\":\"DEFAULT_FLOW\",\"variablesState\":{},\"evalStack\":[],\"visitCounts\":{},\"turnIndices\":{},\"turnIdx\":0,\"storySeed\":11,\"previousRandom\":0,\"inkSaveVersion\":10,\"inkFormatVersion\":21}",
+        "cursorPath": "fixture_a.8",
+        "checkpoint": {
+          "kind": "line",
+          "presentation": {
+            "sceneId": "fixture.main",
+            "speaker": "none",
+            "expression": null,
+            "position": null
+          },
+          "line": {
+            "id": "fixture_branch_a_001",
+            "text": "ข้อความจากเส้นทางทดสอบหนึ่ง"
+          },
+          "choices": []
+        },
+        "backlog": [
+          {
+            "lineId": "fixture_start_001",
+            "text": "ข้อความทดสอบเริ่มต้น ไม่ใช่บทเกม",
+            "speakerId": "none"
+          },
+          {
+            "lineId": "fixture_branch_a_001",
+            "text": "ข้อความจากเส้นทางทดสอบหนึ่ง",
+            "speakerId": "none"
+          }
+        ]
+      }
+    },
+    {
+      "appBuildVersion": "0.0.0+m1-batch-3b-1",
+      "saveSchemaVersion": 1,
+      "storyCompatibilityVersion": "technical-fixture-checkpoint-v1",
+      "scope": "technical-fixture-only",
+      "profileId": "baseline-3b1-profile",
+      "timestamp": 1792098054256,
+      "game": {
+        "runId": "f16ceef1-731e-4e65-a223-020e448820e3",
+        "flags": {
+          "fixture.branch_enabled": true,
+          "fixture.branch_committed": true,
+          "fixture.branch_pending": false
+        },
+        "selectedBranch": "a",
+        "effectCount": 1,
+        "committedEventIds": ["fixture.domain.branch_a"]
+      },
+      "narrative": {
+        "inkStateJson": "{\"flows\":{\"DEFAULT_FLOW\":{\"callstack\":{\"threads\":[{\"callstack\":[{\"cPath\":\"fixture_rejoin\",\"idx\":17,\"exp\":false,\"type\":0}],\"threadIndex\":1,\"previousContentObject\":\"fixture_rejoin.16\"}],\"threadCounter\":2},\"outputStream\":[\"#\",\"^event:fixture.presentation.rejoined\",\"/#\",\"^ข้อความทดสอบจุดกลับร่วม ยืนยันข้อมูลหลังบันทึก\",\"^ \",\"#\",\"^line:fixture_rejoin_001\",\"/#\",\"\\n\"],\"currentChoices\":[]}},\"currentFlowName\":\"DEFAULT_FLOW\",\"variablesState\":{},\"evalStack\":[],\"visitCounts\":{},\"turnIndices\":{},\"turnIdx\":0,\"storySeed\":11,\"previousRandom\":0,\"inkSaveVersion\":10,\"inkFormatVersion\":21}",
+        "cursorPath": "fixture_rejoin.17",
+        "checkpoint": {
+          "kind": "line",
+          "presentation": {
+            "sceneId": "fixture.rejoin",
+            "speaker": "none",
+            "expression": null,
+            "position": null
+          },
+          "line": {
+            "id": "fixture_rejoin_001",
+            "text": "ข้อความทดสอบจุดกลับร่วม ยืนยันข้อมูลหลังบันทึก"
+          },
+          "choices": []
+        },
+        "backlog": [
+          {
+            "lineId": "fixture_start_001",
+            "text": "ข้อความทดสอบเริ่มต้น ไม่ใช่บทเกม",
+            "speakerId": "none"
+          },
+          {
+            "lineId": "fixture_branch_a_001",
+            "text": "ข้อความจากเส้นทางทดสอบหนึ่ง",
+            "speakerId": "none"
+          },
+          {
+            "lineId": "fixture_rejoin_001",
+            "text": "ข้อความทดสอบจุดกลับร่วม ยืนยันข้อมูลหลังบันทึก",
+            "speakerId": "none"
+          }
+        ]
+      }
+    },
+    {
+      "appBuildVersion": "0.0.0+m1-batch-3b-1",
+      "saveSchemaVersion": 1,
+      "storyCompatibilityVersion": "technical-fixture-checkpoint-v1",
+      "scope": "technical-fixture-only",
+      "profileId": "baseline-3b1-profile",
+      "timestamp": 1792098054257,
+      "game": {
+        "runId": "f16ceef1-731e-4e65-a223-020e448820e3",
+        "flags": {
+          "fixture.branch_enabled": true,
+          "fixture.branch_committed": true,
+          "fixture.branch_pending": false
+        },
+        "selectedBranch": "a",
+        "effectCount": 2,
+        "committedEventIds": [
+          "fixture.domain.branch_a",
+          "fixture.domain.rejoined"
+        ]
+      },
+      "narrative": {
+        "inkStateJson": "{\"flows\":{\"DEFAULT_FLOW\":{\"callstack\":{\"threads\":[{\"callstack\":[{\"exp\":false,\"type\":0}],\"threadIndex\":0}],\"threadCounter\":2},\"outputStream\":[\"^สิ้นสุดการทดสอบระบบ \",\"#\",\"^line:fixture_end_001 \",\"/#\",\"#\",\"^event:fixture.domain.rejoined\",\"/#\",\"\\n\"],\"currentChoices\":[]}},\"currentFlowName\":\"DEFAULT_FLOW\",\"variablesState\":{},\"evalStack\":[],\"visitCounts\":{},\"turnIndices\":{},\"turnIdx\":0,\"storySeed\":11,\"previousRandom\":0,\"inkSaveVersion\":10,\"inkFormatVersion\":21}",
+        "cursorPath": null,
+        "checkpoint": {
+          "kind": "line",
+          "presentation": {
+            "sceneId": "fixture.rejoin",
+            "speaker": "none",
+            "expression": null,
+            "position": null
+          },
+          "line": {
+            "id": "fixture_end_001",
+            "text": "สิ้นสุดการทดสอบระบบ"
+          },
+          "choices": []
+        },
+        "backlog": [
+          {
+            "lineId": "fixture_start_001",
+            "text": "ข้อความทดสอบเริ่มต้น ไม่ใช่บทเกม",
+            "speakerId": "none"
+          },
+          {
+            "lineId": "fixture_branch_a_001",
+            "text": "ข้อความจากเส้นทางทดสอบหนึ่ง",
+            "speakerId": "none"
+          },
+          {
+            "lineId": "fixture_rejoin_001",
+            "text": "ข้อความทดสอบจุดกลับร่วม ยืนยันข้อมูลหลังบันทึก",
+            "speakerId": "none"
+          },
+          {
+            "lineId": "fixture_end_001",
+            "text": "สิ้นสุดการทดสอบระบบ",
+            "speakerId": "none"
+          }
+        ]
+      }
+    },
+    {
+      "appBuildVersion": "0.0.0+m1-batch-3b-1",
+      "saveSchemaVersion": 1,
+      "storyCompatibilityVersion": "technical-fixture-checkpoint-v1",
+      "scope": "technical-fixture-only",
+      "profileId": "baseline-3b1-profile",
+      "timestamp": 1792098054259,
+      "game": {
+        "runId": "a2ac90a1-9798-4e4c-92d7-5b6c061c0c9f",
+        "flags": {
+          "fixture.branch_enabled": true,
+          "fixture.branch_committed": false,
+          "fixture.branch_pending": true
+        },
+        "selectedBranch": null,
+        "effectCount": 0,
+        "committedEventIds": []
+      },
+      "narrative": {
+        "inkStateJson": "{\"flows\":{\"DEFAULT_FLOW\":{\"callstack\":{\"threads\":[{\"callstack\":[{\"cPath\":\"m1_fixture.0.6.b\",\"idx\":9,\"exp\":false,\"type\":0}],\"threadIndex\":0,\"previousContentObject\":\"m1_fixture.0.6.b.8\"}],\"threadCounter\":0},\"outputStream\":[\"^ข้อความทดสอบเริ่มต้น ไม่ใช่บทเกม \",\"#\",\"^line:fixture_start_001 \",\"/#\",\"#\",\"^speaker:none\",\"/#\",\"\\n\"],\"currentChoices\":[]}},\"currentFlowName\":\"DEFAULT_FLOW\",\"variablesState\":{},\"evalStack\":[],\"visitCounts\":{},\"turnIndices\":{},\"turnIdx\":-1,\"storySeed\":34,\"previousRandom\":0,\"inkSaveVersion\":10,\"inkFormatVersion\":21}",
+        "cursorPath": "m1_fixture.0.6.b.9",
+        "checkpoint": {
+          "kind": "line",
+          "presentation": {
+            "sceneId": "fixture.main",
+            "speaker": "none",
+            "expression": null,
+            "position": null
+          },
+          "line": {
+            "id": "fixture_start_001",
+            "text": "ข้อความทดสอบเริ่มต้น ไม่ใช่บทเกม"
+          },
+          "choices": []
+        },
+        "backlog": [
+          {
+            "lineId": "fixture_start_001",
+            "text": "ข้อความทดสอบเริ่มต้น ไม่ใช่บทเกม",
+            "speakerId": "none"
+          }
+        ]
+      }
+    },
+    {
+      "appBuildVersion": "0.0.0+m1-batch-3b-1",
+      "saveSchemaVersion": 1,
+      "storyCompatibilityVersion": "technical-fixture-checkpoint-v1",
+      "scope": "technical-fixture-only",
+      "profileId": "baseline-3b1-profile",
+      "timestamp": 1792098054260,
+      "game": {
+        "runId": "a2ac90a1-9798-4e4c-92d7-5b6c061c0c9f",
+        "flags": {
+          "fixture.branch_enabled": true,
+          "fixture.branch_committed": false,
+          "fixture.branch_pending": true
+        },
+        "selectedBranch": null,
+        "effectCount": 0,
+        "committedEventIds": []
+      },
+      "narrative": {
+        "inkStateJson": "{\"flows\":{\"DEFAULT_FLOW\":{\"callstack\":{\"threads\":[{\"callstack\":[{\"exp\":false,\"type\":0}],\"threadIndex\":0,\"previousContentObject\":\"m1_fixture.0.30\"}],\"threadCounter\":2},\"outputStream\":[\"#\",\"^event:fixture.presentation.started\",\"/#\"],\"choiceThreads\":{\"1\":{\"callstack\":[{\"cPath\":\"m1_fixture.0\",\"idx\":21,\"exp\":false,\"type\":0}],\"threadIndex\":1,\"previousContentObject\":\"m1_fixture.0.20\"},\"2\":{\"callstack\":[{\"cPath\":\"m1_fixture.0\",\"idx\":30,\"exp\":false,\"type\":0}],\"threadIndex\":2,\"previousContentObject\":\"m1_fixture.0.29\"}},\"currentChoices\":[{\"text\":\"เลือกเส้นทางทดสอบหนึ่ง\",\"index\":0,\"originalChoicePath\":\"m1_fixture.0.21\",\"originalThreadIndex\":1,\"targetPath\":\"m1_fixture.0.c-0\",\"isInvisibleDefault\":false,\"tags\":[\"line:fixture_choice_a_001\"]},{\"text\":\"เลือกเส้นทางทดสอบสอง\",\"index\":1,\"originalChoicePath\":\"m1_fixture.0.30\",\"originalThreadIndex\":2,\"targetPath\":\"m1_fixture.0.c-1\",\"isInvisibleDefault\":false,\"tags\":[\"line:fixture_choice_b_001\"]}]}},\"currentFlowName\":\"DEFAULT_FLOW\",\"variablesState\":{},\"evalStack\":[],\"visitCounts\":{},\"turnIndices\":{},\"turnIdx\":-1,\"storySeed\":34,\"previousRandom\":0,\"inkSaveVersion\":10,\"inkFormatVersion\":21}",
+        "cursorPath": null,
+        "checkpoint": {
+          "kind": "choice",
+          "presentation": {
+            "sceneId": "fixture.main",
+            "speaker": "none",
+            "expression": null,
+            "position": null
+          },
+          "line": {
+            "id": "fixture_start_001",
+            "text": "ข้อความทดสอบเริ่มต้น ไม่ใช่บทเกม"
+          },
+          "choices": [
+            {
+              "index": 0,
+              "id": "fixture_choice_a_001",
+              "text": "เลือกเส้นทางทดสอบหนึ่ง"
+            },
+            {
+              "index": 1,
+              "id": "fixture_choice_b_001",
+              "text": "เลือกเส้นทางทดสอบสอง"
+            }
+          ]
+        },
+        "backlog": [
+          {
+            "lineId": "fixture_start_001",
+            "text": "ข้อความทดสอบเริ่มต้น ไม่ใช่บทเกม",
+            "speakerId": "none"
+          }
+        ]
+      }
+    },
+    {
+      "appBuildVersion": "0.0.0+m1-batch-3b-1",
+      "saveSchemaVersion": 1,
+      "storyCompatibilityVersion": "technical-fixture-checkpoint-v1",
+      "scope": "technical-fixture-only",
+      "profileId": "baseline-3b1-profile",
+      "timestamp": 1792098054261,
+      "game": {
+        "runId": "a2ac90a1-9798-4e4c-92d7-5b6c061c0c9f",
+        "flags": {
+          "fixture.branch_enabled": true,
+          "fixture.branch_committed": true,
+          "fixture.branch_pending": false
+        },
+        "selectedBranch": "b",
+        "effectCount": 1,
+        "committedEventIds": ["fixture.domain.branch_b"]
+      },
+      "narrative": {
+        "inkStateJson": "{\"flows\":{\"DEFAULT_FLOW\":{\"callstack\":{\"threads\":[{\"callstack\":[{\"cPath\":\"fixture_b\",\"idx\":8,\"exp\":false,\"type\":0}],\"threadIndex\":2,\"previousContentObject\":\"fixture_b.7\"}],\"threadCounter\":2},\"outputStream\":[\"^ข้อความจากเส้นทางทดสอบสอง \",\"#\",\"^line:fixture_branch_b_001 \",\"/#\",\"#\",\"^event:fixture.domain.branch_b\",\"/#\",\"\\n\"],\"currentChoices\":[]}},\"currentFlowName\":\"DEFAULT_FLOW\",\"variablesState\":{},\"evalStack\":[],\"visitCounts\":{},\"turnIndices\":{},\"turnIdx\":0,\"storySeed\":34,\"previousRandom\":0,\"inkSaveVersion\":10,\"inkFormatVersion\":21}",
+        "cursorPath": "fixture_b.8",
+        "checkpoint": {
+          "kind": "line",
+          "presentation": {
+            "sceneId": "fixture.main",
+            "speaker": "none",
+            "expression": null,
+            "position": null
+          },
+          "line": {
+            "id": "fixture_branch_b_001",
+            "text": "ข้อความจากเส้นทางทดสอบสอง"
+          },
+          "choices": []
+        },
+        "backlog": [
+          {
+            "lineId": "fixture_start_001",
+            "text": "ข้อความทดสอบเริ่มต้น ไม่ใช่บทเกม",
+            "speakerId": "none"
+          },
+          {
+            "lineId": "fixture_branch_b_001",
+            "text": "ข้อความจากเส้นทางทดสอบสอง",
+            "speakerId": "none"
+          }
+        ]
+      }
+    },
+    {
+      "appBuildVersion": "0.0.0+m1-batch-3b-1",
+      "saveSchemaVersion": 1,
+      "storyCompatibilityVersion": "technical-fixture-checkpoint-v1",
+      "scope": "technical-fixture-only",
+      "profileId": "baseline-3b1-profile",
+      "timestamp": 1792098054262,
+      "game": {
+        "runId": "a2ac90a1-9798-4e4c-92d7-5b6c061c0c9f",
+        "flags": {
+          "fixture.branch_enabled": true,
+          "fixture.branch_committed": true,
+          "fixture.branch_pending": false
+        },
+        "selectedBranch": "b",
+        "effectCount": 1,
+        "committedEventIds": ["fixture.domain.branch_b"]
+      },
+      "narrative": {
+        "inkStateJson": "{\"flows\":{\"DEFAULT_FLOW\":{\"callstack\":{\"threads\":[{\"callstack\":[{\"cPath\":\"fixture_rejoin\",\"idx\":17,\"exp\":false,\"type\":0}],\"threadIndex\":2,\"previousContentObject\":\"fixture_rejoin.16\"}],\"threadCounter\":2},\"outputStream\":[\"#\",\"^event:fixture.presentation.rejoined\",\"/#\",\"^ข้อความทดสอบจุดกลับร่วม ยืนยันข้อมูลหลังบันทึก\",\"^ \",\"#\",\"^line:fixture_rejoin_001\",\"/#\",\"\\n\"],\"currentChoices\":[]}},\"currentFlowName\":\"DEFAULT_FLOW\",\"variablesState\":{},\"evalStack\":[],\"visitCounts\":{},\"turnIndices\":{},\"turnIdx\":0,\"storySeed\":34,\"previousRandom\":0,\"inkSaveVersion\":10,\"inkFormatVersion\":21}",
+        "cursorPath": "fixture_rejoin.17",
+        "checkpoint": {
+          "kind": "line",
+          "presentation": {
+            "sceneId": "fixture.rejoin",
+            "speaker": "none",
+            "expression": null,
+            "position": null
+          },
+          "line": {
+            "id": "fixture_rejoin_001",
+            "text": "ข้อความทดสอบจุดกลับร่วม ยืนยันข้อมูลหลังบันทึก"
+          },
+          "choices": []
+        },
+        "backlog": [
+          {
+            "lineId": "fixture_start_001",
+            "text": "ข้อความทดสอบเริ่มต้น ไม่ใช่บทเกม",
+            "speakerId": "none"
+          },
+          {
+            "lineId": "fixture_branch_b_001",
+            "text": "ข้อความจากเส้นทางทดสอบสอง",
+            "speakerId": "none"
+          },
+          {
+            "lineId": "fixture_rejoin_001",
+            "text": "ข้อความทดสอบจุดกลับร่วม ยืนยันข้อมูลหลังบันทึก",
+            "speakerId": "none"
+          }
+        ]
+      }
+    },
+    {
+      "appBuildVersion": "0.0.0+m1-batch-3b-1",
+      "saveSchemaVersion": 1,
+      "storyCompatibilityVersion": "technical-fixture-checkpoint-v1",
+      "scope": "technical-fixture-only",
+      "profileId": "baseline-3b1-profile",
+      "timestamp": 1792098054263,
+      "game": {
+        "runId": "a2ac90a1-9798-4e4c-92d7-5b6c061c0c9f",
+        "flags": {
+          "fixture.branch_enabled": true,
+          "fixture.branch_committed": true,
+          "fixture.branch_pending": false
+        },
+        "selectedBranch": "b",
+        "effectCount": 2,
+        "committedEventIds": [
+          "fixture.domain.branch_b",
+          "fixture.domain.rejoined"
+        ]
+      },
+      "narrative": {
+        "inkStateJson": "{\"flows\":{\"DEFAULT_FLOW\":{\"callstack\":{\"threads\":[{\"callstack\":[{\"exp\":false,\"type\":0}],\"threadIndex\":0}],\"threadCounter\":2},\"outputStream\":[\"^สิ้นสุดการทดสอบระบบ \",\"#\",\"^line:fixture_end_001 \",\"/#\",\"#\",\"^event:fixture.domain.rejoined\",\"/#\",\"\\n\"],\"currentChoices\":[]}},\"currentFlowName\":\"DEFAULT_FLOW\",\"variablesState\":{},\"evalStack\":[],\"visitCounts\":{},\"turnIndices\":{},\"turnIdx\":0,\"storySeed\":34,\"previousRandom\":0,\"inkSaveVersion\":10,\"inkFormatVersion\":21}",
+        "cursorPath": null,
+        "checkpoint": {
+          "kind": "line",
+          "presentation": {
+            "sceneId": "fixture.rejoin",
+            "speaker": "none",
+            "expression": null,
+            "position": null
+          },
+          "line": {
+            "id": "fixture_end_001",
+            "text": "สิ้นสุดการทดสอบระบบ"
+          },
+          "choices": []
+        },
+        "backlog": [
+          {
+            "lineId": "fixture_start_001",
+            "text": "ข้อความทดสอบเริ่มต้น ไม่ใช่บทเกม",
+            "speakerId": "none"
+          },
+          {
+            "lineId": "fixture_branch_b_001",
+            "text": "ข้อความจากเส้นทางทดสอบสอง",
+            "speakerId": "none"
+          },
+          {
+            "lineId": "fixture_rejoin_001",
+            "text": "ข้อความทดสอบจุดกลับร่วม ยืนยันข้อมูลหลังบันทึก",
+            "speakerId": "none"
+          },
+          {
+            "lineId": "fixture_end_001",
+            "text": "สิ้นสุดการทดสอบระบบ",
+            "speakerId": "none"
+          }
+        ]
+      }
+    },
+    {
+      "appBuildVersion": "0.0.0+m1-batch-3b-1",
+      "saveSchemaVersion": 1,
+      "storyCompatibilityVersion": "technical-fixture-checkpoint-v1",
+      "scope": "technical-fixture-only",
+      "profileId": "baseline-3b1-profile",
+      "timestamp": 1792098054264,
+      "game": {
+        "runId": "dd6c61b3-394b-4210-96ba-0ca6562bbcb3",
+        "flags": {
+          "fixture.branch_enabled": false,
+          "fixture.branch_committed": false,
+          "fixture.branch_pending": true
+        },
+        "selectedBranch": null,
+        "effectCount": 0,
+        "committedEventIds": []
+      },
+      "narrative": {
+        "inkStateJson": "{\"flows\":{\"DEFAULT_FLOW\":{\"callstack\":{\"threads\":[{\"callstack\":[{\"cPath\":\"m1_fixture.0.7.b\",\"idx\":9,\"exp\":false,\"type\":0}],\"threadIndex\":0,\"previousContentObject\":\"m1_fixture.0.7.b.8\"}],\"threadCounter\":0},\"outputStream\":[\"^ข้อความทดสอบข้อมูลอีกสถานะ ไม่ใช่บทเกม \",\"#\",\"^line:fixture_start_disabled_001 \",\"/#\",\"#\",\"^speaker:none\",\"/#\",\"\\n\"],\"currentChoices\":[]}},\"currentFlowName\":\"DEFAULT_FLOW\",\"variablesState\":{},\"evalStack\":[],\"visitCounts\":{},\"turnIndices\":{},\"turnIdx\":-1,\"storySeed\":89,\"previousRandom\":0,\"inkSaveVersion\":10,\"inkFormatVersion\":21}",
+        "cursorPath": "m1_fixture.0.7.b.9",
+        "checkpoint": {
+          "kind": "line",
+          "presentation": {
+            "sceneId": "fixture.main",
+            "speaker": "none",
+            "expression": null,
+            "position": null
+          },
+          "line": {
+            "id": "fixture_start_disabled_001",
+            "text": "ข้อความทดสอบข้อมูลอีกสถานะ ไม่ใช่บทเกม"
+          },
+          "choices": []
+        },
+        "backlog": [
+          {
+            "lineId": "fixture_start_disabled_001",
+            "text": "ข้อความทดสอบข้อมูลอีกสถานะ ไม่ใช่บทเกม",
+            "speakerId": "none"
+          }
+        ]
+      }
+    },
+    {
+      "appBuildVersion": "0.0.0+m1-batch-3b-1",
+      "saveSchemaVersion": 1,
+      "storyCompatibilityVersion": "technical-fixture-checkpoint-v1",
+      "scope": "technical-fixture-only",
+      "profileId": "baseline-3b1-profile",
+      "timestamp": 1792098054264,
+      "game": {
+        "runId": "dd6c61b3-394b-4210-96ba-0ca6562bbcb3",
+        "flags": {
+          "fixture.branch_enabled": false,
+          "fixture.branch_committed": false,
+          "fixture.branch_pending": true
+        },
+        "selectedBranch": null,
+        "effectCount": 0,
+        "committedEventIds": []
+      },
+      "narrative": {
+        "inkStateJson": "{\"flows\":{\"DEFAULT_FLOW\":{\"callstack\":{\"threads\":[{\"callstack\":[{\"exp\":false,\"type\":0}],\"threadIndex\":0,\"previousContentObject\":\"m1_fixture.0.30\"}],\"threadCounter\":2},\"outputStream\":[\"#\",\"^event:fixture.presentation.started\",\"/#\"],\"choiceThreads\":{\"1\":{\"callstack\":[{\"cPath\":\"m1_fixture.0\",\"idx\":21,\"exp\":false,\"type\":0}],\"threadIndex\":1,\"previousContentObject\":\"m1_fixture.0.20\"},\"2\":{\"callstack\":[{\"cPath\":\"m1_fixture.0\",\"idx\":30,\"exp\":false,\"type\":0}],\"threadIndex\":2,\"previousContentObject\":\"m1_fixture.0.29\"}},\"currentChoices\":[{\"text\":\"เลือกเส้นทางทดสอบหนึ่ง\",\"index\":0,\"originalChoicePath\":\"m1_fixture.0.21\",\"originalThreadIndex\":1,\"targetPath\":\"m1_fixture.0.c-0\",\"isInvisibleDefault\":false,\"tags\":[\"line:fixture_choice_a_001\"]},{\"text\":\"เลือกเส้นทางทดสอบสอง\",\"index\":1,\"originalChoicePath\":\"m1_fixture.0.30\",\"originalThreadIndex\":2,\"targetPath\":\"m1_fixture.0.c-1\",\"isInvisibleDefault\":false,\"tags\":[\"line:fixture_choice_b_001\"]}]}},\"currentFlowName\":\"DEFAULT_FLOW\",\"variablesState\":{},\"evalStack\":[],\"visitCounts\":{},\"turnIndices\":{},\"turnIdx\":-1,\"storySeed\":89,\"previousRandom\":0,\"inkSaveVersion\":10,\"inkFormatVersion\":21}",
+        "cursorPath": null,
+        "checkpoint": {
+          "kind": "choice",
+          "presentation": {
+            "sceneId": "fixture.main",
+            "speaker": "none",
+            "expression": null,
+            "position": null
+          },
+          "line": {
+            "id": "fixture_start_disabled_001",
+            "text": "ข้อความทดสอบข้อมูลอีกสถานะ ไม่ใช่บทเกม"
+          },
+          "choices": [
+            {
+              "index": 0,
+              "id": "fixture_choice_a_001",
+              "text": "เลือกเส้นทางทดสอบหนึ่ง"
+            },
+            {
+              "index": 1,
+              "id": "fixture_choice_b_001",
+              "text": "เลือกเส้นทางทดสอบสอง"
+            }
+          ]
+        },
+        "backlog": [
+          {
+            "lineId": "fixture_start_disabled_001",
+            "text": "ข้อความทดสอบข้อมูลอีกสถานะ ไม่ใช่บทเกม",
+            "speakerId": "none"
+          }
+        ]
+      }
+    },
+    {
+      "appBuildVersion": "0.0.0+m1-batch-3b-1",
+      "saveSchemaVersion": 1,
+      "storyCompatibilityVersion": "technical-fixture-checkpoint-v1",
+      "scope": "technical-fixture-only",
+      "profileId": "baseline-3b1-profile",
+      "timestamp": 1792098054265,
+      "game": {
+        "runId": "dd6c61b3-394b-4210-96ba-0ca6562bbcb3",
+        "flags": {
+          "fixture.branch_enabled": false,
+          "fixture.branch_committed": true,
+          "fixture.branch_pending": false
+        },
+        "selectedBranch": "a",
+        "effectCount": 1,
+        "committedEventIds": ["fixture.domain.branch_a"]
+      },
+      "narrative": {
+        "inkStateJson": "{\"flows\":{\"DEFAULT_FLOW\":{\"callstack\":{\"threads\":[{\"callstack\":[{\"cPath\":\"fixture_a\",\"idx\":8,\"exp\":false,\"type\":0}],\"threadIndex\":1,\"previousContentObject\":\"fixture_a.7\"}],\"threadCounter\":2},\"outputStream\":[\"^ข้อความจากเส้นทางทดสอบหนึ่ง \",\"#\",\"^line:fixture_branch_a_001 \",\"/#\",\"#\",\"^event:fixture.domain.branch_a\",\"/#\",\"\\n\"],\"currentChoices\":[]}},\"currentFlowName\":\"DEFAULT_FLOW\",\"variablesState\":{},\"evalStack\":[],\"visitCounts\":{},\"turnIndices\":{},\"turnIdx\":0,\"storySeed\":89,\"previousRandom\":0,\"inkSaveVersion\":10,\"inkFormatVersion\":21}",
+        "cursorPath": "fixture_a.8",
+        "checkpoint": {
+          "kind": "line",
+          "presentation": {
+            "sceneId": "fixture.main",
+            "speaker": "none",
+            "expression": null,
+            "position": null
+          },
+          "line": {
+            "id": "fixture_branch_a_001",
+            "text": "ข้อความจากเส้นทางทดสอบหนึ่ง"
+          },
+          "choices": []
+        },
+        "backlog": [
+          {
+            "lineId": "fixture_start_disabled_001",
+            "text": "ข้อความทดสอบข้อมูลอีกสถานะ ไม่ใช่บทเกม",
+            "speakerId": "none"
+          },
+          {
+            "lineId": "fixture_branch_a_001",
+            "text": "ข้อความจากเส้นทางทดสอบหนึ่ง",
+            "speakerId": "none"
+          }
+        ]
+      }
+    },
+    {
+      "appBuildVersion": "0.0.0+m1-batch-3b-1",
+      "saveSchemaVersion": 1,
+      "storyCompatibilityVersion": "technical-fixture-checkpoint-v1",
+      "scope": "technical-fixture-only",
+      "profileId": "baseline-3b1-profile",
+      "timestamp": 1792098054266,
+      "game": {
+        "runId": "dd6c61b3-394b-4210-96ba-0ca6562bbcb3",
+        "flags": {
+          "fixture.branch_enabled": false,
+          "fixture.branch_committed": true,
+          "fixture.branch_pending": false
+        },
+        "selectedBranch": "a",
+        "effectCount": 1,
+        "committedEventIds": ["fixture.domain.branch_a"]
+      },
+      "narrative": {
+        "inkStateJson": "{\"flows\":{\"DEFAULT_FLOW\":{\"callstack\":{\"threads\":[{\"callstack\":[{\"cPath\":\"fixture_rejoin\",\"idx\":17,\"exp\":false,\"type\":0}],\"threadIndex\":1,\"previousContentObject\":\"fixture_rejoin.16\"}],\"threadCounter\":2},\"outputStream\":[\"#\",\"^event:fixture.presentation.rejoined\",\"/#\",\"^ข้อความทดสอบจุดกลับร่วม ยืนยันข้อมูลหลังบันทึก\",\"^ \",\"#\",\"^line:fixture_rejoin_001\",\"/#\",\"\\n\"],\"currentChoices\":[]}},\"currentFlowName\":\"DEFAULT_FLOW\",\"variablesState\":{},\"evalStack\":[],\"visitCounts\":{},\"turnIndices\":{},\"turnIdx\":0,\"storySeed\":89,\"previousRandom\":0,\"inkSaveVersion\":10,\"inkFormatVersion\":21}",
+        "cursorPath": "fixture_rejoin.17",
+        "checkpoint": {
+          "kind": "line",
+          "presentation": {
+            "sceneId": "fixture.rejoin",
+            "speaker": "none",
+            "expression": null,
+            "position": null
+          },
+          "line": {
+            "id": "fixture_rejoin_001",
+            "text": "ข้อความทดสอบจุดกลับร่วม ยืนยันข้อมูลหลังบันทึก"
+          },
+          "choices": []
+        },
+        "backlog": [
+          {
+            "lineId": "fixture_start_disabled_001",
+            "text": "ข้อความทดสอบข้อมูลอีกสถานะ ไม่ใช่บทเกม",
+            "speakerId": "none"
+          },
+          {
+            "lineId": "fixture_branch_a_001",
+            "text": "ข้อความจากเส้นทางทดสอบหนึ่ง",
+            "speakerId": "none"
+          },
+          {
+            "lineId": "fixture_rejoin_001",
+            "text": "ข้อความทดสอบจุดกลับร่วม ยืนยันข้อมูลหลังบันทึก",
+            "speakerId": "none"
+          }
+        ]
+      }
+    },
+    {
+      "appBuildVersion": "0.0.0+m1-batch-3b-1",
+      "saveSchemaVersion": 1,
+      "storyCompatibilityVersion": "technical-fixture-checkpoint-v1",
+      "scope": "technical-fixture-only",
+      "profileId": "baseline-3b1-profile",
+      "timestamp": 1792098054267,
+      "game": {
+        "runId": "dd6c61b3-394b-4210-96ba-0ca6562bbcb3",
+        "flags": {
+          "fixture.branch_enabled": false,
+          "fixture.branch_committed": true,
+          "fixture.branch_pending": false
+        },
+        "selectedBranch": "a",
+        "effectCount": 2,
+        "committedEventIds": [
+          "fixture.domain.branch_a",
+          "fixture.domain.rejoined"
+        ]
+      },
+      "narrative": {
+        "inkStateJson": "{\"flows\":{\"DEFAULT_FLOW\":{\"callstack\":{\"threads\":[{\"callstack\":[{\"exp\":false,\"type\":0}],\"threadIndex\":0}],\"threadCounter\":2},\"outputStream\":[\"^สิ้นสุดการทดสอบระบบ \",\"#\",\"^line:fixture_end_001 \",\"/#\",\"#\",\"^event:fixture.domain.rejoined\",\"/#\",\"\\n\"],\"currentChoices\":[]}},\"currentFlowName\":\"DEFAULT_FLOW\",\"variablesState\":{},\"evalStack\":[],\"visitCounts\":{},\"turnIndices\":{},\"turnIdx\":0,\"storySeed\":89,\"previousRandom\":0,\"inkSaveVersion\":10,\"inkFormatVersion\":21}",
+        "cursorPath": null,
+        "checkpoint": {
+          "kind": "line",
+          "presentation": {
+            "sceneId": "fixture.rejoin",
+            "speaker": "none",
+            "expression": null,
+            "position": null
+          },
+          "line": {
+            "id": "fixture_end_001",
+            "text": "สิ้นสุดการทดสอบระบบ"
+          },
+          "choices": []
+        },
+        "backlog": [
+          {
+            "lineId": "fixture_start_disabled_001",
+            "text": "ข้อความทดสอบข้อมูลอีกสถานะ ไม่ใช่บทเกม",
+            "speakerId": "none"
+          },
+          {
+            "lineId": "fixture_branch_a_001",
+            "text": "ข้อความจากเส้นทางทดสอบหนึ่ง",
+            "speakerId": "none"
+          },
+          {
+            "lineId": "fixture_rejoin_001",
+            "text": "ข้อความทดสอบจุดกลับร่วม ยืนยันข้อมูลหลังบันทึก",
+            "speakerId": "none"
+          },
+          {
+            "lineId": "fixture_end_001",
+            "text": "สิ้นสุดการทดสอบระบบ",
+            "speakerId": "none"
+          }
+        ]
+      }
+    },
+    {
+      "appBuildVersion": "0.0.0+m1-batch-3b-1",
+      "saveSchemaVersion": 1,
+      "storyCompatibilityVersion": "technical-fixture-checkpoint-v1",
+      "scope": "technical-fixture-only",
+      "profileId": "baseline-3b1-profile",
+      "timestamp": 1792098054268,
+      "game": {
+        "runId": "b010e71b-e22a-499f-b1ef-a39d27ce4f10",
+        "flags": {
+          "fixture.branch_enabled": false,
+          "fixture.branch_committed": false,
+          "fixture.branch_pending": true
+        },
+        "selectedBranch": null,
+        "effectCount": 0,
+        "committedEventIds": []
+      },
+      "narrative": {
+        "inkStateJson": "{\"flows\":{\"DEFAULT_FLOW\":{\"callstack\":{\"threads\":[{\"callstack\":[{\"cPath\":\"m1_fixture.0.7.b\",\"idx\":9,\"exp\":false,\"type\":0}],\"threadIndex\":0,\"previousContentObject\":\"m1_fixture.0.7.b.8\"}],\"threadCounter\":0},\"outputStream\":[\"^ข้อความทดสอบข้อมูลอีกสถานะ ไม่ใช่บทเกม \",\"#\",\"^line:fixture_start_disabled_001 \",\"/#\",\"#\",\"^speaker:none\",\"/#\",\"\\n\"],\"currentChoices\":[]}},\"currentFlowName\":\"DEFAULT_FLOW\",\"variablesState\":{},\"evalStack\":[],\"visitCounts\":{},\"turnIndices\":{},\"turnIdx\":-1,\"storySeed\":2,\"previousRandom\":0,\"inkSaveVersion\":10,\"inkFormatVersion\":21}",
+        "cursorPath": "m1_fixture.0.7.b.9",
+        "checkpoint": {
+          "kind": "line",
+          "presentation": {
+            "sceneId": "fixture.main",
+            "speaker": "none",
+            "expression": null,
+            "position": null
+          },
+          "line": {
+            "id": "fixture_start_disabled_001",
+            "text": "ข้อความทดสอบข้อมูลอีกสถานะ ไม่ใช่บทเกม"
+          },
+          "choices": []
+        },
+        "backlog": [
+          {
+            "lineId": "fixture_start_disabled_001",
+            "text": "ข้อความทดสอบข้อมูลอีกสถานะ ไม่ใช่บทเกม",
+            "speakerId": "none"
+          }
+        ]
+      }
+    },
+    {
+      "appBuildVersion": "0.0.0+m1-batch-3b-1",
+      "saveSchemaVersion": 1,
+      "storyCompatibilityVersion": "technical-fixture-checkpoint-v1",
+      "scope": "technical-fixture-only",
+      "profileId": "baseline-3b1-profile",
+      "timestamp": 1792098054268,
+      "game": {
+        "runId": "b010e71b-e22a-499f-b1ef-a39d27ce4f10",
+        "flags": {
+          "fixture.branch_enabled": false,
+          "fixture.branch_committed": false,
+          "fixture.branch_pending": true
+        },
+        "selectedBranch": null,
+        "effectCount": 0,
+        "committedEventIds": []
+      },
+      "narrative": {
+        "inkStateJson": "{\"flows\":{\"DEFAULT_FLOW\":{\"callstack\":{\"threads\":[{\"callstack\":[{\"exp\":false,\"type\":0}],\"threadIndex\":0,\"previousContentObject\":\"m1_fixture.0.30\"}],\"threadCounter\":2},\"outputStream\":[\"#\",\"^event:fixture.presentation.started\",\"/#\"],\"choiceThreads\":{\"1\":{\"callstack\":[{\"cPath\":\"m1_fixture.0\",\"idx\":21,\"exp\":false,\"type\":0}],\"threadIndex\":1,\"previousContentObject\":\"m1_fixture.0.20\"},\"2\":{\"callstack\":[{\"cPath\":\"m1_fixture.0\",\"idx\":30,\"exp\":false,\"type\":0}],\"threadIndex\":2,\"previousContentObject\":\"m1_fixture.0.29\"}},\"currentChoices\":[{\"text\":\"เลือกเส้นทางทดสอบหนึ่ง\",\"index\":0,\"originalChoicePath\":\"m1_fixture.0.21\",\"originalThreadIndex\":1,\"targetPath\":\"m1_fixture.0.c-0\",\"isInvisibleDefault\":false,\"tags\":[\"line:fixture_choice_a_001\"]},{\"text\":\"เลือกเส้นทางทดสอบสอง\",\"index\":1,\"originalChoicePath\":\"m1_fixture.0.30\",\"originalThreadIndex\":2,\"targetPath\":\"m1_fixture.0.c-1\",\"isInvisibleDefault\":false,\"tags\":[\"line:fixture_choice_b_001\"]}]}},\"currentFlowName\":\"DEFAULT_FLOW\",\"variablesState\":{},\"evalStack\":[],\"visitCounts\":{},\"turnIndices\":{},\"turnIdx\":-1,\"storySeed\":2,\"previousRandom\":0,\"inkSaveVersion\":10,\"inkFormatVersion\":21}",
+        "cursorPath": null,
+        "checkpoint": {
+          "kind": "choice",
+          "presentation": {
+            "sceneId": "fixture.main",
+            "speaker": "none",
+            "expression": null,
+            "position": null
+          },
+          "line": {
+            "id": "fixture_start_disabled_001",
+            "text": "ข้อความทดสอบข้อมูลอีกสถานะ ไม่ใช่บทเกม"
+          },
+          "choices": [
+            {
+              "index": 0,
+              "id": "fixture_choice_a_001",
+              "text": "เลือกเส้นทางทดสอบหนึ่ง"
+            },
+            {
+              "index": 1,
+              "id": "fixture_choice_b_001",
+              "text": "เลือกเส้นทางทดสอบสอง"
+            }
+          ]
+        },
+        "backlog": [
+          {
+            "lineId": "fixture_start_disabled_001",
+            "text": "ข้อความทดสอบข้อมูลอีกสถานะ ไม่ใช่บทเกม",
+            "speakerId": "none"
+          }
+        ]
+      }
+    },
+    {
+      "appBuildVersion": "0.0.0+m1-batch-3b-1",
+      "saveSchemaVersion": 1,
+      "storyCompatibilityVersion": "technical-fixture-checkpoint-v1",
+      "scope": "technical-fixture-only",
+      "profileId": "baseline-3b1-profile",
+      "timestamp": 1792098054269,
+      "game": {
+        "runId": "b010e71b-e22a-499f-b1ef-a39d27ce4f10",
+        "flags": {
+          "fixture.branch_enabled": false,
+          "fixture.branch_committed": true,
+          "fixture.branch_pending": false
+        },
+        "selectedBranch": "b",
+        "effectCount": 1,
+        "committedEventIds": ["fixture.domain.branch_b"]
+      },
+      "narrative": {
+        "inkStateJson": "{\"flows\":{\"DEFAULT_FLOW\":{\"callstack\":{\"threads\":[{\"callstack\":[{\"cPath\":\"fixture_b\",\"idx\":8,\"exp\":false,\"type\":0}],\"threadIndex\":2,\"previousContentObject\":\"fixture_b.7\"}],\"threadCounter\":2},\"outputStream\":[\"^ข้อความจากเส้นทางทดสอบสอง \",\"#\",\"^line:fixture_branch_b_001 \",\"/#\",\"#\",\"^event:fixture.domain.branch_b\",\"/#\",\"\\n\"],\"currentChoices\":[]}},\"currentFlowName\":\"DEFAULT_FLOW\",\"variablesState\":{},\"evalStack\":[],\"visitCounts\":{},\"turnIndices\":{},\"turnIdx\":0,\"storySeed\":2,\"previousRandom\":0,\"inkSaveVersion\":10,\"inkFormatVersion\":21}",
+        "cursorPath": "fixture_b.8",
+        "checkpoint": {
+          "kind": "line",
+          "presentation": {
+            "sceneId": "fixture.main",
+            "speaker": "none",
+            "expression": null,
+            "position": null
+          },
+          "line": {
+            "id": "fixture_branch_b_001",
+            "text": "ข้อความจากเส้นทางทดสอบสอง"
+          },
+          "choices": []
+        },
+        "backlog": [
+          {
+            "lineId": "fixture_start_disabled_001",
+            "text": "ข้อความทดสอบข้อมูลอีกสถานะ ไม่ใช่บทเกม",
+            "speakerId": "none"
+          },
+          {
+            "lineId": "fixture_branch_b_001",
+            "text": "ข้อความจากเส้นทางทดสอบสอง",
+            "speakerId": "none"
+          }
+        ]
+      }
+    },
+    {
+      "appBuildVersion": "0.0.0+m1-batch-3b-1",
+      "saveSchemaVersion": 1,
+      "storyCompatibilityVersion": "technical-fixture-checkpoint-v1",
+      "scope": "technical-fixture-only",
+      "profileId": "baseline-3b1-profile",
+      "timestamp": 1792098054269,
+      "game": {
+        "runId": "b010e71b-e22a-499f-b1ef-a39d27ce4f10",
+        "flags": {
+          "fixture.branch_enabled": false,
+          "fixture.branch_committed": true,
+          "fixture.branch_pending": false
+        },
+        "selectedBranch": "b",
+        "effectCount": 1,
+        "committedEventIds": ["fixture.domain.branch_b"]
+      },
+      "narrative": {
+        "inkStateJson": "{\"flows\":{\"DEFAULT_FLOW\":{\"callstack\":{\"threads\":[{\"callstack\":[{\"cPath\":\"fixture_rejoin\",\"idx\":17,\"exp\":false,\"type\":0}],\"threadIndex\":2,\"previousContentObject\":\"fixture_rejoin.16\"}],\"threadCounter\":2},\"outputStream\":[\"#\",\"^event:fixture.presentation.rejoined\",\"/#\",\"^ข้อความทดสอบจุดกลับร่วม ยืนยันข้อมูลหลังบันทึก\",\"^ \",\"#\",\"^line:fixture_rejoin_001\",\"/#\",\"\\n\"],\"currentChoices\":[]}},\"currentFlowName\":\"DEFAULT_FLOW\",\"variablesState\":{},\"evalStack\":[],\"visitCounts\":{},\"turnIndices\":{},\"turnIdx\":0,\"storySeed\":2,\"previousRandom\":0,\"inkSaveVersion\":10,\"inkFormatVersion\":21}",
+        "cursorPath": "fixture_rejoin.17",
+        "checkpoint": {
+          "kind": "line",
+          "presentation": {
+            "sceneId": "fixture.rejoin",
+            "speaker": "none",
+            "expression": null,
+            "position": null
+          },
+          "line": {
+            "id": "fixture_rejoin_001",
+            "text": "ข้อความทดสอบจุดกลับร่วม ยืนยันข้อมูลหลังบันทึก"
+          },
+          "choices": []
+        },
+        "backlog": [
+          {
+            "lineId": "fixture_start_disabled_001",
+            "text": "ข้อความทดสอบข้อมูลอีกสถานะ ไม่ใช่บทเกม",
+            "speakerId": "none"
+          },
+          {
+            "lineId": "fixture_branch_b_001",
+            "text": "ข้อความจากเส้นทางทดสอบสอง",
+            "speakerId": "none"
+          },
+          {
+            "lineId": "fixture_rejoin_001",
+            "text": "ข้อความทดสอบจุดกลับร่วม ยืนยันข้อมูลหลังบันทึก",
+            "speakerId": "none"
+          }
+        ]
+      }
+    },
+    {
+      "appBuildVersion": "0.0.0+m1-batch-3b-1",
+      "saveSchemaVersion": 1,
+      "storyCompatibilityVersion": "technical-fixture-checkpoint-v1",
+      "scope": "technical-fixture-only",
+      "profileId": "baseline-3b1-profile",
+      "timestamp": 1792098054270,
+      "game": {
+        "runId": "b010e71b-e22a-499f-b1ef-a39d27ce4f10",
+        "flags": {
+          "fixture.branch_enabled": false,
+          "fixture.branch_committed": true,
+          "fixture.branch_pending": false
+        },
+        "selectedBranch": "b",
+        "effectCount": 2,
+        "committedEventIds": [
+          "fixture.domain.branch_b",
+          "fixture.domain.rejoined"
+        ]
+      },
+      "narrative": {
+        "inkStateJson": "{\"flows\":{\"DEFAULT_FLOW\":{\"callstack\":{\"threads\":[{\"callstack\":[{\"exp\":false,\"type\":0}],\"threadIndex\":0}],\"threadCounter\":2},\"outputStream\":[\"^สิ้นสุดการทดสอบระบบ \",\"#\",\"^line:fixture_end_001 \",\"/#\",\"#\",\"^event:fixture.domain.rejoined\",\"/#\",\"\\n\"],\"currentChoices\":[]}},\"currentFlowName\":\"DEFAULT_FLOW\",\"variablesState\":{},\"evalStack\":[],\"visitCounts\":{},\"turnIndices\":{},\"turnIdx\":0,\"storySeed\":2,\"previousRandom\":0,\"inkSaveVersion\":10,\"inkFormatVersion\":21}",
+        "cursorPath": null,
+        "checkpoint": {
+          "kind": "line",
+          "presentation": {
+            "sceneId": "fixture.rejoin",
+            "speaker": "none",
+            "expression": null,
+            "position": null
+          },
+          "line": {
+            "id": "fixture_end_001",
+            "text": "สิ้นสุดการทดสอบระบบ"
+          },
+          "choices": []
+        },
+        "backlog": [
+          {
+            "lineId": "fixture_start_disabled_001",
+            "text": "ข้อความทดสอบข้อมูลอีกสถานะ ไม่ใช่บทเกม",
+            "speakerId": "none"
+          },
+          {
+            "lineId": "fixture_branch_b_001",
+            "text": "ข้อความจากเส้นทางทดสอบสอง",
+            "speakerId": "none"
+          },
+          {
+            "lineId": "fixture_rejoin_001",
+            "text": "ข้อความทดสอบจุดกลับร่วม ยืนยันข้อมูลหลังบันทึก",
+            "speakerId": "none"
+          },
+          {
+            "lineId": "fixture_end_001",
+            "text": "สิ้นสุดการทดสอบระบบ",
+            "speakerId": "none"
+          }
+        ]
+      }
+    }
+  ]
+}

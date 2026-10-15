@@ -1,7 +1,11 @@
 import type { EventRegistry } from '../narrative/EventRegistry.ts';
 import type { FixtureReferences } from '../narrative/types.ts';
 import type { StoredRecord } from './SaveRepository.ts';
-import type { FixtureSaveEnvelope, SaveVersions } from './types.ts';
+import {
+  supportsFixtureBuild,
+  type FixtureSaveEnvelope,
+  type SaveVersions,
+} from './types.ts';
 import { validateSaveEnvelope } from './validateSave.ts';
 
 export type SaveInspection =
@@ -58,7 +62,7 @@ export function inspectSave(
     return result('corrupt');
   if (input.storyCompatibilityVersion !== versions.storyCompatibilityVersion)
     return result('incompatible-story');
-  if (input.appBuildVersion !== versions.appBuildVersion)
+  if (!supportsFixtureBuild(input.appBuildVersion, versions))
     return result('incompatible-build');
   if (input.profileId !== profileId) return result('foreign-profile');
   try {

@@ -7,12 +7,12 @@ import {
   createFixtureDomainStore,
   type FixtureDomainState,
 } from '../state/fixtureDomainStore.ts';
-import {
-  createFixtureProfileStore,
-  type FixtureProfileStore,
-} from '../state/fixtureProfileStore.ts';
+import { type FixtureProfileStore } from '../state/fixtureProfileStore.ts';
 import { SaveCoordinator } from '../save/SaveCoordinator.ts';
 import { fixtureSaveVersions } from '../save/types.ts';
+import { FixtureRuntime } from './FixtureRuntime.ts';
+import { LocalStorageSaveRepository } from '../save/LocalStorageSaveRepository.ts';
+import type { SaveRepository } from '../save/SaveRepository.ts';
 
 // Imported only by the dev/QA panel, never a release entry or production state.
 export function createFixtureSession(
@@ -44,15 +44,21 @@ export function createFixtureSession(
   });
 }
 
-export function createFixtureRuntime() {
-  const profile = createFixtureProfileStore();
-  return new SaveCoordinator({
-    profile,
-    versions: fixtureSaveVersions,
+export function createFixtureRuntime(
+  repository: SaveRepository = new LocalStorageSaveRepository(),
+) {
+  return new FixtureRuntime({
+    repository,
     references,
-    registry: createFixtureEventRegistry(),
-    createSession: (seed) => createFixtureSession(seed, profile),
-    repository: null,
+    createCoordinator: (profile) =>
+      new SaveCoordinator({
+        profile,
+        versions: fixtureSaveVersions,
+        references,
+        registry: createFixtureEventRegistry(),
+        createSession: (seed) => createFixtureSession(seed, profile),
+        repository,
+      }),
   });
 }
 

@@ -7,7 +7,8 @@ import {
 } from 'react';
 import type { FixtureSession } from '../narrative/fixtureSession';
 import type { NarrativeView } from '../narrative/types';
-import type { SaveCoordinator } from '../save/SaveCoordinator';
+import type { FixtureRuntime } from '../narrative/FixtureRuntime';
+import { saveSlots } from '../save/SaveRepository';
 import { Button } from './Button';
 
 // This owner stays mounted when the fixture view/world is closed. React view
@@ -19,67 +20,175 @@ export default function NarrativeFixturePanel({
   paused: boolean;
   visible: boolean;
 }) {
-  const [session, setSession] = useState<FixtureSession | null>(null);
+  const [runtime, setRuntime] = useState<FixtureRuntime | null>(null);
   const [loadError, setLoadError] = useState(false);
-  const owner = useRef<SaveCoordinator | null>(null);
 
   useEffect(() => {
     let active = true;
-    let unsubscribe: (() => void) | undefined;
+    let created: FixtureRuntime | undefined;
     void import('../narrative/fixtureSession')
       .then(({ createFixtureRuntime }) => {
         if (!active) return;
-        const runtime = createFixtureRuntime();
-        owner.current = runtime;
-        const showSession = () => {
-          const created = runtime.getSnapshot().session;
-          setSession(created);
-        };
-        unsubscribe = runtime.subscribe(showSession);
-        showSession();
+        created = createFixtureRuntime();
+        setRuntime(created);
+        void created.initialize();
       })
       .catch(() => {
         if (active) setLoadError(true);
       });
     return () => {
       active = false;
-      unsubscribe?.();
-      owner.current?.dispose();
-      owner.current = null;
+      created?.dispose();
     };
   }, []);
 
   useEffect(() => {
-    if (!session) return;
-    session.controller.setPaused(paused || !visible);
-    if (!paused && visible) session.controller.start();
-  }, [paused, visible, session]);
-
-  function newRun() {
-    void owner.current?.newRun().catch(() => setLoadError(true));
-  }
+    void runtime?.setEnvironment(paused || !visible);
+  }, [paused, visible, runtime]);
 
   if (!visible) return null;
   if (loadError) return <p role="alert">ไม่สามารถเปิดชุดทดสอบระบบข้อความ</p>;
-  if (!session) return <p>กำลังโหลดชุดทดสอบ</p>;
+  if (!runtime) return <p>กำลังโหลดชุดทดสอบ</p>;
+  return <RuntimeView runtime={runtime} paused={paused} />;
+}
+
+function RuntimeView({
+  runtime,
+  paused,
+}: {
+  runtime: FixtureRuntime;
+  paused: boolean;
+}) {
+  const state = useSyncExternalStore(runtime.subscribe, runtime.getSnapshot);
+  const unavailable =
+    state.busy || !!state.confirmation || state.phase === 'blocked';
+  const labels = {
+    autosave: 'อัตโนมัติ',
+    'manual-1': 'ช่อง 1',
+    'manual-2': 'ช่อง 2',
+    'manual-3': 'ช่อง 3',
+  };
+  const safe =
+    state.session &&
+    ['line', 'choice'].includes(state.session.controller.getSnapshot().phase);
   return (
-    <FixtureView
-      key={session.controller.getSnapshot().sessionId}
-      session={session}
-      paused={paused}
-      newRun={newRun}
-    />
+    <div
+      data-runtime-phase={state.phase}
+      data-runtime-busy={String(state.busy)}
+      data-feedback={state.feedback.status}
+      data-read-history={state.readLineIds.join(',')}
+    >
+      <section aria-label="จัดการจุดบันทึกทดสอบ" className="narrative-fixture">
+        <p>จุดบันทึกสำหรับ QA — ไม่ใช่เมนูเกมฉบับเผยแพร่</p>
+        <p role="status" aria-label="สถานะจุดบันทึกทดสอบ">
+          {state.busy ? 'กำลังดำเนินการ… ' : ''}
+          {state.feedback.message}
+        </p>
+        <div className="ui-actions">
+          <Button
+            disabled={
+              unavailable ||
+              paused ||
+              state.phase !== 'awaiting-decision' ||
+              state.slots.autosave?.status !== 'valid'
+            }
+            onClick={() => void runtime.resume()}
+          >
+            เล่นต่อจาก Autosave
+          </Button>
+          <Button
+            disabled={unavailable || paused || state.phase === 'checking'}
+            onClick={() => void runtime.newRun()}
+          >
+            เริ่มรอบทดสอบใหม่
+          </Button>
+          <Button
+            disabled={unavailable || state.phase === 'checking'}
+            onClick={() => void runtime.inspect()}
+          >
+            ตรวจช่องบันทึก
+          </Button>
+          <Button
+            disabled={unavailable || !safe}
+            onClick={() => void runtime.retrySave()}
+          >
+            ลองบันทึก Autosave อีกครั้ง
+          </Button>
+        </div>
+        {saveSlots.map((slot) => (
+          <div
+            key={slot}
+            className="ui-actions"
+            data-slot={slot}
+            data-slot-status={state.slots[slot]?.status ?? 'checking'}
+          >
+            <span>
+              {labels[slot]}: {state.slots[slot]?.status ?? 'checking'}
+              {state.slots[slot]?.status === 'valid'
+                ? ` — ${state.slots[slot].envelope.narrative.checkpoint.line.id}`
+                : ''}
+            </span>
+            {slot !== 'autosave' ? (
+              <>
+                <Button
+                  disabled={unavailable || !safe}
+                  onClick={() => void runtime.manualSave(slot)}
+                >
+                  บันทึก {labels[slot]}
+                </Button>
+                <Button
+                  disabled={
+                    unavailable ||
+                    paused ||
+                    state.slots[slot]?.status !== 'valid'
+                  }
+                  onClick={() => void runtime.manualLoad(slot)}
+                >
+                  โหลด {labels[slot]}
+                </Button>
+              </>
+            ) : null}
+          </div>
+        ))}
+        {state.confirmation ? (
+          <div role="dialog" aria-label="ยืนยันแทนที่จุดบันทึก">
+            <p>
+              {state.confirmation.kind === 'load'
+                ? 'การเล่นต่อจากช่องนี้จะใช้ Autosave แทนรอบเดิมเมื่อถึงจุดบันทึกถัดไป'
+                : 'ยืนยันให้ข้อมูลของรอบนี้แทนที่ช่องบันทึกเดิมหรือไม่'}
+            </p>
+            <Button
+              disabled={state.busy || paused}
+              onClick={() => void runtime.confirm()}
+            >
+              ยืนยันแทนที่
+            </Button>
+            <Button disabled={state.busy} onClick={() => runtime.cancel()}>
+              ยกเลิก
+            </Button>
+          </div>
+        ) : null}
+      </section>
+      {state.session && state.phase === 'active' ? (
+        <FixtureView
+          key={state.session.controller.getSnapshot().sessionId}
+          session={state.session}
+          runtime={runtime}
+          paused={paused || state.busy || !!state.confirmation}
+        />
+      ) : null}
+    </div>
   );
 }
 
 function FixtureView({
   session,
   paused,
-  newRun,
+  runtime,
 }: {
   session: FixtureSession;
   paused: boolean;
-  newRun: () => void;
+  runtime: FixtureRuntime;
 }) {
   const view: NarrativeView = useSyncExternalStore(
     session.controller.subscribe,
@@ -92,7 +201,7 @@ function FixtureView({
   const region = useRef<HTMLDivElement>(null);
 
   function continueLine() {
-    if (view && session && !paused) session.controller.continue(view);
+    if (view && session && !paused) void runtime.continue(view);
   }
 
   function onKeyDown(event: KeyboardEvent<HTMLDivElement>) {
@@ -179,7 +288,7 @@ function FixtureView({
                 disabled={paused}
                 onClick={(event) => {
                   if (!paused && event.detail <= 1)
-                    session?.controller.choose(view, choice.index);
+                    void runtime.choose(view, choice.index);
                 }}
               >
                 {choice.text}
@@ -188,9 +297,6 @@ function FixtureView({
           : null}
       </div>
       {view?.phase === 'ended' ? <p>จบชุดทดสอบ</p> : null}
-      <Button disabled={paused} onClick={newRun}>
-        เริ่มรอบทดสอบใหม่
-      </Button>
     </div>
   );
 }
