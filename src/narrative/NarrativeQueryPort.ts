@@ -30,6 +30,9 @@ export function bindFixtureQueries(story: Story, queries: NarrativeQueryPort) {
       if (typeof id !== 'string') throw new Error('Query ID must be a string');
       return queries.getFlag(id);
     },
-    true, // Pure read-only query, safe during Ink lookahead.
+    // Facts can change after the current output commits. Defer external reads
+    // past newline lookahead; purity alone does not make them lookahead-safe.
+    // Choice text/quoted strings must interpolate a just-evaluated Ink temp.
+    false,
   );
 }

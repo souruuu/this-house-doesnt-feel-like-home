@@ -1,4 +1,4 @@
-// M1 Batch 1 technical fixture only. No release characters or durable events.
+// Technical fixture only. Domain events have no release story semantics.
 EXTERNAL fixture_flag(id)
 -> m1_fixture
 
@@ -15,15 +15,15 @@ EXTERNAL fixture_flag(id)
     -> fixture_b
 
 === fixture_a ===
-ข้อความจากเส้นทางทดสอบหนึ่ง # line:fixture_branch_a_001
+ข้อความจากเส้นทางทดสอบหนึ่ง # line:fixture_branch_a_001 # event:fixture.domain.branch_a
 -> fixture_rejoin
 
 === fixture_b ===
-ข้อความจากเส้นทางทดสอบสอง # line:fixture_branch_b_001
+ข้อความจากเส้นทางทดสอบสอง # line:fixture_branch_b_001 # event:fixture.domain.branch_b
 -> fixture_rejoin
 
 === fixture_rejoin ===
 # event:fixture.presentation.rejoined
-ข้อความทดสอบจุดกลับร่วม # line:fixture_rejoin_001
-สิ้นสุดการทดสอบระบบ # line:fixture_end_001
+{fixture_flag("fixture.branch_committed"):ข้อความทดสอบจุดกลับร่วม ยืนยันข้อมูลหลังบันทึก|ข้อมูลทดสอบยังไม่บันทึก} # line:fixture_rejoin_001
+สิ้นสุดการทดสอบระบบ # line:fixture_end_001 # event:fixture.domain.rejoined
 -> END

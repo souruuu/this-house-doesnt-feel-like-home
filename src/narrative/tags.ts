@@ -2,7 +2,7 @@ import type { EventRegistry } from './EventRegistry.ts';
 import type {
   FixtureReferences,
   PresentationContext,
-  PresentationEvent,
+  NarrativeEvent,
 } from './types.ts';
 
 export function resetPresentation(sceneId: string): PresentationContext {
@@ -33,11 +33,11 @@ export function parseOutput(
   if (lineId && !Object.hasOwn(references.lines, lineId))
     throw new Error(`Unknown Line ID: ${lineId}`);
   const eventId = values.get('event');
-  let event: Readonly<PresentationEvent> | undefined;
+  let event: Readonly<NarrativeEvent> | undefined;
   if (eventId) {
     if (!references.events.includes(eventId))
       throw new Error(`Unknown event reference: ${eventId}`);
-    event = registry.resolvePresentation(eventId);
+    event = registry.resolve(eventId);
   }
   const sceneId = lineId
     ? references.lines[lineId]

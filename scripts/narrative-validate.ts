@@ -1,7 +1,6 @@
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 import { Story } from 'inkjs';
-import { createStore } from 'zustand/vanilla';
 import { fixtureOutput, fixtureSource } from './narrative-compile.ts';
 import {
   createFixtureEventRegistry,
@@ -10,10 +9,14 @@ import {
 import {
   bindFixtureQueries,
   createNarrativeQueryPort,
-  type FixtureFacts,
 } from '../src/narrative/NarrativeQueryPort.ts';
+import {
+  createFixtureDomainStore,
+  initialFixtureState,
+  type FixtureDomainStore,
+} from '../src/state/fixtureDomainStore.ts';
 import { parseOutput, resetPresentation } from '../src/narrative/tags.ts';
-import type { FixtureReferences } from '../src/narrative/types.ts';
+import type { DomainEvent, FixtureReferences } from '../src/narrative/types.ts';
 
 export function assertAssetPath(path: string) {
   if (
@@ -98,19 +101,18 @@ export function validateCompiledFixture(
   let tagOnlyOutputs = 0;
   // Explicit query inputs cover both variants, without guessing production facts.
   for (const enabled of [true, false]) {
-    const store = createStore<FixtureFacts>(() => ({
-      flags: { 'fixture.branch_enabled': enabled },
-    }));
-    const makeStory = () => {
+    const initial = initialFixtureState(enabled);
+    const makeStory = (store: FixtureDomainStore) => {
       const story = new Story(compiled);
       bindFixtureQueries(story, createNarrativeQueryPort(store));
       return story;
     };
-    const first = makeStory();
+    const first = makeStory(createFixtureDomainStore(initial));
     const queue = [
       {
         state: first.state.ToJson(),
         context: resetPresentation(Object.keys(references.scenes)[0]),
+        domain: initial,
       },
     ];
     let steps = 0;
@@ -118,23 +120,48 @@ export function validateCompiledFixture(
       if (++steps > 256) throw new Error('Fixture traversal limit exceeded');
       const item = queue.shift();
       if (!item) break;
-      const story = makeStory();
+      // Each queued path owns its facts/ledger. No branch leaks into a sibling.
+      const store = createFixtureDomainStore(item.domain);
+      const story = makeStory(store);
       story.state.LoadJson(item.state); // Tool traversal only, not player save/load.
       let context = item.context;
       while (story.canContinue) {
-        if (++steps > 256) throw new Error('Fixture traversal limit exceeded');
-        const text = story.Continue() ?? '';
-        const parsed = parseOutput(
-          story.currentTags ?? [],
-          text,
-          references,
-          registry,
-          context,
-        );
-        context = parsed.context;
-        if (parsed.lineId) lines.add(parsed.lineId);
-        if (!parsed.text && (story.currentTags?.length ?? 0) > 0)
-          tagOnlyOutputs++;
+        const events: Readonly<DomainEvent>[] = [];
+        do {
+          if (++steps > 256)
+            throw new Error('Fixture traversal limit exceeded');
+          const text = story.Continue() ?? '';
+          const parsed = parseOutput(
+            story.currentTags ?? [],
+            text,
+            references,
+            registry,
+            context,
+          );
+          context = parsed.context;
+          if (parsed.event?.category === 'domain') events.push(parsed.event);
+          if (parsed.lineId) lines.add(parsed.lineId);
+          if (!parsed.text && (story.currentTags?.length ?? 0) > 0)
+            tagOnlyOutputs++;
+          if (parsed.text) break;
+        } while (story.canContinue);
+        // Match the controller: validate choices before the batch commit.
+        for (const choice of story.currentChoices) {
+          const parsed = parseOutput(
+            choice.tags ?? [],
+            choice.text,
+            references,
+            registry,
+            context,
+          );
+          if (
+            parsed.event ||
+            !parsed.lineId ||
+            parsed.context.sceneId !== context.sceneId
+          )
+            throw new Error('Invalid choice identity/scene/event');
+        }
+        store.commit(events);
       }
       if (!story.currentChoices.length) terminalPaths++;
       for (const choice of story.currentChoices) {
@@ -150,10 +177,14 @@ export function validateCompiledFixture(
         if (!parsed.lineId || parsed.context.sceneId !== context.sceneId)
           throw new Error('Invalid choice identity/scene');
         lines.add(parsed.lineId);
-        const branch = makeStory();
+        const branch = makeStory(createFixtureDomainStore(store.getState()));
         branch.state.LoadJson(story.state.ToJson());
         branch.ChooseChoiceIndex(choice.index);
-        queue.push({ state: branch.state.ToJson(), context: { ...context } });
+        queue.push({
+          state: branch.state.ToJson(),
+          context: { ...context },
+          domain: store.getState(),
+        });
         if (queue.length > 128)
           throw new Error('Fixture branch limit exceeded');
       }

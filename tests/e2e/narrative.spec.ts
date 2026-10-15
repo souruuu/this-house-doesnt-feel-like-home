@@ -22,12 +22,21 @@ test('fixture branch/rejoin uses keyboard and stable identities without errors',
   ).toBeFocused();
   await page.keyboard.press('Enter');
   await expect(region).toHaveAttribute('data-line-id', 'fixture_branch_b_001');
+  await expect(region).toHaveAttribute('data-effects', '1');
+  await expect(region).toHaveAttribute(
+    'data-ledger',
+    'fixture.domain.branch_b',
+  );
   await region.focus();
   await page.keyboard.press('Space');
   await expect(region).toHaveAttribute('data-line-id', 'fixture_rejoin_001');
+  await expect(region.locator('.fixture-line')).toContainText(
+    'ยืนยันข้อมูลหลังบันทึก',
+  );
   await expect(region).toHaveAttribute('data-notifications', '2');
   await page.getByRole('button', { name: 'อ่านต่อ', exact: true }).click();
   await expect(region).toHaveAttribute('data-line-id', 'fixture_end_001');
+  await expect(region).toHaveAttribute('data-effects', '2');
   await expect(region).toHaveAttribute('data-fixture-phase', 'line');
   await expect(region.locator('[data-choice]')).toHaveCount(0);
   await expect(region).toHaveAttribute('data-notifications', '2');
@@ -42,7 +51,7 @@ test('fixture branch/rejoin uses keyboard and stable identities without errors',
   expect(errors).toEqual([]);
 });
 
-test('StrictMode, double click, focused controls and remount do not duplicate advancement', async ({
+test('StrictMode, double input and UI remount preserve a run; explicit new run isolates it', async ({
   page,
 }) => {
   await page.goto('/');
@@ -61,18 +70,35 @@ test('StrictMode, double click, focused controls and remount do not duplicate ad
   ).toBeDisabled();
   await expect(region).toHaveAttribute('data-line-id', 'fixture_branch_a_001');
   await page.getByRole('button', { name: 'เล่นต่อ', exact: true }).click();
+  const session = await region.getAttribute('data-session');
+  const run = await region.getAttribute('data-run');
   for (let i = 0; i < 3; i++) {
-    const session = await region.getAttribute('data-session');
     await page.getByRole('button', { name: 'ปิดฉากทดสอบ' }).click();
     await expect(region).toHaveCount(0);
     await page.getByRole('button', { name: 'เปิดฉากทดสอบ' }).click();
-    await expect(region).toHaveAttribute('data-line-id', 'fixture_start_001');
-    await expect(region).not.toHaveAttribute('data-session', session ?? '');
-    await expect(region).toHaveAttribute('data-notifications', '0');
-    await expect(page.locator('[data-world-state="ready"]')).toHaveCount(1);
-    await page.getByRole('button', { name: 'อ่านต่อ', exact: true }).click();
+    await expect(region).toHaveAttribute(
+      'data-line-id',
+      'fixture_branch_a_001',
+    );
+    await expect(region).toHaveAttribute('data-session', session ?? '');
+    await expect(region).toHaveAttribute('data-run', run ?? '');
+    await expect(region).toHaveAttribute('data-effects', '1');
+    await expect(region).toHaveAttribute(
+      'data-ledger',
+      'fixture.domain.branch_a',
+    );
     await expect(region).toHaveAttribute('data-notifications', '1');
+    await expect(page.locator('[data-world-state="ready"]')).toHaveCount(1);
   }
+  await page
+    .getByRole('button', { name: 'เริ่มรอบทดสอบใหม่', exact: true })
+    .click();
+  await expect(region).toHaveAttribute('data-line-id', 'fixture_start_001');
+  await expect(region).not.toHaveAttribute('data-session', session ?? '');
+  await expect(region).not.toHaveAttribute('data-run', run ?? '');
+  await expect(region).toHaveAttribute('data-effects', '0');
+  await expect(region).toHaveAttribute('data-ledger', '');
+  await expect(region).toHaveAttribute('data-notifications', '0');
 });
 
 test('touch portrait, pause, hidden state and key repeats guard fixture input', async ({

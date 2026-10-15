@@ -22,7 +22,29 @@ export interface PresentationEvent {
   category: 'presentation';
 }
 
-// Batch 1 has no world commands or durable effects. This port only notifies QA.
+// Fixture-only actions; these are not release domain rules or Ink payloads.
+export type FixtureDomainAction =
+  | { readonly kind: 'select-branch'; readonly branch: 'a' | 'b' }
+  | { readonly kind: 'record-rejoin' };
+
+export interface DomainEvent {
+  readonly id: string;
+  readonly sceneId: string;
+  readonly category: 'domain';
+  readonly action: FixtureDomainAction;
+}
+
+export type NarrativeEvent = PresentationEvent | DomainEvent;
+
+export interface FixtureDomainPort {
+  // Validation failure throws before mutation. Notification failure is a receipt
+  // after mutation, so callers must never interpret it as a failed commit.
+  commit(events: readonly Readonly<DomainEvent>[]): {
+    notificationError: string | null;
+  };
+}
+
+// Presentation still only notifies QA; it does not bypass GameBridge to Phaser.
 export interface FixturePresentationPort {
   dispatch(event: Readonly<PresentationEvent>): void;
 }
@@ -41,4 +63,5 @@ export interface NarrativeView {
   line: Readonly<{ id: string; text: string }> | null;
   choices: readonly Readonly<{ index: number; id: string; text: string }>[];
   error: string | null;
+  failureStage: 'pre-commit' | 'post-commit' | null;
 }

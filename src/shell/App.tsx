@@ -103,9 +103,9 @@ export function App() {
             <Panel title="บ้านที่ไม่รู้สึกเหมือนบ้าน">
               <p>โครงทดสอบระบบ — ภาพและตำแหน่งทั้งหมดเป็นตัวแทนชั่วคราว</p>
               <p>ยังไม่มีเนื้อเรื่องหรือภาพฉบับเผยแพร่</p>
-              {NarrativeFixturePanel && mounted ? (
+              {NarrativeFixturePanel ? (
                 <Suspense fallback={<p>กำลังโหลดชุดทดสอบ</p>}>
-                  <NarrativeFixturePanel paused={paused} />
+                  <NarrativeFixturePanel paused={paused} visible={mounted} />
                 </Suspense>
               ) : null}
               <div className="ui-actions">
