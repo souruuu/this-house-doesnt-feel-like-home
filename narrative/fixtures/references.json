@@ -17,6 +17,12 @@
   "speakers": ["none"],
   "expressions": {},
   "positions": [],
-  "events": ["fixture.presentation.started", "fixture.presentation.rejoined"],
+  "events": [
+    "fixture.presentation.started",
+    "fixture.presentation.rejoined",
+    "fixture.domain.branch_a",
+    "fixture.domain.branch_b",
+    "fixture.domain.rejoined"
+  ],
   "assets": ["m0.world.reference"]
 }

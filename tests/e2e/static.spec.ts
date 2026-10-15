@@ -33,6 +33,9 @@ test('same static dist runs at a nested path inside an iframe', async ({
     expect(code).not.toContain('m0_probe_line_001');
     expect(code).not.toContain('fixture_start_001');
     expect(code).not.toContain('fixture.presentation.started');
+    expect(code).not.toContain('fixture.domain.branch_a');
+    expect(code).not.toContain('fixture.branch_committed');
+    expect(code).not.toContain('เริ่มรอบทดสอบใหม่');
     expect(code).not.toContain('ทดสอบระบบข้อความ');
     expect(code).not.toContain('technical_fixture');
     expect(code).not.toContain('inkVersion');

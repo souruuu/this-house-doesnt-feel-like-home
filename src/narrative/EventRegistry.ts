@@ -1,10 +1,15 @@
-import type { PresentationEvent } from './types.ts';
+import type { FixtureDomainAction, NarrativeEvent } from './types.ts';
 
-export interface EventDefinition {
+interface EventIdentity {
   id: string;
   sceneId: string;
-  category: 'presentation' | 'domain';
 }
+
+export type EventDefinition = EventIdentity &
+  (
+    | { category: 'presentation' }
+    | { category: 'domain'; action: FixtureDomainAction }
+  );
 
 export class EventRegistry {
   private readonly definitions = new Map<string, Readonly<EventDefinition>>();
@@ -13,16 +18,21 @@ export class EventRegistry {
     for (const definition of definitions) {
       if (this.definitions.has(definition.id))
         throw new Error(`Duplicate Event ID: ${definition.id}`);
-      this.definitions.set(definition.id, Object.freeze({ ...definition }));
+      this.definitions.set(
+        definition.id,
+        Object.freeze(
+          definition.category === 'domain'
+            ? { ...definition, action: Object.freeze({ ...definition.action }) }
+            : { ...definition },
+        ),
+      );
     }
   }
 
-  resolvePresentation(id: string): Readonly<PresentationEvent> {
+  resolve(id: string): Readonly<NarrativeEvent> {
     const definition = this.definitions.get(id);
     if (!definition) throw new Error(`Unknown event: ${id}`);
-    if (definition.category !== 'presentation')
-      throw new Error(`Domain execution is outside Batch 1: ${id}`);
-    return Object.freeze({ ...definition, category: 'presentation' });
+    return definition;
   }
 }
 
@@ -36,6 +46,24 @@ export const fixtureEventDefinitions: readonly EventDefinition[] = [
     id: 'fixture.presentation.rejoined',
     sceneId: 'fixture.rejoin',
     category: 'presentation',
+  },
+  {
+    id: 'fixture.domain.branch_a',
+    sceneId: 'fixture.main',
+    category: 'domain',
+    action: { kind: 'select-branch', branch: 'a' },
+  },
+  {
+    id: 'fixture.domain.branch_b',
+    sceneId: 'fixture.main',
+    category: 'domain',
+    action: { kind: 'select-branch', branch: 'b' },
+  },
+  {
+    id: 'fixture.domain.rejoined',
+    sceneId: 'fixture.rejoin',
+    category: 'domain',
+    action: { kind: 'record-rejoin' },
   },
 ];
 

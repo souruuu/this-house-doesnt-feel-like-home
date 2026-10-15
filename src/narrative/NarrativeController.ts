@@ -7,10 +7,11 @@ import {
 import { parseOutput, resetPresentation } from './tags.ts';
 import type {
   FixturePresentationPort,
+  FixtureDomainPort,
   FixtureReferences,
   NarrativeRequest,
   NarrativeView,
-  PresentationEvent,
+  NarrativeEvent,
 } from './types.ts';
 
 let nextSession = 0;
@@ -28,9 +29,15 @@ export class NarrativeController {
     private readonly registry: EventRegistry,
     queries: NarrativeQueryPort,
     private readonly presentation: FixturePresentationPort,
+    private readonly domain: FixtureDomainPort = {
+      commit(events) {
+        if (events.length) throw new Error('Missing fixture domain port');
+        return { notificationError: null };
+      },
+    },
   ) {
     if (references.scope !== 'technical-fixture-only')
-      throw new Error('Batch 1 only accepts technical fixtures');
+      throw new Error('Controller only accepts technical fixtures');
     this.story = new Story(compiled);
     bindFixtureQueries(this.story, queries);
     const initialScene = Object.keys(references.scenes)[0];
@@ -44,29 +51,37 @@ export class NarrativeController {
       line: null,
       choices: Object.freeze([]),
       error: null,
+      failureStage: null,
     };
     this.view = Object.freeze(this.view);
   }
 
   getSnapshot = () => this.view;
 
-  subscribe(listener: (view: NarrativeView) => void) {
+  subscribe = (listener: (view: NarrativeView) => void) => {
     if (!this.active) throw new Error('Session is disposed');
     this.listeners.add(listener);
     return () => this.listeners.delete(listener);
-  }
+  };
 
   private publish(view: NarrativeView) {
-    if (!this.active) return;
+    if (!this.active) return null;
     this.view = Object.freeze(view);
+    let notificationError: string | null = null;
     for (const listener of this.listeners) {
       if (!this.active) break;
-      listener(this.view);
+      try {
+        listener(this.view);
+      } catch (error) {
+        notificationError ??=
+          error instanceof Error ? error.message : String(error);
+      }
     }
+    return notificationError;
   }
 
   setPaused(paused: boolean) {
-    if (this.active && paused !== this.view.paused)
+    if (this.active && !this.locked && paused !== this.view.paused)
       // Pending intentions from before pause/resume must not become valid again.
       this.publish({ ...this.view, paused, revision: this.view.revision + 1 });
   }
@@ -105,12 +120,13 @@ export class NarrativeController {
   private advance(choiceIndex?: number) {
     this.locked = true;
     const revision = this.view.revision + 1;
+    let commitCompleted = false;
     try {
       if (choiceIndex !== undefined) this.story.ChooseChoiceIndex(choiceIndex);
       let context = { ...this.view.presentation };
       let line = this.view.line;
       let receivedLine = false;
-      const events: Readonly<PresentationEvent>[] = [];
+      const events: Readonly<NarrativeEvent>[] = [];
       let outputs = 0;
       while (this.story.canContinue) {
         if (++outputs > 128) throw new Error('Fixture output limit exceeded');
@@ -150,12 +166,19 @@ export class NarrativeController {
         });
       });
       // All tag-only outputs, the line and every available choice are valid first.
+      const receipt = this.domain.commit(
+        events.filter((event) => event.category === 'domain'),
+      );
+      commitCompleted = true;
+      if (receipt.notificationError !== null)
+        throw new Error(receipt.notificationError);
       for (const event of events) {
         if (!this.active) return false;
-        this.presentation.dispatch(event);
+        if (event.category === 'presentation')
+          this.presentation.dispatch(event);
       }
       if (!this.active) return false;
-      this.publish({
+      const notificationError = this.publish({
         ...this.view,
         revision,
         // A newly published line always waits for its own Continue intention.
@@ -164,7 +187,9 @@ export class NarrativeController {
         line,
         choices: Object.freeze(receivedLine ? [] : choices),
         error: null,
+        failureStage: null,
       });
+      if (notificationError !== null) throw new Error(notificationError);
       return true;
     } catch (error) {
       this.publish({
@@ -174,6 +199,7 @@ export class NarrativeController {
         line: null,
         choices: Object.freeze([]),
         error: error instanceof Error ? error.message : String(error),
+        failureStage: commitCompleted ? 'post-commit' : 'pre-commit',
       });
       return false;
     } finally {

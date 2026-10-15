@@ -2,7 +2,7 @@
 
 Source of Truth ของลำดับงาน Definition of Done และหลักฐานตรวจ เพื่อไปถึง **Prototype บทนำ + Day 1–3** และ competition package ขอบเขตเกมเต็มอยู่ใน [PROJECT](PROJECT.md); เนื้อหารายฉากอยู่ใน [Narrative Map](sources/narrative_map_7_day_Updates.md)
 
-สถานะ: **M0 คง Conditional Acceptance; M1 Batch 1 implementation พร้อม Owner Review บน `codex/m1-narrative-engine-batch-1` แต่ยังไม่ commit/push** ไม่ถือว่า M0 หรือ M1 ผ่าน Definition of Done ครบ; ManagedGame confirmed defect ยังไม่แก้, Windows Firefox verification และ A-01 ยัง OPEN Batch ถัดไปและ M2–M7 ยังไม่เริ่ม M1 stacked จาก M0 baseline `3c0010bb4d2adf3b3a185bebfb7079a9bf98a4f1`; M0 ต้อง merge ก่อน M1 และตรวจ integration ใหม่ก่อน M1 merge
+สถานะ: **M0 และ M1 Batch 1 merge เข้า remote main แล้วแบบ Conditional Integration Acceptance**: M0 PR #2 `d33c5976bc3446acca8c27ce23c52e1a66dbc34a` → M1 PR #3 `7cd44c19eb5d8634c90dd4dde95ecf77f8a06101` โดยรักษา merge ancestry; Batch 1 commit `72fda637efde5e91925da03681fb2908790d8fc8` มี B-01–B-03 PASS และ B-04 FIX VERIFIED M0 ยัง NOT DONE; M1 milestone ยัง NOT DONE ManagedGame defect, Firefox/A-01 คง OPEN และ pre-READY failure คง unverified residual risk Batch 2 ทำใน working tree จาก main baseline ข้างต้น รวม focused lookahead-safety fix ที่ Owner อนุมัติ Option 1 และคง **Pending Review**; Batch 3/M2–M7 ยังไม่เริ่ม รายละเอียด Batch 2 อยู่ด้านล่าง ข้อความรอ review/Git approval ในบันทึก M0/Batch 1 เก็บเป็นประวัติก่อน approvals/merge ไม่ใช่สถานะปัจจุบัน
 
 ## บันทึกงาน M0 — 2026-10-13
 
@@ -154,6 +154,61 @@ Independent Source Review ให้ B-01/B-02/B-03 PASS และพบ B-04 blo
 Evidence B-04: `%TEMP%/this-house-m0-qa/m1-b04-chromium-webkit-1792044644084/verification.log` และ test-results รอบเดียวกัน Firefox ไม่ rerun ใน B-04 ตามขอบเขตเจ้าของ ผลเดิมยัง 0 passed / 6 failed / 0 skipped, exit 1 จาก spawn UNKNOWN ก่อนเข้าเกม; ไม่แก้ Windows Firefox และไม่อ้าง full E2E ผ่าน
 
 Diff เพิ่มจาก source-review snapshot จำกัด 5 ไฟล์เดิม: src/narrative/NarrativeController.ts, tests/unit/narrative.test.ts, tests/e2e/narrative.spec.ts, MASTER_PLAN.md, README.md ไม่มีไฟล์ใหม่เพิ่มจากรายการ 18 ไฟล์เดิม ไม่แก้ EventRegistry/parser/validator/query, architecture/DoD/dependencies หรือ Phaser lifecycle; M0 known defects/Firefox/A-01 คง OPEN รอ Owner Review B-04 ก่อน stage/commit/push/merge หรือ Batch ถัดไป ZIP review เดิมเป็น pre-B-04 snapshot และไม่ได้เขียนทับ
+
+## บันทึกงาน M1 Batch 2 — 2026-10-15 / Pending Review
+
+Owner อนุมัติ Batch 2 เฉพาะ domain transaction/committed-event ledger และ documentation follow-up; Batch 3 persistence/checkpoint restore ยังไม่อนุมัติ ก่อนสร้าง branch ตรวจ remote main `7cd44c19eb5d8634c90dd4dde95ecf77f8a06101`, clean working tree และไม่มีชื่อ branch ทั้ง local/remote แล้ว fetch exact SHA และสร้าง `codex/m1-narrative-engine-batch-2` ที่ SHA นี้ ไม่อัปเดต local main ไม่ stage/commit/push/PR/merge
+
+แผนที่อนุมัติ: typed registry/parser → authoritative fixture store + atomic effects/ledger → controller failure boundary/order → run owner แยก view subscriptions → path-isolated validator/fixture → unit/E2E/static regressions → documentation/verification ไม่เปลี่ยน DoD/dependencies/architecture และไม่แตะ src/world ขอบเขต domain มีเพียง technical branch selection/rejoin และ effect counter ไม่ใช่สูตรหรือข้อเท็จจริงของเรื่อง
+
+- Registry คืน discriminated domain/presentation metadata; parameters อยู่ TypeScript เท่านั้น Store คำนวณ candidate และตรวจทุก precondition ก่อน update เดียวที่รวม effects+ledger Duplicate IDs ไม่เพิ่ม effects และ ledger ไม่ข้าม run
+- Controller validate ทุก buffered output/choice ก่อน domain commit แล้ว presentation/publish Input ถูก lock รวมช่วง synchronous subscribers หาก pre-commit failure หลัง Ink เคลื่อนแล้วจะหยุด phase error และไม่ retry/advance หลัง callback failure ที่เกิดหลัง commit คง facts/ledger และหยุด flow; notification error receipt แยกจาก failed commit ไม่เพิ่ม recovery framework หรือ rollback gameplay
+- Run owner อยู่เหนือ React view subscriptions ปิด/เปิด view ไม่สร้าง store/controller ใหม่ Explicit dev-only New Run สร้าง run identity ใหม่และ dispose controller เก่า ไม่มี storage หรือ save/load API
+- Validator เตรียม domain state ตาม readable output boundary แบบเดียวกับ controller และ clone facts/ledger ต่อ queued traversal path ทั้งสอง branches/สอง query inputs คง bounded traversal, source-ID uniqueness และ negative cases ไม่ใช่ production story validator
+
+**ประวัติ blocker — Ink lookahead/query timing ก่อน Option 1 (เงื่อนไข B):** real inkjs 2.4.0 ทดสอบ inline query/temporary variable หลัง readable commit line แล้วอ่านค่าหลัง commit ได้ แต่ query ที่เป็นเงื่อนไข choices ทันทีหลัง line เดียวกันถูกประเมินขณะ lookahead ด้วย facts ก่อน commit เมื่อคืน line นั้น `canContinue=false` และ `currentChoices=['stale']`; หลัง commit ไม่มี Continue ใหม่ให้ re-evaluate จึงคง choices เก่า รอบนั้นเก็บ failing regression โดยไม่ skip และหยุดส่วน query timing ไม่เปลี่ยน transaction architecture หรือ mirror facts เข้า Ink
+
+Probe public API แบบ isolated (ไม่แก้ implementation) เปรียบเทียบ `BindExternalFunction(..., true)` เดิมกับ `false`: true มี query reads `[false,false]` และ stale choice; false ก่อน commit มี reads `[]`, canContinue=true แล้วหลัง commit/Continue มี reads `[true,true]` และ committed choice จึงเป็นทางเลือกให้ Owner review การใช้ false ยังต้องตรวจข้อจำกัด query ระหว่าง string generation และอาจใช้ temporary query expression ก่อนข้อความ; อีกทางคืออนุมัติ authored output boundary ที่เลื่อน query-dependent choices ออกไป ไม่ใช้การทดลองนี้เป็นเหตุให้เปลี่ยน binding/architecture เอง
+
+ผลตรวจระหว่างทำก่อน Option 1: รอบแรก `npm test` ใน sandbox exit 1 โหลด 3 suites ไม่ได้เพราะ Vitest cache EPERM ไม่มี test ที่รัน นอก sandbox รอบแรก 54 passed/1 failed จาก loop fixture ที่กลับไปเลือก branch ต่างหลัง domain commit; แก้ looping negative fixture ให้ loop ที่ rejoin เพื่อทดสอบ traversal bound โดยตรง (ไม่ผ่อน domain precondition) หลังเพิ่ม focused tests รอบก่อน Owner Decision `npm test` exit 1: **77 passed/1 failed/0 skipped ใน 4 files** failing assertion คือ query-dependent choices ได้ stale แทน committed ข้างต้น
+
+`npm run narrative:compile`, `npm run narrative:validate` (8 Line IDs/4 terminal paths/2 tag-only outputs), `npm run typecheck`, `npm run lint`, `npm run format:check` และ `npm run build` exit 0 Build มี Phaser chunk-size warning เดิมประมาณ 1.39 MB/gzip 372 kB ไม่มี dependency install/version/config change Environment Windows/PowerShell, Node.js 24.13.1/npm 11.8.0/inkjs 2.4.0/Playwright 1.64.0 เดิม
+
+Browser verification ก่อน Option 1: `npm run test:e2e:windows-chromium-webkit` exit 0, **12 passed/0 failed/0 skipped** (51.3s) รวม actual fixture branches/committed query line, ledger หลัง UI remount สามรอบ, explicit New Run isolation, terminal line, input/pause/portrait และ production fixture exclusion นี่ไม่ครอบคลุม immediate query-dependent choices ที่ unit regression พบว่า fail `npm run test:e2e:firefox` exit 1, **0 passed/6 failed/0 skipped** จาก `browserType.launch: spawn UNKNOWN` ก่อนรันเกม ไม่ใช่ app assertion failure Environment อื่นยังไม่รัน ไม่ลบ/skip Firefox project และไม่อ้าง full E2E หรือ CI PASS
+
+Evidence logs ก่อน Option 1 อยู่ `%TEMP%/this-house-m0-qa/m1-batch2-unit-20261015/verification.log`, `m1-batch2-chromium-webkit-20261015/verification.log` และ `m1-batch2-firefox-20261015/verification.log` พร้อม browser artifacts ใน test-results ของแต่ละ run Regression ตอนนั้นผ่าน NarrativeController จริงยืนยัน authoritative flag/ledger commit แล้ว แต่ choices เป็น `fixture_choice_b_001` แทน `fixture_choice_a_001` ผลรวม 77 passed/1 failed/0 skipped ไม่ใช้การรัน subset ปิด blocker เก็บ logs เดิมแยกจากผลหลัง fix
+
+### Owner Option 1 — Focused Lookahead-Safety Fix
+
+Owner อนุมัติ public `BindExternalFunction(..., false)` สำหรับ authoritative queries ภายใน Batch 2 โดยไม่เปลี่ยน transaction architecture หรือเพิ่ม narrative boundary แก้เพียง binding policy ที่ Controller/validator ใช้ร่วมกัน ไม่มี private API, dependency patch, arbitrary payload/tag ใหม่ หรือ authoritative state mirror ใน Ink Technical fixture ไม่มีข้อความหรือ Continue step เพิ่มจากรอบ blocker
+
+Regression เดิมผ่าน NarrativeController จริงโดยไม่เปลี่ยน assertion/skip: หลัง flag/ledger commit คืน choice ที่ถูกต้อง เพิ่ม technical flag `fixture.branch_pending` ที่เปลี่ยน true→false ใน atomic branch action เดียวกับ `fixture.branch_committed` false→true เพื่อทดสอบสองทิศทาง ไม่เพิ่ม domain action ของเรื่อง Query spies ยืนยันไม่อ่านแบบ speculative ก่อน readable commit boundary และอ่านค่าหลัง commit จริง
+
+Controller integration matrix ครอบคลุม temporary expressions, choice conditions, inline interpolation, temp ก่อน quoted string/choice text และ leading/trailing Glue โดยไม่มี output/Continue แทรก Authoring limitations และตัวอย่างอยู่ [README](README.md#authoritative-query-binding--inkjs-240): direct query ใน choice text/quoted string ถูก runtime ปฏิเสธ ต้องประเมิน temp ที่จุดใช้งานก่อนสร้าง string Negative cases ตรวจทั้ง startup และหลัง transaction ก่อนหน้าที่ commit แล้ว โดย transaction ที่ผิดไม่มี effects เพิ่มและไม่ retry Glue รวมเป็น output เดียวจึงไม่ใช่ commit boundary; placement ที่รวม Line IDs ซ้ำถูก guard ตาม contract เดิม (isolated probe ยืนยัน behavior นี้มีใน binding true เดิมด้วย)
+
+Validator integration ใช้ fixture ที่ query เก่าจะเข้า unknown-flag path แต่ policy ใหม่เดิน path หลัง commit ถูกต้อง เช่นเดียวกับ Controller และตรวจ unsupported string generation ให้ fail ทั้งคู่ Focused `npx vitest run tests/unit/domain-transaction.test.ts` exit 0 **42 passed/0 failed/0 skipped**; `npm test` exit 0 **97 passed/0 failed/0 skipped ใน 4 files** รวม atomic commit/ledger/reentrancy/pre-post failure/B-04/Batch 1 regressions ผลระหว่างเขียน matrix เคยมี assertions ผิดเรื่องจังหวะ runtime error และ Glue/tag placement 4 failed/90 passed; ปรับ test fixtures/expectations ให้ตรวจ transaction ที่ผิดจริง ไม่แก้ assertion ของ original stale-choice regression Lint เคย fail จาก unnecessary quote escapes ใน negative fixture และ format check fail หลังแก้ escapes; แก้ test source แล้ว
+
+ผล verification หลัง Option 1 บน Windows/PowerShell และ toolchain/dependencies เดิม:
+
+| คำสั่ง | Exit | ผล |
+|---|---:|---|
+| `npm run narrative:compile` | 0 | Technical fixture เดิม ไม่มีข้อความ/Continue เพิ่ม |
+| `npm run narrative:validate` | 0 | 8 Line IDs/4 terminal paths/2 tag-only outputs |
+| `npm run typecheck` | 0 | App/scripts/tests ผ่าน |
+| `npm run lint` | 0 | ผ่านหลังแก้ test quote escapes |
+| `npm run format:check` | 0 | ผ่านหลัง format test file |
+| `npx vitest run tests/unit/domain-transaction.test.ts` | 0 | 42 passed/0 failed/0 skipped |
+| `npm test` | 0 | 97 passed/0 failed/0 skipped; 4 files |
+| `npm run build` | 0 | Static build ผ่าน; Phaser chunk warning เดิม |
+| `npm run test:e2e:windows-chromium-webkit` | 0 | 12 passed/0 failed/0 skipped; 50.3s |
+| `npm run test:e2e:firefox` | 1 | 0 passed/6 failed/0 skipped; spawn UNKNOWN ก่อนเข้าเกม |
+| `git diff --check` | 0 | ไม่มี whitespace errors |
+
+Evidence ใหม่แยกใน `%TEMP%/this-house-m0-qa/m1-batch2-lookahead-unit-20261015/verification.log` และ `focused-verification.log`, `m1-batch2-lookahead-chromium-webkit-20261015/verification.log`, `m1-batch2-lookahead-firefox-20261015/verification.log` พร้อม browser artifacts Environment อื่นยังไม่ verified ไม่ใช้ Chromium/WebKit subset แทน full E2E หรือ CI PASS ไม่มี blocking implementation regression จาก checks ที่รัน แต่ยังรอ independent review และ full browser gate ยังไม่ผ่าน
+
+รอบ Option 1 เปลี่ยนเฉพาะ NarrativeQueryPort, fixtureDomainStore, domain-transaction tests, README และ MASTER_PLAN; cumulative Batch 2 มี modified 16/new 2 ไฟล์ ไม่มี dependency/architecture/Phaser/config/tag changes ตรวจ milestone/Definition of Done ทั้ง 8 แถวเทียบ baseline แล้วตรงกัน Git HEAD ยัง `7cd44c19eb5d8634c90dd4dde95ecf77f8a06101` และ index ว่าง
+
+**Remaining work:** Owner Code Review และ Git Approval แยกต่างหากก่อน stage/commit/push/PR/merge Batch 3 SaveCoordinator/SaveRepository/Safe Checkpoint/restore/profile-backlog persistence ยังไม่ implement ไม่มีหลักฐาน idempotency หลัง browser reload/save restore M0 acceptance/known risks/Firefox/A-01 ไม่ถูกปิดจากผล Batch 2
 
 ## Milestones
 

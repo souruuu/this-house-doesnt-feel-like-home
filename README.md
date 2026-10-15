@@ -1,8 +1,8 @@
 # บ้านที่ไม่รู้สึกเหมือนบ้าน
 
-Interactive Game Website — M0 scaffold + M1 Batch 1 technical fixture (dev/QA)
+Interactive Game Website — M0 scaffold + M1 technical fixture (dev/QA)
 
-**สถานะ:** M1 Batch 1 บน `codex/m1-narrative-engine-batch-1` implementation พร้อม Owner Review แต่ยังไม่ commit/push; stacked จาก M0 SHA `3c0010bb4d2adf3b3a185bebfb7079a9bf98a4f1` M0 คง Conditional Acceptance, ManagedGame confirmed defect ยังไม่แก้, Firefox/A-01 ยัง OPEN และ M1 ไม่ใช่ DONE ไม่มี release story, save/domain implementation หรือ final art รายละเอียด decision/ผลตรวจจริงอยู่ใน [MASTER_PLAN](MASTER_PLAN.md) M0 ต้อง merge ก่อน M1 และตรวจ integration ใหม่ก่อน M1 merge
+**สถานะ:** M0 PR #2 merge commit `d33c5976bc3446acca8c27ce23c52e1a66dbc34a` และ M1 Batch 1 PR #3 merge commit `7cd44c19eb5d8634c90dd4dde95ecf77f8a06101` อยู่ใน remote main แล้ว M0 และ Batch 1 คง Conditional Acceptance; M0/M1 ไม่ใช่ DONE ขณะนี้ Batch 2 เป็น working tree บน `codex/m1-narrative-engine-batch-2` จาก exact main baseline ดังกล่าว มี fixture-only domain transaction/ledger และ focused lookahead-safety fix ตาม Owner Option 1; **Pending Review** ยังไม่ stage/commit/push ManagedGame defect, Firefox/A-01 คง OPEN ไม่มี release story, persistence/restore หรือ final art ดูผลจริงและ Owner Decisions ใน [MASTER_PLAN](MASTER_PLAN.md)
 
 **Checkpoint:** คง implementation และ dependency versions ปัจจุบัน หยุดทดลอง Phaser internals/startup override/failure-injection และไม่มี lifecycle fix ใหม่ ผล probe กับ Phaser 4.2.1 จริงยืนยันว่า ManagedGame ลบ external visibilitychange listener จาก postBoot โดยไม่ตั้งใจ 3/3 รอบ ส่วน pre-READY boot failure เป็น residual risk ที่ยังไม่พิสูจน์ด้วย runtime failure-injection ดูหลักฐานแยกกันใน MASTER_PLAN ไม่เปลี่ยน Definition of Done และไม่ถือว่า checkpoint ผ่าน lifecycle gate
 
@@ -39,7 +39,24 @@ npm run dev
 | `npm run build` | compile/validate narrative + typecheck + Vite static build ไป `dist/` |
 | `npm run preview` | Vite preview ของ build ที่สร้างแล้ว |
 
-**N-02 CLOSED:** source/tag/EventRegistry/query/identity contract อยู่ใน [docs/NARRATIVE_SYSTEM.md](docs/NARRATIVE_SYSTEM.md) Batch 1 มี controller/registry/read-only query สำหรับ fixture; durable ledger/domain execution/checkpoint/save ยังไม่ implement ผลตรวจแต่ละคำสั่งอยู่ใน MASTER_PLAN
+**N-02 CLOSED:** source/tag/EventRegistry/query/identity contract อยู่ใน [docs/NARRATIVE_SYSTEM.md](docs/NARRATIVE_SYSTEM.md) Batch 2 เพิ่ม typed domain/presentation registry และ authoritative fixture store ที่ commit effects+ledger พร้อมกัน; checkpoint/save/restore ยังไม่ implement Query timing regression สำหรับ choices ทันทีหลัง commit line ผ่านด้วย public binding policy ด้านล่าง ผลตรวจและข้อจำกัดอยู่ใน MASTER_PLAN; Batch 2 ยังรอ Owner Code Review
+
+### Authoritative query binding — inkjs 2.4.0
+
+`bindFixtureQueries()` ใช้ `BindExternalFunction(..., false)` ร่วมกันทั้ง Controller และ validator เพราะ read-only query อาจเปลี่ยนค่าหลัง domain commit จึงไม่ใช่ lookahead-safe แม้ไม่มี mutation จาก Ink ไม่ mirror authoritative state เข้า Ink และไม่เปลี่ยน transaction order หรือเพิ่ม Continue step ให้ fixture
+
+- Choice conditions และ query ในข้อความปกติ เช่น `value {fixture_flag("fixture.branch_committed")}` ใช้ได้ตาม Controller integration tests Query หลัง readable commit boundary อ่าน Zustand ปัจจุบันทั้ง false→true และ true→false โดยไม่มี speculative read ก่อน commit ในกรณีที่ทดสอบ
+- Direct query ภายใน **choice text** หรือ **quoted string** ถูก inkjs ปฏิเสธด้วย runtime string-generation error ให้ประเมิน `temp` ที่จุดใช้งานก่อนสร้าง string/choice ตามตัวอย่าง ไม่ใช้ temp เป็น authoritative fact หรือ writer และต้องประเมินใหม่หลัง commit ที่เกี่ยวข้อง
+
+```ink
+~ temp current = fixture_flag("fixture.branch_committed")
++ [ค่าทดสอบ {current} # line:fixture_choice_a_001]
+    -> END
+```
+
+Quoted string ใช้ `~ temp label = "ค่าทดสอบ {current}"` หลังประเมิน temp แทนการเรียก external query ภายใน quotes โดยตรง Unknown flag และ unsupported string-generation forms ต้อง fail/guard ไม่ default เป็นผลทางเรื่อง
+
+Glue เป็นการรวมข้อความ ไม่ใช่ domain transaction boundary: query ใน output ที่ Glue รวมยังอ่าน facts ก่อน commit ของ output นั้น แล้ว output ถัดไปอ่าน facts หลัง commit Tests ครอบคลุม leading/trailing Glue และ temp โดยไม่แยก output เพิ่ม วาง event tag ก่อนข้อความที่ลงท้าย `<>` หรือใช้ leading Glue ตามรูปแบบที่ทดสอบ; `prefix <> # event:...` อาจรวมบรรทัดถัดไปต่อเนื่องใน inkjs 2.4.0 เช่นเดียวกับ binding เดิม ถ้ารวมหลาย `line` tags เป็น output เดียว Controller/validator ต้อง reject ตาม singleton tag contract เดิม ต้องมี stable Line ID เดียวต่อ readable runtime output ไม่ใช้ physical source line เป็น identity
 
 ## A-01 toolchain baseline
 
@@ -73,15 +90,16 @@ Compiler ที่ใช้จริงคือ `Compiler` จาก `inkjs/ful
 - `ManagedGame` ใช้ adapter จับ native registrations ช่วง `start()` ของ Phaser 4.2.1 แต่มี confirmed ownership defect: external visibilitychange listener จาก postBoot ถูกจับและลบด้วย ยังไม่แก้และไม่ถือว่า lifecycle cleanup ผ่านครบ; รายละเอียดและ residual risks อยู่ MASTER_PLAN ไม่แก้ node_modules
 - `src/ui`: reusable Button/Panel, centralized neutral CSS tokens และ stylesheet แยกจาก shell/game logic ตำแหน่ง/สี/font เป็น technical probe ไม่ใช่ final identity หรือ approved dialogue/stage coordinates
 - `src/assets/manifest.json`: semantic ID `m0.world.reference` → SVG grid ทางเทคนิคใน `public/assets/placeholders` ใช้ relative base เดียวกับ Vite ไม่มี character mapping จาก JPG sheet, production dimensions, anchor, pose หรือ layering catalog
-- `narrative/fixtures/technical_fixture.ink`: fixture ภาษาไทย line→choice→สอง branches→rejoin มี stable IDs/tag-only presentation events และ read-only query test ไม่มี release characters/domain facts Generated output อยู่ `generated/narrative` และไม่เข้า production `dist`; dev watcher compile/validate เมื่อแก้ Ink แล้ว reload หรือแสดง error overlay เมื่อผิด
-- `src/narrative`: Story อยู่ใน session-owned NarrativeController เท่านั้น; whole-output validation ก่อน injected QA notification dispatch, read-only query จาก isolated Zustand fixture facts, scene context reset และ stale session/revision/input-lock guards ไม่มี world commands หรือ durable actions/ledger
-- `src/ui/NarrativeFixturePanel.tsx`: Continue/Choice ใช้ keyboard/touch/pause/focus guards ใน dev/QA เท่านั้น ปิดแล้วเปิดฉากทดสอบจะสร้าง narrative session ใหม่ StrictMode ยกเลิก async session creation ที่ unmount แล้ว ไม่มีการเปลี่ยน Phaser startup หรือ window focus/blur handlers
+- `narrative/fixtures/technical_fixture.ink`: fixture ภาษาไทย line→choice→สอง branches→rejoin มี stable IDs/tag-only output, technical domain events และ query หลัง commit ไม่มี release characters/domain rules Generated output อยู่ `generated/narrative` และไม่เข้า production `dist`; dev watcher compile/validate เมื่อแก้ Ink แล้ว reload หรือแสดง error overlay เมื่อผิด
+- `src/narrative`: Story อยู่ใน session-owned NarrativeController; validate output/choices ทั้งชุด → commit fixture domain events → injected QA presentation notifications → publish รักษา scene/session/revision/input-lock guards หาก transaction ล้มเหลวจะหยุดที่ error ไม่ advance/retry จาก cursor ที่ขยับแล้ว หลัง commit ไม่ rollback effects/ledger เพราะ callback ล้มเหลว ไม่มี world commands ใหม่
+- `src/state/fixtureDomainStore.ts`: Zustand เป็น authoritative state ของ technical playthrough; typed actions ตรวจ preconditions ทั้งชุดบน candidate แล้วเปลี่ยน facts+committed-event ledger ด้วย update เดียว Registry ไม่เก็บ ledger ไม่ใช่ release GameState/production domain rules และไม่ persist ข้าม browser reload
+- `src/ui/NarrativeFixturePanel.tsx`: owner ของ run/controller อยู่เหนือ view subscriptions; ปิด/เปิดฉากทดสอบ remount view โดยคง run/ledger เดิม ปุ่ม dev-only “เริ่มรอบทดสอบใหม่” สร้าง run/session/ledger ใหม่และ dispose controller เก่า Continue/Choice ใช้ keyboard/touch/pause/focus guards และ StrictMode cancellation เดิม ไม่มีการเปลี่ยน Phaser startup หรือ window focus/blur handlers
 - ยังไม่มี `narrative/main.ink`/prologue/days ที่อนุมัติ ห้ามใช้บท Google Doc ห้าวันเป็น release entry แทน source เจ็ดวัน
 - `scripts/serve-static-test.ts` เป็น local-only QA harness สำหรับ subdirectory/iframe ไม่ใช่ runtime backend และไม่อยู่ใน dist Playwright จัด dev server + build/static QA server ให้เอง
 
 ผล screenshot/trace ของ Playwright รอบใหม่อยู่ `%TEMP%/this-house-m0-qa/<platform>-<run-id>/test-results` ไม่รวมใน Git Worker ทุกตัวใช้ run ID ที่รับจาก parent process ผ่าน `PHASER_M0_QA_RUN_ID`; variable นี้กำหนด artifact path เท่านั้น ไม่ใช้เปลี่ยน projects หรือ skip tests สามารถกำหนด ID สำหรับรอบตรวจเองได้ (ตัวอักษร/ตัวเลข/hyphen) และควรใช้ ID ใหม่ต่อ invocation Full run เดิมใน `%TEMP%/this-house-m0-qa/test-results` ยังคงเป็นหลักฐาน failed run; subset ไม่ overwrite หลักฐานนั้น การตรวจตัวอย่าง desktop/landscape/portrait ไม่ปิด U-01 minimum viewport/touch target และไม่ยืนยัน final font หรือ accessibility certification
 
-ผลล่าสุดหลังแก้ B-04 บน Windows: unit 55 passed/0 failed/0 skipped; Chromium/WebKit subset 12 passed/0 failed/0 skipped, exit 0 บรรทัดสุดท้ายรอ Continue ก่อน ended และไม่ replay events; implementation รอ Owner Review Firefox ไม่ rerun ใน B-04 ตามขอบเขตเจ้าของ ผลเดิมยัง 0 passed/6 failed/0 skipped, exit 1 จาก `browserType.launch: spawn UNKNOWN` ก่อนรันเกม Firefox environment อื่นยังไม่ได้ตรวจ แผนคือใช้ source/lockfile เดียวกันบน Linux ที่เจ้าของอนุมัติ ติดตั้ง browser ที่ตรงกับ Playwright แล้วรัน `npm run test:e2e:firefox` และเก็บผลแยก ไม่รวมผลต่าง environments แล้วเรียกว่า full E2E ผ่าน Exact commands/evidence/limitations อยู่ MASTER_PLAN
+หลักฐาน Batch 1 หลังแก้ B-04: unit 55 passed/0 failed/0 skipped; Chromium/WebKit subset 12 passed/0 failed/0 skipped, exit 0 และ Owner ยอมรับแบบ conditional ก่อน merge แล้ว ผล Batch 2 แยกใน MASTER_PLAN ไม่ใช้ผลเก่าแทน implementation ปัจจุบัน Firefox environment อื่นยังไม่ได้ตรวจ แผนคือใช้ source/lockfile เดียวกันบน Linux ที่เจ้าของอนุมัติ ติดตั้ง browser ที่ตรงกับ Playwright แล้วรัน `npm run test:e2e:firefox` และเก็บผลแยก ไม่รวมผลต่าง environments แล้วเรียกว่า full E2E ผ่าน
 
 ติดตั้ง browser สำหรับ Playwright ครั้งแรกหลังติดตั้ง dependencies:
 

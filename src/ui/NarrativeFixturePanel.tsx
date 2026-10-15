@@ -1,32 +1,39 @@
-import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
+import {
+  useEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+  type KeyboardEvent,
+} from 'react';
 import type { FixtureSession } from '../narrative/fixtureSession';
 import type { NarrativeView } from '../narrative/types';
 import { Button } from './Button';
 
-export default function NarrativeFixturePanel({ paused }: { paused: boolean }) {
+// This owner stays mounted when the fixture view/world is closed. React view
+// subscriptions may remount without replacing the active playthrough.
+export default function NarrativeFixturePanel({
+  paused,
+  visible,
+}: {
+  paused: boolean;
+  visible: boolean;
+}) {
   const [session, setSession] = useState<FixtureSession | null>(null);
-  const [view, setView] = useState<NarrativeView | null>(null);
   const [loadError, setLoadError] = useState(false);
-  const latestPause = useRef(paused);
-  const region = useRef<HTMLDivElement>(null);
+  const latestPause = useRef(paused || !visible);
+  const createSession = useRef<(() => FixtureSession) | null>(null);
+  const ownedSession = useRef<FixtureSession | null>(null);
 
   useEffect(() => {
     let active = true;
-    let cleanup: (() => void) | undefined;
     void import('../narrative/fixtureSession')
       .then(({ createFixtureSession }) => {
         if (!active) return;
+        createSession.current = createFixtureSession;
         const created = createFixtureSession();
-        const unsubscribe = created.controller.subscribe((snapshot) => {
-          if (active) setView(snapshot);
-        });
-        cleanup = () => {
-          unsubscribe();
-          created.controller.dispose();
-        };
+        ownedSession.current = created;
         created.controller.setPaused(latestPause.current);
         created.controller.start();
-        setView(created.controller.getSnapshot());
         setSession(created);
       })
       .catch(() => {
@@ -34,16 +41,60 @@ export default function NarrativeFixturePanel({ paused }: { paused: boolean }) {
       });
     return () => {
       active = false;
-      cleanup?.();
+      ownedSession.current?.controller.dispose();
+      ownedSession.current = null;
+      createSession.current = null;
     };
   }, []);
 
   useEffect(() => {
-    latestPause.current = paused;
+    latestPause.current = paused || !visible;
     if (!session) return;
-    session.controller.setPaused(paused);
-    if (!paused) session.controller.start();
-  }, [paused, session]);
+    session.controller.setPaused(paused || !visible);
+    if (!paused && visible) session.controller.start();
+  }, [paused, visible, session]);
+
+  function newRun() {
+    if (!createSession.current) return;
+    const next = createSession.current();
+    ownedSession.current?.controller.dispose();
+    ownedSession.current = next;
+    next.controller.setPaused(latestPause.current);
+    next.controller.start();
+    setSession(next);
+  }
+
+  if (!visible) return null;
+  if (loadError) return <p role="alert">ไม่สามารถเปิดชุดทดสอบระบบข้อความ</p>;
+  if (!session) return <p>กำลังโหลดชุดทดสอบ</p>;
+  return (
+    <FixtureView
+      key={session.controller.getSnapshot().sessionId}
+      session={session}
+      paused={paused}
+      newRun={newRun}
+    />
+  );
+}
+
+function FixtureView({
+  session,
+  paused,
+  newRun,
+}: {
+  session: FixtureSession;
+  paused: boolean;
+  newRun: () => void;
+}) {
+  const view: NarrativeView = useSyncExternalStore(
+    session.controller.subscribe,
+    session.controller.getSnapshot,
+  );
+  const domain = useSyncExternalStore(
+    session.store.subscribe,
+    session.store.getState,
+  );
+  const region = useRef<HTMLDivElement>(null);
 
   function continueLine() {
     if (view && session && !paused) session.controller.continue(view);
@@ -104,16 +155,16 @@ export default function NarrativeFixturePanel({ paused }: { paused: boolean }) {
       data-session={view?.sessionId}
       data-line-id={view?.line?.id}
       data-notifications={session?.notificationCount() ?? 0}
+      data-run={domain.runId}
+      data-effects={domain.effectCount}
+      data-ledger={domain.committedEventIds.join(',')}
       onKeyDown={onKeyDown}
     >
       <p>ชุดทดสอบระบบข้อความ — ไม่ใช่บทเกม</p>
-      {loadError || view?.phase === 'error' ? (
-        <p role="alert">
-          ข้อมูลชุดทดสอบไม่ถูกต้อง กรุณาปิดแล้วเปิดฉากทดสอบใหม่
-        </p>
+      {view.phase === 'error' ? (
+        <p role="alert">ข้อมูลชุดทดสอบไม่ถูกต้อง กรุณาเริ่มรอบทดสอบใหม่</p>
       ) : null}
       {view?.line ? <p className="fixture-line">{view.line.text}</p> : null}
-      {!view && !loadError ? <p>กำลังโหลดชุดทดสอบ</p> : null}
       <div className="ui-actions">
         {view?.phase === 'line' ? (
           <Button
@@ -142,6 +193,9 @@ export default function NarrativeFixturePanel({ paused }: { paused: boolean }) {
           : null}
       </div>
       {view?.phase === 'ended' ? <p>จบชุดทดสอบ</p> : null}
+      <Button disabled={paused} onClick={newRun}>
+        เริ่มรอบทดสอบใหม่
+      </Button>
     </div>
   );
 }

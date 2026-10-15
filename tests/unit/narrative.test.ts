@@ -18,6 +18,10 @@ import {
 } from '../../src/narrative/EventRegistry.ts';
 import { NarrativeController } from '../../src/narrative/NarrativeController.ts';
 import {
+  createFixtureDomainStore,
+  initialFixtureState,
+} from '../../src/state/fixtureDomainStore.ts';
+import {
   createNarrativeQueryPort,
   type FixtureFacts,
 } from '../../src/narrative/NarrativeQueryPort.ts';
@@ -43,15 +47,14 @@ function session(
   presentation: FixturePresentationPort = { dispatch: vi.fn() },
   enabled = true,
 ) {
-  const store = createStore<FixtureFacts>(() => ({
-    flags: { 'fixture.branch_enabled': enabled },
-  }));
+  const store = createFixtureDomainStore(initialFixtureState(enabled));
   const controller = new NarrativeController(
     input,
     refs,
     registry,
     createNarrativeQueryPort(store),
     presentation,
+    store,
   );
   return { controller, presentation, store };
 }
@@ -113,7 +116,7 @@ describe('whole fixture traversal and source identities', () => {
     ).toThrow('Unknown source Event ID');
   });
   it('terminates traversal of a looping fixture with a clear guard', () => {
-    const invalid = source.replace('-> END', '-> m1_fixture');
+    const invalid = source.replace('-> END', '-> fixture_rejoin');
     expect(() =>
       validateCompiledFixture(invalid, compile(invalid), references),
     ).toThrow(/limit exceeded/);
@@ -225,7 +228,7 @@ describe('tag parsing and scene presentation context', () => {
 });
 
 describe('registry and read-only Zustand queries', () => {
-  it('rejects duplicate registry IDs and domain execution', () => {
+  it('rejects duplicate IDs and resolves immutable typed domain metadata', () => {
     expect(
       () =>
         new EventRegistry([
@@ -234,14 +237,20 @@ describe('registry and read-only Zustand queries', () => {
         ]),
     ).toThrow('Duplicate Event ID');
     const registry = new EventRegistry([
-      { ...fixtureEventDefinitions[0], category: 'domain' },
+      {
+        ...fixtureEventDefinitions[0],
+        category: 'domain',
+        action: { kind: 'record-rejoin' },
+      },
     ]);
-    expect(() =>
-      registry.resolvePresentation('fixture.presentation.started'),
-    ).toThrow('outside Batch 1');
-    expect(() =>
-      createFixtureEventRegistry().resolvePresentation('unknown'),
-    ).toThrow('Unknown event');
+    const event = registry.resolve('fixture.presentation.started');
+    expect(event.category).toBe('domain');
+    expect(Object.isFrozen(event)).toBe(true);
+    if (event.category === 'domain')
+      expect(Object.isFrozen(event.action)).toBe(true);
+    expect(() => createFixtureEventRegistry().resolve('unknown')).toThrow(
+      'Unknown event',
+    );
   });
   it('exposes only a frozen read port, reads current Zustand state, and rejects unknown facts', () => {
     const store = createStore<FixtureFacts>(() => ({ flags: { probe: true } }));
@@ -379,9 +388,13 @@ describe('controller dispatch and request acceptance', () => {
     expect(controller.getSnapshot().phase).toBe('error');
     expect(presentation.dispatch).not.toHaveBeenCalled();
   });
-  it('domain category fails before any fixture notification', () => {
+  it('domain precondition failure prevents fixture notifications', () => {
     const registry = new EventRegistry([
-      { ...fixtureEventDefinitions[0], category: 'domain' },
+      {
+        ...fixtureEventDefinitions[0],
+        category: 'domain',
+        action: { kind: 'record-rejoin' },
+      },
     ]);
     const { controller, presentation } = session(
       compiled,
