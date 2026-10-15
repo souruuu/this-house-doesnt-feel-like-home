@@ -2,7 +2,7 @@
 
 Source of Truth ของลำดับงาน Definition of Done และหลักฐานตรวจ เพื่อไปถึง **Prototype บทนำ + Day 1–3** และ competition package ขอบเขตเกมเต็มอยู่ใน [PROJECT](PROJECT.md); เนื้อหารายฉากอยู่ใน [Narrative Map](sources/narrative_map_7_day_Updates.md)
 
-สถานะ: **M0 และ M1 Batch 1/2 merge เข้า remote main แล้วแบบ Conditional Integration Acceptance**: PR #2 `d33c5976bc3446acca8c27ce23c52e1a66dbc34a` → PR #3 `7cd44c19eb5d8634c90dd4dde95ecf77f8a06101` → PR #4 `f9cd7dcc89c5b595de66a7d0acaa3605c7157487` โดยรักษา merge ancestry รวม Batch 2 commit `83fe4b7b4ac075b45cf6e43108f4b25c54e2a114` Independent Review: Batch 1 B-01–B-03 PASS/B-04 FIX VERIFIED; Batch 2 Blocking Implementation Issues 0 และ Ink query timing FIX VERIFIED ขณะนี้ Batch 3A เป็น working tree จาก exact remote main baseline ล่าสุด Implementation/verification เสร็จและ **Pending Independent Review** ยังไม่ stage/commit/push M0 ยัง **NOT DONE**; M1 milestone ยัง **NOT DONE** ManagedGame defect, Firefox/A-01 คง OPEN และ pre-READY failure คง unverified residual risk Batch 3B/M2–M7 ยังไม่เริ่ม ข้อความรอ review/Git approval เดิมด้านล่างเป็นประวัติก่อน approvals/merge
+สถานะ: **M0 และ M1 Batch 1/2/3A merge เข้า remote main แล้วแบบ Conditional Integration Acceptance**: PR #2 `d33c5976bc3446acca8c27ce23c52e1a66dbc34a` → PR #3 `7cd44c19eb5d8634c90dd4dde95ecf77f8a06101` → PR #4 `f9cd7dcc89c5b595de66a7d0acaa3605c7157487` → PR #5 `e9731550f17227883681dd3d6b073f3097fdab0f` โดยรักษา Batch 3A commit `dee9efaacdf51d6839df41d86217f5eeb132fdc7` ใน ancestry Batch 1 B-01–B-03 PASS/B-04 FIX VERIFIED; Batch 2 query timing FIX VERIFIED; Batch 3A Independent Review PASS WITH NON-BLOCKING FOLLOW-UP 3A-F01 ยัง OPEN รอ Independent Review ของ write-safety evidence ใน Batch 3B-1 ปัจจุบัน Owner อนุมัติเฉพาะ 3B-1 จาก baseline PR #5 ยังไม่ stage/commit/push M0/M1 milestone ยัง **NOT DONE**; ManagedGame defect, Firefox/A-01 OPEN; pre-READY failure unverified residual risk; 3B-2/M2–M7 ยังไม่เริ่ม ข้อความรอ approvals เดิมด้านล่างเป็นประวัติ ณ รอบนั้น
 
 ## บันทึกงาน M0 — 2026-10-13
 
@@ -212,7 +212,9 @@ Evidence ใหม่แยกใน `%TEMP%/this-house-m0-qa/m1-batch2-lookahea
 
 **Remaining work ณ จบ Batch 2:** Persistence/Safe Checkpoint restore และ idempotency หลัง browser reload/save-load ยังไม่พิสูจน์ ผล Batch 2 ไม่ปิด M0 acceptance/known risks/Firefox/A-01 ส่วน Batch 3A ปัจจุบันแยกบันทึกด้านล่าง
 
-## บันทึกงาน M1 Batch 3A — 2026-10-15 / Pending Independent Review
+## บันทึกงาน M1 Batch 3A — 2026-10-15 / Conditional Integration Acceptance
+
+ผลหลัง Independent Review: PASS WITH NON-BLOCKING FOLLOW-UP, blocking findings 0; commit `dee9efaacdf51d6839df41d86217f5eeb132fdc7` และ PR #5 merge เป็น `e9731550f17227883681dd3d6b073f3097fdab0f` แล้ว 3A-F01 — stale asynchronous save after coordinator disposal — ยัง OPEN: เดิมตรวจ stale หลัง repository.save() จึงไม่พิสูจน์การป้องกัน stale physical overwrite ต้องผ่าน tests/Independent Review ก่อน Batch 3B acceptance บันทึก implementation/verification ต่อไปนี้เป็นประวัติก่อน Git approval ไม่ใช่สถานะ working tree ปัจจุบัน
 
 Owner อนุมัติ Coherent Checkpoint & Candidate Restore เท่านั้น ตรวจ remote main ตรง `f9cd7dcc89c5b595de66a7d0acaa3605c7157487`, working tree สะอาด และไม่มี branch ชื่อนี้แล้ว fetch exact SHA และสร้าง `codex/m1-persistence-checkpoint-batch-3a` จาก baseline นี้ ไม่อัปเดต local main ไม่เปลี่ยน branches เดิม การอนุมัติไม่รวม stage/commit/push/PR/merge หรือ Batch 3B
 
@@ -252,7 +254,49 @@ Logs สุดท้ายอยู่ `%TEMP%/this-house-m0-qa/m1-batch3a-coher
 
 ขอบเขตไฟล์: modified 7/new 7 รวม 14 ไฟล์ (source 10/tests 2/docs 2) ไม่แตะ architecture/dependencies/Phaser/Ink source/tags หรือ source-of-truth contracts อื่น ตรวจ DoD ทั้ง 8 แถวเทียบ exact baseline แล้วตรงกัน และไม่พบ fixture/version markers ใน production dist
 
-Remaining scope: Batch 3B LocalStorageSaveRepository, persisted profile identity, actual browser refresh/resume และ storage UI ยังไม่ implement/ยังไม่อนุมัติ ผล in-memory round-trip ไม่รับรอง durability หลังปิด browser M0 Conditional Acceptance — NOT DONE; Batch 1/2 Conditional Acceptance; Batch 3A Pending Review; M1 NOT DONE; ManagedGame/Firefox/A-01 OPEN และ pre-READY failure unverified ตามเดิม
+Remaining scope ณ จบ implementation 3A: LocalStorage/profile persistence และ actual refresh/resume ยังไม่ implement ผล in-memory round-trip ไม่รับรอง browser durability ปัจจุบัน Owner อนุมัติแยก 3B-1 repository/profile กับ 3B-2 startup/resume โดยให้เริ่มเฉพาะ 3B-1 ด้านล่าง Batch 3A Conditional Acceptance; M0/M1 NOT DONE; ManagedGame/Firefox/A-01 OPEN และ pre-READY failure unverified ตามเดิม
+
+## บันทึกงาน M1 Batch 3B-1 — Guarded Repository / Pending Independent Review
+
+Owner อนุมัติเฉพาะ guarded repository, LocalStorage/profile persistence และ regression evidence ตรวจ remote main ตรง `e9731550f17227883681dd3d6b073f3097fdab0f`, working tree/index สะอาด และชื่อ branch ยังไม่ใช้ จึง fetch exact SHA และสร้าง `codex/m1-persistence-storage-batch-3b-1` จาก SHA นี้ ไม่อัปเดต local main ที่เก่า ไม่ stage/commit/push/PR/merge
+
+แผนที่อนุมัติ: red regression 3A-F01 → revocable permit + last-boundary byte checks → slot inspection/overwrite/version policies → profile validation/persistence → delayed writes ทั้ง fake/LocalStorage และ existing regressions → verification → Independent Review ไม่ implement startup gate, autosave scheduling, Resume/Save/Load UI หรือ 3B-2 ไม่เปลี่ยน dependencies, architecture, domain rules หรือ DoD
+
+Storage boundary: repository จัด keys/serialization ใน namespace `this-house:technical-fixture` ที่ไม่เปลี่ยนตาม build Coordinator validate full envelope/invariants และ opaque Ink checkpoint ผ่าน candidate restore ก่อน overwrite Permit ผูก coordinator instance + operation token + immutable session/generation pointer มี synchronous callback เท่านั้น ตรวจ permit/expected profile+slot bytes ก่อน mutation ไม่มี await/notification ระหว่าง final checks กับ `setItem` Dispose/operation completion เพิกถอน permit ทันที คง busy policy ไม่มี queue/retry หรือ multi-tab lock ต่าง run ต้อง explicit overwrite consent ที่ผูกกับ inspected bytes; invalid/unsupported/corrupt/foreign data ไม่ถูก overwrite แม้มี consent
+
+Profile: schema 1 เฉพาะ identity/read Line IDs ไม่มี U-03 defaults hydrate validated data ได้ Persisted history ถูกรวมโดยไม่ rewind; changed in-memory snapshot/changed storage bytes ถูกปฏิเสธก่อน write Missing profile ที่ยังมี slots (ตรวจซ้ำ ณ physical boundary), corrupt/future/foreign profile block persistent writes ไม่สร้าง identity เพื่อยึดข้อมูลเดิม Profile กับ slot แยก write; failure receipt ระบุ `profileCommitted`/`slotCommitted` ให้คงความจริงเมื่อเขียนสำเร็จแล้วแต่ completion ล้มเหลวหรือ stale ไม่ rollback bytes สมมติ และไม่ publish success จาก old operation
+
+Version policy: save DTO คง schema `1`, story compatibility `technical-fixture-checkpoint-v1`; current app build `0.0.0+m1-batch-3b-1` รองรับ exact tested identities เท่านั้น Build 3A/unknown builds หรือ schema เก่า/อนาคตเป็น unsupported และ preserve ไม่มี migration ที่ไม่มี fixture จริง Browser QA เรียก repository/controller โดยตรงเพื่อทดสอบ native LocalStorage ไม่ได้เชื่อม storage เข้ากับ dev UI; runtime เดิมยังใช้ repository null
+
+3A-F01 evidence: baseline regression ใช้ delayed fake กับ Coordinator จริง พบ stored bytes ของ Save B ถูก A ทับหลัง dispose: `npx vitest run tests/unit/storage-persistence.test.ts` exit 1, 0 passed/1 failed/0 skipped จึงแก้ที่ write boundary โดยไม่ลด assertion กรณี post-write disposal แยกจาก pre-write cancellation และไม่ถือว่าการตรวจ stale หลัง await ป้องกัน overwrite ได้ 3A-F01 **ยัง OPEN รอ Independent Review** ไม่ปิดจากผล tests ฝ่าย implementation เอง
+
+### Verification Batch 3B-1 — 2026-10-16 / source สำหรับ Independent Review
+
+Windows/PowerShell, Node 24.13.1/npm 11.8.0, dependencies/config เดิม Focused tests เป็นส่วนหนึ่งของ full unit ไม่ให้นับรวมซ้ำ Runtime dev panel ยังไม่ใช้ LocalStorage และไม่ได้ตรวจ actual refresh/resume
+
+| คำสั่งที่รันจริง | Exit | Passed / Failed / Skipped หรือผล |
+|---|---:|---|
+| `npm run narrative:compile` | 0 | technical fixture เดิม |
+| `npm run narrative:validate` | 0 | 8 IDs, 4 terminal paths, 2 tag-only outputs |
+| `npm run typecheck` | 0 | app/tooling/tests/config |
+| `npm run lint` | 0 | ไม่มี errors/warnings |
+| `npm run format:check` | 0 | matched files ผ่าน; Markdown ตาม ignore policy เดิม |
+| `npm test` | 0 | **199 / 0 / 0**, 6 files; เดิม 151 + storage regressions 48 |
+| `npx vitest run tests/unit/storage-persistence.test.ts tests/unit/save-checkpoint.test.ts tests/unit/domain-transaction.test.ts` | 0 | **144 / 0 / 0**, 3 files; storage 48 + checkpoint 54 + domain/query 42 |
+| `npm run build` | 0 | relative static build; Phaser chunk warning เดิม 1,388.98 kB/gzip 372.29 kB |
+| `npm run test:e2e:windows-chromium-webkit` | 0 | **14 / 0 / 0**, 51.2s; existing 12 + native repository probe ทั้งสอง browsers |
+| `npm run test:e2e:firefox` | 1 | **0 / 7 / 0**; `browserType.launch: spawn UNKNOWN` ก่อนเข้า app; existing 6 + native probe 1 |
+| `git diff --check` | 0 | whitespace ผ่าน; index ว่าง |
+
+Focused evidence: delayed fake และ wrapper ของ LocalStorageSaveRepository ป้องกัน A ที่ disposed ทั้งก่อน/หลัง B write; stale completion ไม่ publish success/ปลด busy ของ B; permit หลัง operation complete/New Run ใช้ไม่ได้; after-write disposal/failure คง committed bytes พร้อม receipt จริง Profile delayed/stale snapshot/changed stored history ไม่ย้อน read IDs ตรวจ missing profile ทั้ง preparation/final boundary, slot/profile bytes เปลี่ยนก่อน write, corrupt/future/unsupported/foreign records, explicit cross-run overwrite consent, four-slot/run isolation และ partial profile-success/slot-failure Native Chromium/WebKit probe ใช้ window.localStorage จริงกับ Coordinator/Ink และตรวจ raw bytes หลัง stale A เสร็จ ไม่ได้แทน browser refresh/resume flow Unit regressions ของ B-04, query policy และ candidate restore เดิมยังผ่าน
+
+Raw logs: `C:\Users\USER\AppData\Local\Temp\this-house-m0-qa\m1-batch3b1-storage-20261016\` มี `compile.log`, `validate.log`, `typecheck.log`, `lint.log`, `format.log`, `unit.log`, `focused.log`, `build.log`, `chromium-webkit.log`, `firefox.log`; browser artifacts อยู่ QA root เดียวกันใต้ `m1-batch3b1-chromium-webkit-20261016/test-results` และ `m1-batch3b1-firefox-20261016/test-results` Environment อื่นยังไม่ตรวจ ไม่มี full E2E/CI PASS ให้อ้าง
+
+ระหว่างพัฒนา: typecheck exit 1 สองรอบจาก profile ID inference ของ crypto.randomUUID และ closure narrowing ของ retained permit ใน test แก้ type annotation/local const แล้ว final typecheck exit 0 Vitest ครั้งแรกใน sandbox exit 1/failed suite/0 tests จาก cache rename EPERM จึงรันคำสั่งเดิมนอก sandbox ได้ red regression 1 failed จริงตามบันทึกข้างต้น แล้วรัน focused/full หลังแก้โดยไม่ skip/decrease assertions Initial fetch ถูก sandbox ปฏิเสธการเขียน FETCH_HEAD แล้ว fetch/switch สำเร็จด้วยสิทธิ์สำหรับ Git action ที่ Owner อนุมัติ ไม่ได้ commit/stage/push ไม่มี scope deviation
+
+ขอบเขต 13 ไฟล์: modified 7/new 6 (source 7/tests 4/docs 2) ตรวจ Milestone/DoD ทั้ง 8 แถวตรง exact baseline; architecture/dependencies/Phaser/narrative/query policy/UI/shell bytes ไม่เปลี่ยน ผล static iframe/production fixture exclusion ยังผ่าน ไม่เพิ่ม release content หรือ fixture UI controls
+
+Remaining scope: 3B-2 startup detection/explicit Resume-New Run, actual autosave scheduling, dev Save/Load controls และ browser refresh/resume ยังไม่ implement/ยังไม่อนุมัติ ไม่อ้าง Full E2E/CI PASS; single-page one-writer scope เท่านั้น ไม่มี cross-key atomicity หรือ cross-tab guarantee M0 NOT DONE; M1 Batch 1/2/3A Conditional Acceptance; 3B-1 Pending Independent Review; M1 milestone NOT DONE; ManagedGame/Firefox/A-01 OPEN และ pre-READY residual risk unverified
 
 ## Milestones
 

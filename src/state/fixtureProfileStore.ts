@@ -1,10 +1,18 @@
 import { createStore } from 'zustand/vanilla';
 
-// Memory-only profile foundation. No settings defaults or persistence policy.
-export function createFixtureProfileStore(profileId = crypto.randomUUID()) {
+// Hydration receives validated profile data. No settings defaults or slot restore.
+export function createFixtureProfileStore(
+  profileId: string = crypto.randomUUID(),
+  readLineIds: readonly string[] = [],
+) {
   if (!profileId.trim()) throw new Error('Profile identity is required');
+  if (
+    readLineIds.some((id) => !id.trim()) ||
+    new Set(readLineIds).size !== readLineIds.length
+  )
+    throw new Error('Invalid profile read history');
   const store = createStore(() =>
-    Object.freeze({ profileId, readLineIds: Object.freeze([] as string[]) }),
+    Object.freeze({ profileId, readLineIds: Object.freeze([...readLineIds]) }),
   );
   return Object.freeze({
     getState: store.getState,
