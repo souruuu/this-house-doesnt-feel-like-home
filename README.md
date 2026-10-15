@@ -1,8 +1,8 @@
 # บ้านที่ไม่รู้สึกเหมือนบ้าน
 
-Interactive Game Website — M0 technical scaffold
+Interactive Game Website — M0 scaffold + M1 Batch 1 technical fixture (dev/QA)
 
-**สถานะ:** M0 WIP checkpoint บน `feat/m0-project-scaffold` commit/push แล้ว เจ้าของให้ Conditional Acceptance เพื่อเตรียม M1 โดยยอมรับ ManagedGame confirmed defect ชั่วคราว; ไม่ถือว่า M0 ผ่าน Definition of Done ครบและ M0/A-01 ยัง OPEN Windows Firefox ยังไม่ผ่าน verification แผน M1 ใช้ technical fixture และรอ approval ก่อน implementation; decision/ข้อจำกัดอยู่ใน [MASTER_PLAN](MASTER_PLAN.md#owner-decision-m0-conditional-acceptance) ไม่มี release story, save/domain implementation หรือ final art
+**สถานะ:** M1 Batch 1 บน `codex/m1-narrative-engine-batch-1` implementation พร้อม Owner Review แต่ยังไม่ commit/push; stacked จาก M0 SHA `3c0010bb4d2adf3b3a185bebfb7079a9bf98a4f1` M0 คง Conditional Acceptance, ManagedGame confirmed defect ยังไม่แก้, Firefox/A-01 ยัง OPEN และ M1 ไม่ใช่ DONE ไม่มี release story, save/domain implementation หรือ final art รายละเอียด decision/ผลตรวจจริงอยู่ใน [MASTER_PLAN](MASTER_PLAN.md) M0 ต้อง merge ก่อน M1 และตรวจ integration ใหม่ก่อน M1 merge
 
 **Checkpoint:** คง implementation และ dependency versions ปัจจุบัน หยุดทดลอง Phaser internals/startup override/failure-injection และไม่มี lifecycle fix ใหม่ ผล probe กับ Phaser 4.2.1 จริงยืนยันว่า ManagedGame ลบ external visibilitychange listener จาก postBoot โดยไม่ตั้งใจ 3/3 รอบ ส่วน pre-READY boot failure เป็น residual risk ที่ยังไม่พิสูจน์ด้วย runtime failure-injection ดูหลักฐานแยกกันใน MASTER_PLAN ไม่เปลี่ยน Definition of Done และไม่ถือว่า checkpoint ผ่าน lifecycle gate
 
@@ -35,11 +35,11 @@ npm run dev
 | `npm run lint` | ESLint |
 | `npm run format:check` | Prettier check code/config; ไม่ reformat narrative/design Markdown |
 | `npm run narrative:compile` | compile Ink เป็น JSON ด้วย compiler ที่เข้ากับ inkjs ที่ล็อกใน M0 |
-| `npm run narrative:validate` | ตรวจ scene/tag/event/asset references ของ linear technical fixture เท่านั้น; ยังไม่ใช่ release graph validator ของ M1 |
+| `npm run narrative:validate` | ตรวจ source-ID declarations และ traverse ทั้งสอง fixture branches สำหรับ query inputs true/false รวม scene/tag/event/asset references; ไม่ใช่ release story graph validator |
 | `npm run build` | compile/validate narrative + typecheck + Vite static build ไป `dist/` |
 | `npm run preview` | Vite preview ของ build ที่สร้างแล้ว |
 
-**N-02 CLOSED:** source/tag/EventRegistry/query/identity contract อยู่ใน [docs/NARRATIVE_SYSTEM.md](docs/NARRATIVE_SYSTEM.md) Scripts มีจริงแล้ว ผลตรวจแต่ละคำสั่งอยู่ใน MASTER_PLAN ไม่หมายถึง M1 controller/registry/ledger/save พร้อมแล้ว
+**N-02 CLOSED:** source/tag/EventRegistry/query/identity contract อยู่ใน [docs/NARRATIVE_SYSTEM.md](docs/NARRATIVE_SYSTEM.md) Batch 1 มี controller/registry/read-only query สำหรับ fixture; durable ledger/domain execution/checkpoint/save ยังไม่ implement ผลตรวจแต่ละคำสั่งอยู่ใน MASTER_PLAN
 
 ## A-01 toolchain baseline
 
@@ -73,13 +73,15 @@ Compiler ที่ใช้จริงคือ `Compiler` จาก `inkjs/ful
 - `ManagedGame` ใช้ adapter จับ native registrations ช่วง `start()` ของ Phaser 4.2.1 แต่มี confirmed ownership defect: external visibilitychange listener จาก postBoot ถูกจับและลบด้วย ยังไม่แก้และไม่ถือว่า lifecycle cleanup ผ่านครบ; รายละเอียดและ residual risks อยู่ MASTER_PLAN ไม่แก้ node_modules
 - `src/ui`: reusable Button/Panel, centralized neutral CSS tokens และ stylesheet แยกจาก shell/game logic ตำแหน่ง/สี/font เป็น technical probe ไม่ใช่ final identity หรือ approved dialogue/stage coordinates
 - `src/assets/manifest.json`: semantic ID `m0.world.reference` → SVG grid ทางเทคนิคใน `public/assets/placeholders` ใช้ relative base เดียวกับ Vite ไม่มี character mapping จาก JPG sheet, production dimensions, anchor, pose หรือ layering catalog
-- `narrative/fixtures/technical_fixture.ink`: compiler probe ภาษาไทยสองบรรทัด ไม่ใช่บทเกม ไม่มี choices/domain events/scene facts Generated output อยู่ `generated/narrative` และไม่เข้า `dist`; dev watcher compile/validate เมื่อแก้ Ink แล้ว reload หรือแสดง error overlay เมื่อผิด
+- `narrative/fixtures/technical_fixture.ink`: fixture ภาษาไทย line→choice→สอง branches→rejoin มี stable IDs/tag-only presentation events และ read-only query test ไม่มี release characters/domain facts Generated output อยู่ `generated/narrative` และไม่เข้า production `dist`; dev watcher compile/validate เมื่อแก้ Ink แล้ว reload หรือแสดง error overlay เมื่อผิด
+- `src/narrative`: Story อยู่ใน session-owned NarrativeController เท่านั้น; whole-output validation ก่อน injected QA notification dispatch, read-only query จาก isolated Zustand fixture facts, scene context reset และ stale session/revision/input-lock guards ไม่มี world commands หรือ durable actions/ledger
+- `src/ui/NarrativeFixturePanel.tsx`: Continue/Choice ใช้ keyboard/touch/pause/focus guards ใน dev/QA เท่านั้น ปิดแล้วเปิดฉากทดสอบจะสร้าง narrative session ใหม่ StrictMode ยกเลิก async session creation ที่ unmount แล้ว ไม่มีการเปลี่ยน Phaser startup หรือ window focus/blur handlers
 - ยังไม่มี `narrative/main.ink`/prologue/days ที่อนุมัติ ห้ามใช้บท Google Doc ห้าวันเป็น release entry แทน source เจ็ดวัน
 - `scripts/serve-static-test.ts` เป็น local-only QA harness สำหรับ subdirectory/iframe ไม่ใช่ runtime backend และไม่อยู่ใน dist Playwright จัด dev server + build/static QA server ให้เอง
 
 ผล screenshot/trace ของ Playwright รอบใหม่อยู่ `%TEMP%/this-house-m0-qa/<platform>-<run-id>/test-results` ไม่รวมใน Git Worker ทุกตัวใช้ run ID ที่รับจาก parent process ผ่าน `PHASER_M0_QA_RUN_ID`; variable นี้กำหนด artifact path เท่านั้น ไม่ใช้เปลี่ยน projects หรือ skip tests สามารถกำหนด ID สำหรับรอบตรวจเองได้ (ตัวอักษร/ตัวเลข/hyphen) และควรใช้ ID ใหม่ต่อ invocation Full run เดิมใน `%TEMP%/this-house-m0-qa/test-results` ยังคงเป็นหลักฐาน failed run; subset ไม่ overwrite หลักฐานนั้น การตรวจตัวอย่าง desktop/landscape/portrait ไม่ปิด U-01 minimum viewport/touch target และไม่ยืนยัน final font หรือ accessibility certification
 
-ผลล่าสุดของ subset บน Windows: 6 passed/0 failed/0 skipped, exit 0; Firefox แยกบน Windows: 0 passed/3 failed/0 skipped, exit 1 จาก `spawn UNKNOWN` ไม่ได้รันเกมจริง Firefox ใน environment อื่นยังไม่ได้ตรวจ แผนคือใช้ source/lockfile เดียวกันบน Linux ที่เจ้าของอนุมัติ ติดตั้ง browser ที่ตรงกับ Playwright แล้วรัน `npm run test:e2e:firefox` และเก็บผลแยก ไม่รวมผลต่าง environments แล้วเรียกว่า full E2E ผ่าน
+ผลล่าสุดหลังแก้ B-04 บน Windows: unit 55 passed/0 failed/0 skipped; Chromium/WebKit subset 12 passed/0 failed/0 skipped, exit 0 บรรทัดสุดท้ายรอ Continue ก่อน ended และไม่ replay events; implementation รอ Owner Review Firefox ไม่ rerun ใน B-04 ตามขอบเขตเจ้าของ ผลเดิมยัง 0 passed/6 failed/0 skipped, exit 1 จาก `browserType.launch: spawn UNKNOWN` ก่อนรันเกม Firefox environment อื่นยังไม่ได้ตรวจ แผนคือใช้ source/lockfile เดียวกันบน Linux ที่เจ้าของอนุมัติ ติดตั้ง browser ที่ตรงกับ Playwright แล้วรัน `npm run test:e2e:firefox` และเก็บผลแยก ไม่รวมผลต่าง environments แล้วเรียกว่า full E2E ผ่าน Exact commands/evidence/limitations อยู่ MASTER_PLAN
 
 ติดตั้ง browser สำหรับ Playwright ครั้งแรกหลังติดตั้ง dependencies:
 
@@ -123,5 +125,5 @@ npm run preview
 
 **Technical Documentation Baseline v0.1 — พร้อมสำหรับ Freeze ของ core technical contracts:** N-02, G-02 และ G-03 CLOSED แล้ว Safe Checkpoint และ profile/playthrough scope อยู่ใน [docs/GAME_STATE.md](docs/GAME_STATE.md); โครง placeholder UI ต้อง style-ready ตาม [docs/UI_ASSET_SPEC.md](docs/UI_ASSET_SPEC.md)
 
-Baseline ไม่ได้แปลว่า production content พร้อมทั้งหมด A-01 และผลตรวจ M0 ให้ดู ARCHITECTURE/MASTER_PLAN ส่วน G-01/N-03/U-01–U-03/P-01–P-02 เป็น OPEN QUESTION ตาม gate เดิม ไม่เริ่ม M1 จน review M0 แล้ว และไม่ commit/push โดยไม่มี approval
+Baseline ไม่ได้แปลว่า production content พร้อมทั้งหมด A-01 และผลตรวจ M0/M1 ให้ดู ARCHITECTURE/MASTER_PLAN ส่วน G-01/N-03/U-01–U-03/P-01–P-02 เป็น OPEN QUESTION ตาม gate เดิม Batch ถัดไปรอ Owner Review/approval และไม่ commit/push โดยไม่มี approval
 

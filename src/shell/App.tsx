@@ -1,9 +1,13 @@
-import { useEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { Button } from '../ui/Button';
 import { Panel } from '../ui/Panel';
 import { WorldHost } from '../world/WorldHost';
 import { fitViewport } from './viewport';
 import { useShellStore } from './shellStore';
+
+const NarrativeFixturePanel = import.meta.env.DEV
+  ? lazy(() => import('../ui/NarrativeFixturePanel'))
+  : null;
 
 export function App() {
   const shellRef = useRef<HTMLDivElement>(null);
@@ -99,6 +103,11 @@ export function App() {
             <Panel title="บ้านที่ไม่รู้สึกเหมือนบ้าน">
               <p>โครงทดสอบระบบ — ภาพและตำแหน่งทั้งหมดเป็นตัวแทนชั่วคราว</p>
               <p>ยังไม่มีเนื้อเรื่องหรือภาพฉบับเผยแพร่</p>
+              {NarrativeFixturePanel && mounted ? (
+                <Suspense fallback={<p>กำลังโหลดชุดทดสอบ</p>}>
+                  <NarrativeFixturePanel paused={paused} />
+                </Suspense>
+              ) : null}
               <div className="ui-actions">
                 <Button onClick={togglePause}>
                   {userPaused ? 'เล่นต่อ' : 'พัก'}

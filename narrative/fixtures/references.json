@@ -1,9 +1,22 @@
 {
   "scope": "technical-fixture-only",
-  "scenes": { "m0.toolchain": "m0_probe" },
+  "scenes": {
+    "fixture.main": "m1_fixture",
+    "fixture.rejoin": "fixture_rejoin"
+  },
+  "lines": {
+    "fixture_start_001": "fixture.main",
+    "fixture_start_disabled_001": "fixture.main",
+    "fixture_choice_a_001": "fixture.main",
+    "fixture_choice_b_001": "fixture.main",
+    "fixture_branch_a_001": "fixture.main",
+    "fixture_branch_b_001": "fixture.main",
+    "fixture_rejoin_001": "fixture.rejoin",
+    "fixture_end_001": "fixture.rejoin"
+  },
   "speakers": ["none"],
   "expressions": {},
   "positions": [],
-  "events": [],
+  "events": ["fixture.presentation.started", "fixture.presentation.rejoined"],
   "assets": ["m0.world.reference"]
 }
