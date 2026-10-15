@@ -1,4 +1,6 @@
 import { Story } from 'inkjs';
+import { Path } from 'inkjs/engine/Path';
+import { validateNarrativeSnapshot } from '../save/validateSave.ts';
 import type { EventRegistry } from './EventRegistry.ts';
 import {
   bindFixtureQueries,
@@ -12,6 +14,8 @@ import type {
   NarrativeRequest,
   NarrativeView,
   NarrativeEvent,
+  NarrativeSnapshot,
+  TranscriptEntry,
 } from './types.ts';
 
 let nextSession = 0;
@@ -21,6 +25,9 @@ export class NarrativeController {
   private readonly listeners = new Set<(view: NarrativeView) => void>();
   private active = true;
   private locked = false;
+  private publishing = false;
+  private operationHeld = false;
+  private backlog: readonly TranscriptEntry[] = Object.freeze([]);
   private view: NarrativeView;
 
   constructor(
@@ -58,6 +65,148 @@ export class NarrativeController {
 
   getSnapshot = () => this.view;
 
+  getBacklog = () => this.backlog;
+
+  private assertAvailable() {
+    if (!this.active || this.locked || this.publishing || this.operationHeld)
+      throw new Error('Narrative session is busy or disposed');
+  }
+
+  private capture<T>(readDurable: () => T) {
+    if (
+      !this.active ||
+      this.locked ||
+      this.publishing ||
+      (this.view.phase !== 'line' && this.view.phase !== 'choice') ||
+      !this.view.line
+    )
+      throw new Error('Not a safe line/choice checkpoint');
+    this.locked = true;
+    try {
+      // No await or user notification between these immutable snapshots.
+      const narrative: NarrativeSnapshot = Object.freeze({
+        inkStateJson: this.story.state.ToJson(),
+        cursorPath: this.story.state.currentPathString,
+        checkpoint: Object.freeze({
+          kind: this.view.phase,
+          presentation: this.view.presentation,
+          line: this.view.line,
+          choices: this.view.choices,
+        }),
+        backlog: this.backlog,
+      });
+      return Object.freeze({ narrative, game: readDurable() });
+    } finally {
+      this.locked = false;
+    }
+  }
+
+  captureCheckpoint<T>(readDurable: () => T) {
+    this.assertAvailable();
+    return this.capture(readDurable);
+  }
+
+  // Narrow lease for Save/Load/New Run. Input stays blocked across repository
+  // awaits; a released lease cannot capture a later session state.
+  holdForSessionOperation() {
+    this.assertAvailable();
+    this.operationHeld = true;
+    let held = true;
+    return Object.freeze({
+      capture: <T>(readDurable: () => T) => {
+        if (!held) throw new Error('Session operation lease was released');
+        return this.capture(readDurable);
+      },
+      release: () => {
+        if (!held) return;
+        held = false;
+        this.operationHeld = false;
+      },
+    });
+  }
+
+  // Candidate-only preparation: public Ink APIs, no Continue/Choose/dispatch or
+  // subscriber notification. A failure is discarded with the candidate.
+  restoreCheckpoint(input: unknown, committedEventIds: readonly string[]) {
+    this.assertAvailable();
+    if (this.view.phase !== 'idle')
+      throw new Error('Restore requires a fresh candidate controller');
+    const snapshot = validateNarrativeSnapshot(input, this.references);
+    this.story.state.LoadJson(snapshot.inkStateJson);
+    if (
+      this.story.hasError ||
+      this.story.hasWarning ||
+      JSON.stringify(JSON.parse(this.story.state.ToJson())) !==
+        JSON.stringify(JSON.parse(snapshot.inkStateJson))
+    )
+      throw new Error('Ink state could not be restored exactly');
+    const cursor = this.story.state.currentPathString;
+    if (cursor !== snapshot.cursorPath)
+      throw new Error('Ink cursor/checkpoint mismatch');
+    const assertPath = (path: string) => {
+      // ContentAtPath/Path are exported public APIs in inkjs 2.4.0. Reject its
+      // approximate path recovery, including an out-of-range content index.
+      if (!this.story.ContentAtPath(new Path(path)).correctObj)
+        throw new Error('Invalid Ink cursor/choice path');
+    };
+    if (cursor !== null) assertPath(cursor);
+    const { checkpoint } = snapshot;
+    const parsed = parseOutput(
+      this.story.currentTags ?? [],
+      this.story.currentText ?? '',
+      this.references,
+      this.registry,
+      checkpoint.presentation,
+    );
+    if (
+      parsed.event?.category === 'domain' &&
+      !committedEventIds.includes(parsed.event.id)
+    )
+      throw new Error('Restored output is missing its committed domain event');
+    if (
+      JSON.stringify(parsed.context) !==
+        JSON.stringify(checkpoint.presentation) ||
+      (checkpoint.kind === 'line' && !parsed.text) ||
+      (parsed.text &&
+        (parsed.lineId !== checkpoint.line.id ||
+          parsed.text !== checkpoint.line.text))
+    )
+      throw new Error('Ink output/semantic checkpoint mismatch');
+    const choices = this.story.currentChoices.map((choice) => {
+      assertPath(choice.sourcePath);
+      assertPath(choice.pathStringOnChoice);
+      const output = parseOutput(
+        choice.tags ?? [],
+        choice.text,
+        this.references,
+        this.registry,
+        checkpoint.presentation,
+      );
+      if (
+        output.event ||
+        !output.lineId ||
+        output.context.sceneId !== checkpoint.presentation.sceneId
+      )
+        throw new Error('Invalid restored choice');
+      return { index: choice.index, id: output.lineId, text: output.text };
+    });
+    if (
+      checkpoint.kind === 'choice' &&
+      (this.story.canContinue ||
+        JSON.stringify(choices) !== JSON.stringify(checkpoint.choices))
+    )
+      throw new Error('Ink choices/semantic checkpoint mismatch');
+    this.backlog = snapshot.backlog;
+    this.view = Object.freeze({
+      ...this.view,
+      revision: this.view.revision + 1,
+      phase: checkpoint.kind,
+      presentation: checkpoint.presentation,
+      line: checkpoint.line,
+      choices: checkpoint.choices,
+    });
+  }
+
   subscribe = (listener: (view: NarrativeView) => void) => {
     if (!this.active) throw new Error('Session is disposed');
     this.listeners.add(listener);
@@ -68,28 +217,45 @@ export class NarrativeController {
     if (!this.active) return null;
     this.view = Object.freeze(view);
     let notificationError: string | null = null;
-    for (const listener of this.listeners) {
-      if (!this.active) break;
-      try {
-        listener(this.view);
-      } catch (error) {
-        notificationError ??=
-          error instanceof Error ? error.message : String(error);
+    this.publishing = true;
+    try {
+      for (const listener of this.listeners) {
+        if (!this.active) break;
+        try {
+          listener(this.view);
+        } catch (error) {
+          notificationError ??=
+            error instanceof Error ? error.message : String(error);
+        }
       }
+    } finally {
+      this.publishing = false;
     }
     return notificationError;
   }
 
   setPaused(paused: boolean) {
-    if (this.active && !this.locked && paused !== this.view.paused)
+    if (
+      this.active &&
+      !this.locked &&
+      !this.publishing &&
+      paused !== this.view.paused
+    )
       // Pending intentions from before pause/resume must not become valid again.
-      this.publish({ ...this.view, paused, revision: this.view.revision + 1 });
+      return this.publish({
+        ...this.view,
+        paused,
+        revision: this.view.revision + 1,
+      });
+    return null;
   }
 
   private accepts(request: NarrativeRequest) {
     return (
       this.active &&
       !this.locked &&
+      !this.publishing &&
+      !this.operationHeld &&
       !this.view.paused &&
       request.sessionId === this.view.sessionId &&
       request.revision === this.view.revision
@@ -178,6 +344,15 @@ export class NarrativeController {
           this.presentation.dispatch(event);
       }
       if (!this.active) return false;
+      if (receivedLine && line)
+        this.backlog = Object.freeze([
+          ...this.backlog,
+          Object.freeze({
+            lineId: line.id,
+            text: line.text,
+            speakerId: context.speaker,
+          }),
+        ]);
       const notificationError = this.publish({
         ...this.view,
         revision,

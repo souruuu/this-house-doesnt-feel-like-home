@@ -7,6 +7,7 @@ import {
 } from 'react';
 import type { FixtureSession } from '../narrative/fixtureSession';
 import type { NarrativeView } from '../narrative/types';
+import type { SaveCoordinator } from '../save/SaveCoordinator';
 import { Button } from './Button';
 
 // This owner stays mounted when the fixture view/world is closed. React view
@@ -20,48 +21,42 @@ export default function NarrativeFixturePanel({
 }) {
   const [session, setSession] = useState<FixtureSession | null>(null);
   const [loadError, setLoadError] = useState(false);
-  const latestPause = useRef(paused || !visible);
-  const createSession = useRef<(() => FixtureSession) | null>(null);
-  const ownedSession = useRef<FixtureSession | null>(null);
+  const owner = useRef<SaveCoordinator | null>(null);
 
   useEffect(() => {
     let active = true;
+    let unsubscribe: (() => void) | undefined;
     void import('../narrative/fixtureSession')
-      .then(({ createFixtureSession }) => {
+      .then(({ createFixtureRuntime }) => {
         if (!active) return;
-        createSession.current = createFixtureSession;
-        const created = createFixtureSession();
-        ownedSession.current = created;
-        created.controller.setPaused(latestPause.current);
-        created.controller.start();
-        setSession(created);
+        const runtime = createFixtureRuntime();
+        owner.current = runtime;
+        const showSession = () => {
+          const created = runtime.getSnapshot().session;
+          setSession(created);
+        };
+        unsubscribe = runtime.subscribe(showSession);
+        showSession();
       })
       .catch(() => {
         if (active) setLoadError(true);
       });
     return () => {
       active = false;
-      ownedSession.current?.controller.dispose();
-      ownedSession.current = null;
-      createSession.current = null;
+      unsubscribe?.();
+      owner.current?.dispose();
+      owner.current = null;
     };
   }, []);
 
   useEffect(() => {
-    latestPause.current = paused || !visible;
     if (!session) return;
     session.controller.setPaused(paused || !visible);
     if (!paused && visible) session.controller.start();
   }, [paused, visible, session]);
 
   function newRun() {
-    if (!createSession.current) return;
-    const next = createSession.current();
-    ownedSession.current?.controller.dispose();
-    ownedSession.current = next;
-    next.controller.setPaused(latestPause.current);
-    next.controller.start();
-    setSession(next);
+    void owner.current?.newRun().catch(() => setLoadError(true));
   }
 
   if (!visible) return null;

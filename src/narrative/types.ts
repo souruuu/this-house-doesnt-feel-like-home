@@ -65,3 +65,24 @@ export interface NarrativeView {
   error: string | null;
   failureStage: 'pre-commit' | 'post-commit' | null;
 }
+
+export interface TranscriptEntry {
+  readonly lineId: string;
+  readonly text: string;
+  readonly speakerId: string;
+}
+
+// Semantic data only. No input intentions, notification history or UI objects.
+export interface FixtureCheckpoint {
+  readonly kind: 'line' | 'choice';
+  readonly presentation: Readonly<PresentationContext>;
+  readonly line: Readonly<{ id: string; text: string }>;
+  readonly choices: NarrativeView['choices'];
+}
+
+export interface NarrativeSnapshot {
+  readonly inkStateJson: string;
+  readonly cursorPath: string | null;
+  readonly checkpoint: FixtureCheckpoint;
+  readonly backlog: readonly TranscriptEntry[];
+}
