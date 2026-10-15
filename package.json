@@ -1,0 +1,48 @@
+{
+  "name": "this-house-doesnt-feel-like-home",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": "24.13.x",
+    "npm": "11.8.x"
+  },
+  "packageManager": "npm@11.8.0",
+  "scripts": {
+    "dev": "vite",
+    "typecheck": "tsc --noEmit",
+    "test": "npm run narrative:compile && vitest run",
+    "test:watch": "npm run narrative:compile && vitest --watch",
+    "test:e2e": "playwright test",
+    "test:e2e:windows-chromium-webkit": "playwright test --project=chromium --project=webkit",
+    "test:e2e:firefox": "playwright test --project=firefox",
+    "lint": "eslint .",
+    "format:check": "prettier --check .",
+    "narrative:compile": "node scripts/narrative-compile.ts",
+    "narrative:validate": "node scripts/narrative-validate.ts",
+    "build": "npm run narrative:compile && npm run narrative:validate && npm run typecheck && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "inkjs": "2.4.0",
+    "phaser": "4.2.1",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "zustand": "5.0.15"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@playwright/test": "1.64.0",
+    "@types/node": "24.13.1",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitejs/plugin-react": "5.2.0",
+    "eslint": "10.12.0",
+    "eslint-plugin-react-hooks": "7.1.1",
+    "prettier": "3.9.10",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.71.2",
+    "vite": "7.3.7",
+    "vitest": "4.1.11"
+  }
+}

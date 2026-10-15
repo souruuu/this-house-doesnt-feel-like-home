@@ -117,5 +117,7 @@ API behavior ต้องตรวจจาก [inkjs documentation](https://git
 
 ## OPEN QUESTION
 
+สถานะรับบท ณ M0 (2026-10-13): shared Google Doc ที่แจ้งมามีบทห้าวัน ขัดกับ Narrative Map เจ็ดวันที่ล็อกใน PROJECT จึงยังไม่รับเป็น release Ink และไม่ปรับ facts/วัน/choices ให้ตรงกันเอง ความขัดแย้งนี้ต้องให้เจ้าของยืนยันใน N-03 ก่อนงาน content; ไม่ขวาง technical compiler fixture ของ M0
+
 **N-03 — Content handoff (ก่อน M2 ฉบับ narrative จริง และก่อน M4–M5):** ต้นฉบับเป็น Scene Map และระบุว่ายังไม่มีบทสนทนาเต็ม ใครส่ง/อนุมัติ scene cards, ข้อความ choice และบทไทยที่จะ compile? ชุดเอกสารนี้ไม่แต่งบทแทน ระหว่างรอใช้ technical fixture ที่ติดป้ายและแยกจาก content ส่งประกวดได้
 

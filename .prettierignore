@@ -1,0 +1,9 @@
+node_modules
+dist
+generated
+package-lock.json
+playwright-report
+test-results
+sources/narrative_map_7_day_Updates.md
+# Code formatting does not rewrite narrative/design source-of-truth prose.
+**/*.md

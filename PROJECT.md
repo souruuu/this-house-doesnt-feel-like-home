@@ -13,7 +13,7 @@
 
 **พร้อมสำหรับ Freeze ของ core technical contracts** ตาม decision ล่าสุด: N-02 CLOSED ใน [NARRATIVE_SYSTEM](docs/NARRATIVE_SYSTEM.md), G-02/G-03 CLOSED ใน [GAME_STATE](docs/GAME_STATE.md) และ placeholder-first but style-ready ตาม [UI_ASSET_SPEC](docs/UI_ASSET_SPEC.md) Narrative facts และ scope เดิมคงตาม Updates
 
-Baseline มีทะเบียน OPEN QUESTION สำหรับ toolchain/domain/content/assets/audience/competition ใน [MASTER_PLAN](MASTER_PLAN.md) จึงไม่ใช่การอนุมัติค่า state/บท/visual direction ที่ยังไม่ล็อก และไม่ใช่คำยืนยันว่า implementation หรือ build ผ่านแล้ว คำถามที่ค้างปิดก่อนงานที่พึ่งพาคำตอบ; รอบนี้ไม่เริ่ม M0
+Baseline มีทะเบียน OPEN QUESTION สำหรับ toolchain/domain/content/assets/audience/competition ใน [MASTER_PLAN](MASTER_PLAN.md) จึงไม่ใช่การอนุมัติค่า state/บท/visual direction ที่ยังไม่ล็อก และไม่ใช่คำยืนยันว่า implementation หรือ build ผ่านแล้ว คำถามที่ค้างปิดก่อนงานที่พึ่งพาคำตอบ; สถานะ implementation/verification ของ M0 ให้ดู MASTER_PLAN
 
 ## Concept
 

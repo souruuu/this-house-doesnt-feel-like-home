@@ -134,6 +134,8 @@ Desktop/laptop first; logical viewport **1920×1080, 16:9** มือถือ l
 
 **A-01 — Toolchain versions (ปิดใน M0 ก่อนล็อก dependencies):** ต้องตรวจเวอร์ชัน Node.js/npm และ minor/patch ของ React, Vite, Phaser 4, Zustand, inkjs, Vitest/Playwright, ESLint/Prettier ที่เข้ากัน รวม compiler ของ Ink บันทึกผลใน `package.json`, lockfile และ README เมื่อ scaffold แล้ว ห้ามใช้ `latest` เป็นหลักฐาน compatibility หรือเปลี่ยน major ที่ล็อกไว้เพราะ template ตั้งต้น
 
+สถานะ M0 (2026-10-13): เลือกและ pin toolchain ใน package.json/lockfile พร้อม Node/npm ใน `.nvmrc`/engines; exact versions/compiler และเหตุผล engine/peer compatibility อยู่ [README](README.md#a-01-toolchain-baseline) ผลตรวจจริง/ข้อจำกัดให้ดู [MASTER_PLAN](MASTER_PLAN.md#บันทึกงาน-m0--2026-10-13) Node/npm install, compiler/runtime round-trip, typecheck/unit/build และ Chromium/WebKit ผ่าน แต่ Firefox เปิดไม่ได้ด้วย Windows SideBySide error จึงคง A-01 OPEN เฉพาะหลักฐาน compatibility ที่ยังไม่ครบ ไม่ downgrade Phaser หรือตัด browser contract
+
 การเลือก patch และ runtime ที่ผ่าน compatibility check เป็นงานตรวจทางเทคนิค; ถ้าตรวจแล้วทำตาม stack/browser contract ไม่ได้ ต้องรายงานข้อขัดแย้งก่อนเปลี่ยนข้อกำหนด
 
 ตรวจแหล่ง Phaser จาก [official release downloads](https://phaser.io/download/stable) แล้ว; ไม่ได้เลือก patch ใหม่แทนเจ้าของโปรเจกต์ในเอกสารนี้
