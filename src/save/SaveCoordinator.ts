@@ -16,6 +16,7 @@ import { inspectSave } from './inspectSave.ts';
 import { captureProfile, validateProfile } from './profile.ts';
 
 export interface SaveOptions {
+  readonly expectedRaw?: string | null;
   // Explicit intention to replace another run; bound to the inspected bytes.
   readonly overwrite?: { readonly expectedRaw: string };
 }
@@ -37,7 +38,7 @@ interface Dependencies {
   readonly references: FixtureReferences;
   readonly registry: EventRegistry;
   readonly createSession: (seed?: FixtureDomainState) => FixtureSession;
-  // Still null in the dev panel: runtime wiring/startup is Batch 3B-2.
+  // The dev runtime installs LocalStorage; null remains valid for isolated QA.
   readonly repository: SaveRepository | null;
 }
 
@@ -261,6 +262,11 @@ export class SaveCoordinator {
         const record = await repository.load(slot);
         this.assertCurrent(previous);
         const target = this.inspectRecord(record);
+        if (
+          options.expectedRaw !== undefined &&
+          options.expectedRaw !== target.raw
+        )
+          throw new Error('Selected save contents changed before save');
         if (target.status !== 'empty' && target.status !== 'valid')
           throw new Error(`Protected save slot: ${target.status}`);
         if (options.overwrite && options.overwrite.expectedRaw !== target.raw)
@@ -302,13 +308,15 @@ export class SaveCoordinator {
     });
   }
 
-  async load(slot: SaveSlot) {
+  async load(slot: SaveSlot, options?: { readonly expectedRaw: string }) {
     return this.operation(async (previous) => {
       const { repository, versions, profile, references, registry } =
         this.dependencies;
       if (!repository) throw new Error('Save storage is not installed');
       const record = await repository.load(slot);
       this.assertCurrent(previous);
+      if (options && record.raw !== options.expectedRaw)
+        throw new Error('Selected save contents changed before load');
       if (record.kind === 'empty') throw new Error('Save slot is empty');
       if (record.kind === 'corrupt') throw new Error('Corrupt save JSON');
       const envelope = validateSaveEnvelope(

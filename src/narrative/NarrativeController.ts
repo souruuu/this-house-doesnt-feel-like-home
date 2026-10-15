@@ -18,8 +18,6 @@ import type {
   TranscriptEntry,
 } from './types.ts';
 
-let nextSession = 0;
-
 export class NarrativeController {
   private readonly story: Story;
   private readonly listeners = new Set<(view: NarrativeView) => void>();
@@ -50,7 +48,7 @@ export class NarrativeController {
     const initialScene = Object.keys(references.scenes)[0];
     if (!initialScene) throw new Error('Fixture needs a scene');
     this.view = {
-      sessionId: `fixture-session-${++nextSession}`,
+      sessionId: `fixture-session-${crypto.randomUUID()}`,
       revision: 0,
       phase: 'idle',
       paused: false,

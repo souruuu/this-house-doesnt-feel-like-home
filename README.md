@@ -2,7 +2,7 @@
 
 Interactive Game Website — M0 scaffold + M1 technical fixture (dev/QA)
 
-**สถานะ:** M0 PR #2 → M1 Batch 1 PR #3 → Batch 2 PR #4 → Batch 3A PR #5 merge เข้า remote main แล้วแบบ Conditional Integration Acceptance; approved baseline `e9731550f17227883681dd3d6b073f3097fdab0f` เก็บ Batch 3A commit `dee9efaacdf51d6839df41d86217f5eeb132fdc7` ใน ancestry Batch 3A ผ่าน Independent Review แบบ PASS WITH NON-BLOCKING FOLLOW-UP; 3A-F01 ยัง OPEN รอหลักฐานและ Independent Review ของ guarded writes ใน Batch 3B-1 ขณะนี้ทำเฉพาะ 3B-1 บน `codex/m1-persistence-storage-batch-3b-1` ยังไม่ stage/commit/push M0/M1 milestone ยัง **NOT DONE**; ManagedGame defect, Firefox/A-01 คง OPEN และ pre-READY failure คง unverified residual risk Browser startup/resume, autosave scheduling และ Save/Load controls ยังรอ Batch 3B-2 approval ไม่มี release story หรือ final art ดูหลักฐานและ Owner Decisions ใน [MASTER_PLAN](MASTER_PLAN.md)
+**สถานะ:** M0 และ M1 Batch 1/2/3A/3B-1 merge แบบ Conditional Integration Acceptance แล้ว PR #6 merge commit `6a44b987fc0f512400f784a2d4cb8e8611b68509` เป็น approved baseline ของ Batch 3B-2 บน `codex/m1-persistence-runtime-batch-3b-2` Owner รับ 3B-1 หลัง Independent Review PASS และ 3A-F01 **FIX VERIFIED เฉพาะ Single-page Writer Scope**; ไม่ครอบคลุม multi-tab Batch 3B-2 implement/verify แล้วตามผลด้านล่างและรอ Independent Review ยังไม่ stage/commit/push M0/M1 milestone **NOT DONE**; ManagedGame defect, Firefox/A-01 OPEN; pre-READY failure unverified ไม่มี release story/final art บันทึก 3A/3B-1 ด้านล่างเป็นประวัติ ณ batch นั้น ดูผลรอบปัจจุบันใน [MASTER_PLAN](MASTER_PLAN.md)
 
 **Checkpoint:** คง implementation และ dependency versions ปัจจุบัน หยุดทดลอง Phaser internals/startup override/failure-injection และไม่มี lifecycle fix ใหม่ ผล probe กับ Phaser 4.2.1 จริงยืนยันว่า ManagedGame ลบ external visibilitychange listener จาก postBoot โดยไม่ตั้งใจ 3/3 รอบ ส่วน pre-READY boot failure เป็น residual risk ที่ยังไม่พิสูจน์ด้วย runtime failure-injection ดูหลักฐานแยกกันใน MASTER_PLAN ไม่เปลี่ยน Definition of Done และไม่ถือว่า checkpoint ผ่าน lifecycle gate
 
@@ -64,6 +64,19 @@ npm run dev
 - รับประกันภายในหน้าเกมที่มีหนึ่ง active runtime writer เท่านั้น การตรวจ expected bytes ไม่ใช่ cross-tab CAS หรือ cross-key transaction 3A-F01 ยัง OPEN จนผ่าน Independent Review ของหลักฐานชุดนี้ ไม่ใช้ผล storage tests ปิด Firefox/A-01 หรือ ManagedGame
 
 ผล verification และข้อจำกัดของ Batch 3B-1 บันทึกใน MASTER_PLAN แยกจากผล Batch 3A ไม่อ้างว่า refresh/resume หรือ full E2E ผ่าน
+
+### Batch 3B-2 — technical fixture startup/autosave/resume
+
+- `FixtureRuntime` เป็น dev-only command owner ครอบ Coordinator เดิม: `checking → awaiting-decision → active`, พร้อม `blocked/disposed` ตรวจ profile/ทั้งสี่ slots และ candidate Ink ก่อนเปิด narrative ไม่มี advance/write ก่อน explicit decision Startup ที่ไม่มี autosave ไม่โหลด manual แทน Valid autosave รอ Resume/New Run
+- Resume/Manual Load ใช้ candidate restore เดิม ไม่มี Continue/Choose/dispatch เพื่อสร้าง view ใหม่ ไม่มี autosave จาก activation Saved Run ID คงเดิม Controller Session ID ใช้ UUID ใหม่ข้าม reload Auto/Skip ยังไม่ implement และไม่มี state เปิดถูก restore
+- New Run ที่มี autosave ต้องยืนยันก่อนแทนที่; Manual Save ที่มีข้อมูลต้องยืนยัน; Load คนละ run ขอ consent สำหรับ autosave ในอนาคต Confirmation ผูก session และ actual raw bytes; Load/Save มี expected-contents guard Cancel ไม่เขียน Protected slots/profile ไม่ถูก reset/delete/overwrite
+- Autosave หลัง accepted command คืนจาก Controller และ unlock แล้วเท่านั้น: stable scene initialization, entering unselected choice, completed choice/domain commit หรือ completed scene transition ไม่ trigger จาก render/subscription/pause/remount/restore หรือ ordinary dialogue บรรทัดอื่น Profile read history persist แยกโดยไม่เขียน game slot ทุก line
+- Panel ใช้ LocalStorage repository จริง พร้อม dev-only Resume/New Run/manual 3 slots/inspect/retry/confirm และ busy/saved/unsaved/error ผ่าน components/tokens เดิม ปิด/เปิด view ไม่สร้าง run ใหม่ ไม่มี production Save UI และ components ไม่เรียก LocalStorage/Story
+- Missing/corrupt profile กับ existing slots, protected autosave หรือ read failure block startup ไม่มี memory-only fallback Active write failure คง coherent live session ให้เล่นต่อพร้อม unsaved/error และ explicit retry ไม่อ้าง game save success เมื่อ slot ไม่ถูกเขียน Profile กับ slot เป็นคนละ write; receipt เดิมแยก physical commits
+- Current producer build `0.0.0+m1-batch-3b-2`, schema `1`, story `technical-fixture-checkpoint-v1` อ่าน current build และคู่ 3B-1 → 3B-2 ที่ทดสอบด้วย 20 real checkpoints จาก commit `e0b6eefe3bd41ed6574bd13224868ea101b72547` ใน `tests/fixtures/saves/build-3b1.json` เท่านั้น Preserve producer identity เมื่ออ่าน; Save ใหม่ใช้ current build Inspection/Load/Save validation ใช้ policy เดียวกัน ไม่รับ arbitrary builds ที่ schema เท่ากัน ไม่มี migration framework
+- Browser persistence จำกัด same origin/profile และ completed safe writes ไม่รับประกันการ flush ก่อนปิด browser, cross-origin, cross-tab หรือ cross-key atomicity ค่า ordinary dialogue หลัง checkpoint ล่าสุดอาจยังไม่ถูก save ต้องดู feedback/checkpoint ID จริง
+
+ผล Batch 3B-2 รอบสุดท้าย: full unit **244/0/0**, focused **189/0/0** (subset), Chromium/WebKit **26/0/0** รวม page reload และ persistent browser restart; Firefox **0/13/0** ล้มก่อนเข้าเกมจาก `spawn UNKNOWN` Compile/validate/typecheck/lint/format/build exit 0 มี Phaser chunk warning เดิม รายละเอียด commands/logs และ failures ระหว่างพัฒนาอยู่ MASTER_PLAN ไม่มี Full E2E/CI PASS และไม่ปิด Firefox/A-01, ManagedGame, pre-READY risk หรือ M1 DoD **Batch 3B-2 รอ Independent Review**
 
 ### Authoritative query binding — inkjs 2.4.0
 

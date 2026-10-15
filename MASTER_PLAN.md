@@ -2,7 +2,7 @@
 
 Source of Truth ของลำดับงาน Definition of Done และหลักฐานตรวจ เพื่อไปถึง **Prototype บทนำ + Day 1–3** และ competition package ขอบเขตเกมเต็มอยู่ใน [PROJECT](PROJECT.md); เนื้อหารายฉากอยู่ใน [Narrative Map](sources/narrative_map_7_day_Updates.md)
 
-สถานะ: **M0 และ M1 Batch 1/2/3A merge เข้า remote main แล้วแบบ Conditional Integration Acceptance**: PR #2 `d33c5976bc3446acca8c27ce23c52e1a66dbc34a` → PR #3 `7cd44c19eb5d8634c90dd4dde95ecf77f8a06101` → PR #4 `f9cd7dcc89c5b595de66a7d0acaa3605c7157487` → PR #5 `e9731550f17227883681dd3d6b073f3097fdab0f` โดยรักษา Batch 3A commit `dee9efaacdf51d6839df41d86217f5eeb132fdc7` ใน ancestry Batch 1 B-01–B-03 PASS/B-04 FIX VERIFIED; Batch 2 query timing FIX VERIFIED; Batch 3A Independent Review PASS WITH NON-BLOCKING FOLLOW-UP 3A-F01 ยัง OPEN รอ Independent Review ของ write-safety evidence ใน Batch 3B-1 ปัจจุบัน Owner อนุมัติเฉพาะ 3B-1 จาก baseline PR #5 ยังไม่ stage/commit/push M0/M1 milestone ยัง **NOT DONE**; ManagedGame defect, Firefox/A-01 OPEN; pre-READY failure unverified residual risk; 3B-2/M2–M7 ยังไม่เริ่ม ข้อความรอ approvals เดิมด้านล่างเป็นประวัติ ณ รอบนั้น
+สถานะปัจจุบัน: **M0 และ M1 Batch 1/2/3A/3B-1 merge แบบ Conditional Integration Acceptance แล้ว** PR #2 → #3 → #4 → #5 → #6; PR #6 merge `6a44b987fc0f512400f784a2d4cb8e8611b68509` เก็บ commit `e0b6eefe3bd41ed6574bd13224868ea101b72547` ใน ancestry 3A-F01 **FIX VERIFIED เฉพาะ Single-page Writer Scope** หลัง Independent Review PASS ของ 3B-1 Owner อนุมัติ Batch 3B-2 บน `codex/m1-persistence-runtime-batch-3b-2` จาก exact baseline นี้ ขณะนี้รอ Independent Review ไม่ stage/commit/push M0/M1 milestone **NOT DONE**; ManagedGame defect/Firefox/A-01 OPEN; pre-READY failure unverified M2–M7 ยังไม่เริ่ม ข้อความ Pending/OPEN/รอ approval ในบันทึก batch เก่าด้านล่างเป็นประวัติ ณ รอบนั้น ไม่เปลี่ยน Definition of Done
 
 ## บันทึกงาน M0 — 2026-10-13
 
@@ -297,6 +297,54 @@ Raw logs: `C:\Users\USER\AppData\Local\Temp\this-house-m0-qa\m1-batch3b1-storage
 ขอบเขต 13 ไฟล์: modified 7/new 6 (source 7/tests 4/docs 2) ตรวจ Milestone/DoD ทั้ง 8 แถวตรง exact baseline; architecture/dependencies/Phaser/narrative/query policy/UI/shell bytes ไม่เปลี่ยน ผล static iframe/production fixture exclusion ยังผ่าน ไม่เพิ่ม release content หรือ fixture UI controls
 
 Remaining scope: 3B-2 startup detection/explicit Resume-New Run, actual autosave scheduling, dev Save/Load controls และ browser refresh/resume ยังไม่ implement/ยังไม่อนุมัติ ไม่อ้าง Full E2E/CI PASS; single-page one-writer scope เท่านั้น ไม่มี cross-key atomicity หรือ cross-tab guarantee M0 NOT DONE; M1 Batch 1/2/3A Conditional Acceptance; 3B-1 Pending Independent Review; M1 milestone NOT DONE; ManagedGame/Firefox/A-01 OPEN และ pre-READY residual risk unverified
+
+## บันทึกงาน M1 Batch 3B-2 — Startup, Autosave & Browser Resume / Pending Review
+
+Owner อนุมัติ implementation หนึ่ง batch จาก remote main `6a44b987fc0f512400f784a2d4cb8e8611b68509` หลัง PR #6 merge (parents `e9731550f17227883681dd3d6b073f3097fdab0f`, `e0b6eefe3bd41ed6574bd13224868ea101b72547`) preflight branch/index/working tree สะอาดและชื่อ branch ยังไม่ใช้ Fetch exact SHA และสร้าง `codex/m1-persistence-runtime-batch-3b-2` โดยไม่เปลี่ยน local main ที่ล้าสมัย ไม่มี stage/commit/push/PR/merge
+
+Documentation follow-up: Batch 3B-1 ได้รับ Conditional Acceptance/Independent Review PASS และ merge แล้ว 3A-F01 **FIX VERIFIED เฉพาะ Single-page Writer Scope** ตาม Owner Decision บันทึก Pending Review/OPEN/ยังไม่เชื่อม runtime ในหัวข้อ 3A/3B-1 เป็นประวัติก่อน Review/Merge ไม่ใช่สถานะปัจจุบัน ไม่ขยาย guarantee ไป cross-tab M0/M1 ยังคง NOT DONE; Firefox/A-01/ManagedGame OPEN และ pre-READY failure unverified
+
+แผนที่อนุมัติ: runtime ownership/startup gate → safe-boundary autosave/dev controls → integration/browser/regression verification ใช้ technical fixture เท่านั้น ไม่เปลี่ยน domain transaction architecture, dependencies, Phaser/ManagedGame, narrative tags/content หรือ Definition of Done
+
+Runtime owner รับ narrative commands และคุม busy/confirmation state UI subscriptions ไม่สร้าง run หรือสั่ง autosave ตรวจ raw profile/4 slots แบบ read-only แล้ว validate/hydrate profile และ candidate cursor ก่อนเปิด decision ไม่มี advance/write ก่อน explicit Resume/New Run ไม่มี manual fallback Protected startup block และ preserve bytes; stale initialization/disposal ไม่ activate/publish ส่วน StrictMode/view remount ไม่มี writes ซ้ำ
+
+Save flow รักษา capture/lease/permit เดิม Autosave หลัง Controller command จบ/unlock เท่านั้น: scene initialized, unselected choice, choice/domain transaction complete, scene transition ที่ stable Ordinary line ไม่เขียน game slot (มี integration negative case ด้วย real Controller); profile history flush แยกหลัง publish ไม่ย้อนด้วย Load/New Run New Run/overwrite/different-run manual load ใช้ explicit raw-bound confirmation; optional expected-contents guard ปฏิเสธ Load ที่เปลี่ยนก่อน candidate activation และ Manual Save ที่ target เปลี่ยน
+
+Restore ไม่ Continue/Choose/replay Domain หรือ one-shot presentation; Run ID คงจาก Save แต่ Controller Session ID เป็น UUID ใหม่ Coherent candidate activation/ledger/query binding/B-04/physical-write guards เดิมคงอยู่ Active storage failure ไม่ทำลาย live session แสดง unsaved/error พร้อม explicit retry ไม่รายงาน saved จาก write ที่ไม่เกิด และไม่ทำ implicit reset/recovery
+
+Compatibility: ก่อนแก้ build identity ใช้ Controller/Coordinator ของ baseline 3B-1 จริงสร้าง 20 checkpoints (initial query true/false × branches A/B × 4 lines + choice) จากนั้นเก็บ producer commit/compiled SHA-256 กับ DTO ใน `tests/fixtures/saves/build-3b1.json` temporary capture test ผ่าน 1/1 แล้วนำ generator ชั่วคราวออก Current build `0.0.0+m1-batch-3b-2`, schema 1/story v1 คงเดิม; shared policy ยอมรับเฉพาะ current และ tested 3B-1 → 3B-2, preserve original producer on read/new producer on write ไม่มี silent rewrite/migration/all-build claim
+
+### Verification Batch 3B-2 — 2026-10-16 / Pending Independent Review
+
+Windows/PowerShell, Node 24.13.1/npm 11.8.0, pinned dependencies/config เดิม Full unit รวม runtime 45 tests ใหม่ Focused เป็น subset ของ full ห้ามนับรวมซ้ำ
+
+| คำสั่งรันจริงรอบสุดท้าย | Exit | Passed / Failed / Skipped หรือผล |
+|---|---:|---|
+| `npm run narrative:compile` | 0 | technical fixture เดิม |
+| `npm run narrative:validate` | 0 | 8 IDs / 4 terminal paths / 2 tag-only outputs |
+| `npm run typecheck` | 0 | app/tooling/tests |
+| `npm run lint` | 0 | ไม่มี errors/warnings |
+| `npm run format:check` | 0 | matched files ผ่าน |
+| `npm test` | 0 | **244 / 0 / 0**, 7 files |
+| `npm exec -- vitest run tests/unit/fixture-runtime.test.ts tests/unit/storage-persistence.test.ts tests/unit/save-checkpoint.test.ts tests/unit/domain-transaction.test.ts` | 0 | **189 / 0 / 0**, 4 files; runtime 45 + storage 48 + checkpoint 54 + domain/query 42 |
+| `npm run build` | 0 | relative static build; Phaser chunk warning เดิม 1,388.98 kB/gzip 372.29 kB |
+| `npm run test:e2e:windows-chromium-webkit` | 0 | **26 / 0 / 0**, 2.4m; Chromium 13/WebKit 13 |
+| `npm run test:e2e:firefox` | 1 | **0 / 13 / 0**; `browserType.launch`/`launchPersistentContext: spawn UNKNOWN` ก่อนเข้าเกม |
+| `git diff --check` | 0 | whitespace ผ่าน; index ว่าง |
+
+Firefox บน Windows environment นี้ยังเปิด browser ไม่ได้ ไม่ทดลองแก้ environment/Phaser ไม่ skip tests หรือเปลี่ยน projects และไม่มีผล environment อื่นในรอบนี้ **Full E2E verification ยังไม่ผ่านครบ** ไม่มี GitHub CI result ให้อ้างว่า PASS
+
+Page Reload แยกจาก Browser Restart: ทั้งสอง browsers ตรวจ reload/resume line, unselected choice, branches A/B และ current post-commit query text; restart test ใช้ `launchPersistentContext` กับ TEMP user-data directory เดิม ปิด context ซึ่งยุติ browser process แล้วเปิด process ใหม่ 3 รอบ ตรวจ initial line → choice → committed branch line พร้อม same Run ID/new Session ID, bytes คงก่อน decision/หลัง restore, notifications 0 และ ledger/effectCount ไม่เพิ่มซ้ำ ไม่ใช่เพียง page close/new page ใน context เดิม Scope เป็น automated same-origin/profile Chromium/WebKit บน Windows ไม่แทน Safari/iOS จริงหรือการล้าง storage/private mode
+
+Regression evidence: startup advance/write 0 ก่อน explicit decision, stale initialization/disposal, busy/reentrant commands, environment pause ระหว่าง publish พร้อม revision guards, ordinary line ไม่ game-slot save แต่ profile history persist, raw-bound confirmations/cancel, actual target เปลี่ยนก่อน Save/Load, profile/run/slot isolation, protected raw preservation, native quota failure/explicit retry, real old-build checkpoint restore และ baseline regressionsเดิม static nested iframe/production exclusion ตรวจว่าไม่มี fixture bytecode/runtime storage namespace/QA controls ใน dist
+
+ระหว่างพัฒนา: capture fixture test รอบแรกใน sandbox EPERM rename Vite cache (0 tests) แล้วรันด้วยสิทธิ์นอก sandbox ผ่าน 1/1; Git fetch ครั้งแรกเขียน FETCH_HEAD ไม่ได้แล้ว fetch/switch สำเร็จด้วยสิทธิ์สำหรับ approved Git action E2E รอบแรก exit 1, 24 passed/2 failed เพราะ selector shell `role=status` พบ QA save status เพิ่ม แก้ให้ scope สถานะ shell เดิมโดยคง assertion และรอบสุดท้ายผ่านทั้งหมด Unit/focused รอบก่อนสุดท้ายมี 1 failure จาก race injection ที่เกิดก่อน inspection แทนหลัง read จึงแก้ตำแหน่ง injection ให้ตรง boundary โดยคง assertions; logs first/final แยก ไม่ใช้ผล failed รอบนั้นเป็น PASS
+
+Raw logs รอบสุดท้าย: `C:\Users\USER\AppData\Local\Temp\this-house-m0-qa\m1-batch3b2-runtime-20261016\` มี compile/validate/typecheck/lint/format/unit/focused/build/chromium-webkit/firefox และ JSON exit-code records Artifacts final อยู่ QA root ใต้ `m1-batch3b2-chromium-webkit-20261016`/`m1-batch3b2-firefox-20261016`; first E2E artifacts อยู่ `win32-1792098488559` ไม่มี logs/generated/build/browser profiles เข้า Git
+
+Scope review: ไม่เปลี่ยน Milestone/DoD 8 แถว, architecture/AGENTS/dependencies/config, ManagedGame, repository physical-write code, EventRegistry, domain store, QueryPort หรือ Ink source/references เทียบ Git blobs กับ exact baseline แล้วตรงกัน สิ่งเพิ่มจากแผนย่อยคือ expected-contents guard สำหรับ empty Manual Save เพื่อปิด race ระหว่าง inspect/write และ scroll bounds ของ panel ตาม tokens เดิม ไม่มี architecture/scope deviation หรือ release content
+
+Batch 3B-2 ยัง Pending Independent Review/Owner Acceptance; ไม่มี stage/commit/push/PR/merge M0/M1 NOT DONE; ManagedGame/Firefox/A-01 OPEN, pre-READY unverified; 3A-F01 FIX VERIFIED จำกัด single-page writer ไม่มี cross-tab/cross-key atomicity หรือ production UI ไม่เพิ่ม settings defaults/Auto/Skip/audio/puzzle/M2
 
 ## Milestones
 

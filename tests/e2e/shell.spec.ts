@@ -106,7 +106,7 @@ test('Thai shell, shared bounds, remount, pause and keyboard ownership', async (
       document.documentElement.requestFullscreen;
   });
   await page.getByRole('button', { name: 'เต็มจอ', exact: true }).click();
-  await expect(page.getByRole('status')).toContainText(
+  await expect(page.locator('.ui-panel > [role="status"]')).toContainText(
     'ไม่สามารถแสดงเต็มจอได้',
   );
   await page.screenshot({

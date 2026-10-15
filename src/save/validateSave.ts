@@ -10,7 +10,11 @@ import {
   prepareFixtureCommit,
   type FixtureDomainState,
 } from '../state/fixtureDomainStore.ts';
-import type { FixtureSaveEnvelope, SaveVersions } from './types.ts';
+import {
+  supportsFixtureBuild,
+  type FixtureSaveEnvelope,
+  type SaveVersions,
+} from './types.ts';
 
 function record(value: unknown, keys: readonly string[]) {
   if (
@@ -232,7 +236,8 @@ export function validateSaveEnvelope(
   ]);
   if (
     save.scope !== 'technical-fixture-only' ||
-    save.appBuildVersion !== versions.appBuildVersion ||
+    !supportsFixtureBuild(save.appBuildVersion, versions) ||
+    typeof save.appBuildVersion !== 'string' ||
     save.saveSchemaVersion !== versions.saveSchemaVersion ||
     save.storyCompatibilityVersion !== versions.storyCompatibilityVersion
   )
@@ -244,6 +249,7 @@ export function validateSaveEnvelope(
   validateFixtureProgress(game, narrative);
   return Object.freeze({
     ...versions,
+    appBuildVersion: save.appBuildVersion,
     scope: 'technical-fixture-only',
     profileId,
     timestamp: integer(save.timestamp),
