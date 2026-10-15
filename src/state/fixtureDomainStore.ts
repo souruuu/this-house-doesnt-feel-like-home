@@ -102,6 +102,10 @@ export function createFixtureDomainStore(seed = initialFixtureState()) {
     getState: store.getState,
     subscribe: store.subscribe,
     commit: port.commit,
+    capture() {
+      if (committing) throw new Error('Fixture domain commit is locked');
+      return store.getState();
+    },
   });
 }
 

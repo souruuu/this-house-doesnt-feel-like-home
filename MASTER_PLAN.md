@@ -2,7 +2,7 @@
 
 Source of Truth ของลำดับงาน Definition of Done และหลักฐานตรวจ เพื่อไปถึง **Prototype บทนำ + Day 1–3** และ competition package ขอบเขตเกมเต็มอยู่ใน [PROJECT](PROJECT.md); เนื้อหารายฉากอยู่ใน [Narrative Map](sources/narrative_map_7_day_Updates.md)
 
-สถานะ: **M0 และ M1 Batch 1 merge เข้า remote main แล้วแบบ Conditional Integration Acceptance**: M0 PR #2 `d33c5976bc3446acca8c27ce23c52e1a66dbc34a` → M1 PR #3 `7cd44c19eb5d8634c90dd4dde95ecf77f8a06101` โดยรักษา merge ancestry; Batch 1 commit `72fda637efde5e91925da03681fb2908790d8fc8` มี B-01–B-03 PASS และ B-04 FIX VERIFIED M0 ยัง NOT DONE; M1 milestone ยัง NOT DONE ManagedGame defect, Firefox/A-01 คง OPEN และ pre-READY failure คง unverified residual risk Batch 2 ทำใน working tree จาก main baseline ข้างต้น รวม focused lookahead-safety fix ที่ Owner อนุมัติ Option 1 และคง **Pending Review**; Batch 3/M2–M7 ยังไม่เริ่ม รายละเอียด Batch 2 อยู่ด้านล่าง ข้อความรอ review/Git approval ในบันทึก M0/Batch 1 เก็บเป็นประวัติก่อน approvals/merge ไม่ใช่สถานะปัจจุบัน
+สถานะ: **M0 และ M1 Batch 1/2 merge เข้า remote main แล้วแบบ Conditional Integration Acceptance**: PR #2 `d33c5976bc3446acca8c27ce23c52e1a66dbc34a` → PR #3 `7cd44c19eb5d8634c90dd4dde95ecf77f8a06101` → PR #4 `f9cd7dcc89c5b595de66a7d0acaa3605c7157487` โดยรักษา merge ancestry รวม Batch 2 commit `83fe4b7b4ac075b45cf6e43108f4b25c54e2a114` Independent Review: Batch 1 B-01–B-03 PASS/B-04 FIX VERIFIED; Batch 2 Blocking Implementation Issues 0 และ Ink query timing FIX VERIFIED ขณะนี้ Batch 3A เป็น working tree จาก exact remote main baseline ล่าสุด Implementation/verification เสร็จและ **Pending Independent Review** ยังไม่ stage/commit/push M0 ยัง **NOT DONE**; M1 milestone ยัง **NOT DONE** ManagedGame defect, Firefox/A-01 คง OPEN และ pre-READY failure คง unverified residual risk Batch 3B/M2–M7 ยังไม่เริ่ม ข้อความรอ review/Git approval เดิมด้านล่างเป็นประวัติก่อน approvals/merge
 
 ## บันทึกงาน M0 — 2026-10-13
 
@@ -155,7 +155,9 @@ Evidence B-04: `%TEMP%/this-house-m0-qa/m1-b04-chromium-webkit-1792044644084/ver
 
 Diff เพิ่มจาก source-review snapshot จำกัด 5 ไฟล์เดิม: src/narrative/NarrativeController.ts, tests/unit/narrative.test.ts, tests/e2e/narrative.spec.ts, MASTER_PLAN.md, README.md ไม่มีไฟล์ใหม่เพิ่มจากรายการ 18 ไฟล์เดิม ไม่แก้ EventRegistry/parser/validator/query, architecture/DoD/dependencies หรือ Phaser lifecycle; M0 known defects/Firefox/A-01 คง OPEN รอ Owner Review B-04 ก่อน stage/commit/push/merge หรือ Batch ถัดไป ZIP review เดิมเป็น pre-B-04 snapshot และไม่ได้เขียนทับ
 
-## บันทึกงาน M1 Batch 2 — 2026-10-15 / Pending Review
+## บันทึกงาน M1 Batch 2 — 2026-10-15 / Conditional Acceptance และ merge แล้ว
+
+Owner อนุมัติหลัง Independent Code Review, commit `83fe4b7b4ac075b45cf6e43108f4b25c54e2a114` และ PR #4 merge commit `f9cd7dcc89c5b595de66a7d0acaa3605c7157487` parent แรก `7cd44c19eb5d8634c90dd4dde95ecf77f8a06101` parent สองคือ Batch 2 commit นี้ Checks/status results 0 ไม่ใช่ CI PASS ข้อความขั้นตอน implementation/review ต่อไปนี้เป็นประวัติก่อน approvals ไม่ใช่สถานะ Git ปัจจุบัน
 
 Owner อนุมัติ Batch 2 เฉพาะ domain transaction/committed-event ledger และ documentation follow-up; Batch 3 persistence/checkpoint restore ยังไม่อนุมัติ ก่อนสร้าง branch ตรวจ remote main `7cd44c19eb5d8634c90dd4dde95ecf77f8a06101`, clean working tree และไม่มีชื่อ branch ทั้ง local/remote แล้ว fetch exact SHA และสร้าง `codex/m1-narrative-engine-batch-2` ที่ SHA นี้ ไม่อัปเดต local main ไม่ stage/commit/push/PR/merge
 
@@ -208,7 +210,49 @@ Evidence ใหม่แยกใน `%TEMP%/this-house-m0-qa/m1-batch2-lookahea
 
 รอบ Option 1 เปลี่ยนเฉพาะ NarrativeQueryPort, fixtureDomainStore, domain-transaction tests, README และ MASTER_PLAN; cumulative Batch 2 มี modified 16/new 2 ไฟล์ ไม่มี dependency/architecture/Phaser/config/tag changes ตรวจ milestone/Definition of Done ทั้ง 8 แถวเทียบ baseline แล้วตรงกัน Git HEAD ยัง `7cd44c19eb5d8634c90dd4dde95ecf77f8a06101` และ index ว่าง
 
-**Remaining work:** Owner Code Review และ Git Approval แยกต่างหากก่อน stage/commit/push/PR/merge Batch 3 SaveCoordinator/SaveRepository/Safe Checkpoint/restore/profile-backlog persistence ยังไม่ implement ไม่มีหลักฐาน idempotency หลัง browser reload/save restore M0 acceptance/known risks/Firefox/A-01 ไม่ถูกปิดจากผล Batch 2
+**Remaining work ณ จบ Batch 2:** Persistence/Safe Checkpoint restore และ idempotency หลัง browser reload/save-load ยังไม่พิสูจน์ ผล Batch 2 ไม่ปิด M0 acceptance/known risks/Firefox/A-01 ส่วน Batch 3A ปัจจุบันแยกบันทึกด้านล่าง
+
+## บันทึกงาน M1 Batch 3A — 2026-10-15 / Pending Independent Review
+
+Owner อนุมัติ Coherent Checkpoint & Candidate Restore เท่านั้น ตรวจ remote main ตรง `f9cd7dcc89c5b595de66a7d0acaa3605c7157487`, working tree สะอาด และไม่มี branch ชื่อนี้แล้ว fetch exact SHA และสร้าง `codex/m1-persistence-checkpoint-batch-3a` จาก baseline นี้ ไม่อัปเดต local main ไม่เปลี่ยน branches เดิม การอนุมัติไม่รวม stage/commit/push/PR/merge หรือ Batch 3B
+
+แผนที่อนุมัติ: พิสูจน์ public Ink snapshot/semantic cursor → DTO/validation + run backlog → synchronous safe capture → candidate store/controller และ atomic activation → coordinator/repository interface + in-memory test fake → regression/verification → Independent Review ขอบเขตอิง G-02/G-03 เดิม ไม่เปลี่ยน Definition of Done, dependencies, architecture, EventRegistry หรือ query binding policy
+
+Implementation: Controller เก็บ backlog ต่อ run; capture Ink/durable+ledger/semantic view/backlog ใน synchronous boundary ไม่มี await Reject processing/publish/notifications/unsafe phases รวม pause notification แต่ pause จาก stable line/choice capture ได้ SaveCoordinator ใช้ one-operation-at-a-time และ input lease ระหว่าง repository await; validate DTO/invariants ก่อน candidate activation ผูก queries กับ candidate store ก่อน LoadJson แล้ว reconstruct semantic line/choice โดยไม่ Continue/Choose/dispatch เปลี่ยน active store/controller ผ่าน pointer เดียวพร้อม generation ใหม่ หลัง activation คง candidate หาก subscriber ล้มเหลวและคืน notification-error receipt; ก่อน activation ล้มเหลวคง session เดิม
+
+การตรวจ coherence เพิ่มจาก self-review: valid game DTO และ valid narrative DTO อาจมาจากคนละจังหวะ ทดสอบ line ก่อน choice/choice ที่ยังไม่เลือกแต่ใส่ ledger หลังเลือก และ rejoin ที่ใส่ ledger ก่อนเลือก พบ FAIL ทั้ง 3 กรณีก่อนแก้ จึงเพิ่ม invariant ของเส้นทาง fixture เดิม (start → branch a/b → rejoin → terminal line) ให้ backlog/ledger/selected branch/branch-enabled input สัมพันธ์กันก่อนสร้าง candidate โดยไม่ dispatch domain actions ใช้เฉพาะ compatibility version นี้ ไม่เป็น release graph/framework และไม่เพิ่ม tags/payloads Tests เดิมของ Ink/semantic mismatch และ current-output ledger ยังตรวจต่อใน candidate runtime ได้โดยไม่ลด assertions Session pair ถูก freeze ป้องกันการเปลี่ยน store/controller แยกข้างนอก owner
+
+ข้อกำหนด fixture-only: timestamp เป็น Unix epoch milliseconds; app build `0.0.0+m1-batch-3a`, schema `1`, story compatibility `technical-fixture-checkpoint-v1` รองรับ exact identities นี้เท่านั้น ไม่มี migration สมมติหรือ release compatibility guarantee Public APIs: `Story.state.ToJson()/LoadJson()`, current text/tags/choices/path getters และ `Story.ContentAtPath(Path).correctObj` ที่ export ใน inkjs 2.4.0 ตรวจ exact path ไม่ยอมรับ approximate recovery ไม่มี private API/dependency patch Restore คง saved Run ID แต่ใช้ session identity ใหม่ พร้อมคืน line เต็มบรรทัด/choice ที่ยังไม่เลือก
+
+Profile foundation เป็น memory-only read-line history แยกจาก envelope ไม่ rewind เมื่อ Load/New Run ไม่เพิ่ม settings defaults/U-03 Runtime dev panel เชื่อม coordinator เฉพาะ run ownership/New Run; repository เป็น null ไม่มี Save/Load UI Repository contract มี autosave/manual-1–3; in-memory implementation อยู่ tests เท่านั้น Auto/Skip ยังไม่มี implementation/state ให้ replay
+
+### Verification Batch 3A — source สุดท้ายสำหรับ review
+
+Windows/PowerShell, Node 24.13.1/npm 11.8.0, dependencies เดิม ไม่มี Firefox skip หรือเปลี่ยน project ผล focused เป็นส่วนหนึ่งของ full unit ไม่ให้นับรวมซ้ำเป็นจำนวน tests คนละชุด
+
+| คำสั่งที่รันจริง | Exit | Passed / Failed / Skipped หรือผล |
+|---|---:|---|
+| `npm run narrative:compile` | 0 | technical fixture เดิม; ไม่มี release story |
+| `npm run narrative:validate` | 0 | 8 IDs, 4 terminal paths, 2 tag-only outputs |
+| `npm run typecheck` | 0 | app/tooling/tests/config |
+| `npm run lint` | 0 | ไม่มี errors/warnings |
+| `npm run format:check` | 0 | matched files ผ่าน; Markdown ตาม ignore policy เดิม |
+| `npm test` | 0 | **151 / 0 / 0**, 5 files |
+| `npx vitest run tests/unit/save-checkpoint.test.ts tests/unit/domain-transaction.test.ts` | 0 | **96 / 0 / 0**, 2 files: checkpoint 54 + domain/query 42 |
+| `npm run build` | 0 | relative static build; Phaser chunk warning เดิมประมาณ 1.39 MB/gzip 372 kB |
+| `npm run test:e2e:windows-chromium-webkit` | 0 | **12 / 0 / 0**, 55.3s; normal flow, B-04, StrictMode/remount/New Run, portrait/pause/hidden, static iframe/fixture exclusion |
+| `npm run test:e2e:firefox` | 1 | **0 / 6 / 0**; `browserType.launch: spawn UNKNOWN` ก่อนเข้า app ไม่ใช่ gameplay assertion |
+| `git diff --check` | 0 | ไม่มี whitespace errors; index ว่าง |
+
+Focused evidence ใช้ real inkjs/Controller/store: restore ทุก readable line ทั้งสอง branches รวม terminal line และ choice ที่ยังไม่เลือก; spies ตรวจว่า Restore ไม่เรียก `Story.Continue/ChooseChoiceIndex` พร้อมตรวจ actual effect counts/ledger/notification counts/backlog; stale session/revision ไม่ทำงาน; pause stable line/choice capture ได้ และ reject transaction/presentation/domain notifications/controller publish/pause publish; invalid JSON/opaque Ink cursor/approximate path/scene/Line/Choice IDs/types/ledger/schema/build/story/profile ถูกปฏิเสธ; candidate failure คง live session/slot เดิม; activation และ pause-notification failures คง coherent candidate พร้อม error receipt; busy/reentrant operations และ stale completion หลัง dispose ไม่ activate; Load คง Run ID/New Run แยก ledger/backlog และ profile history ไม่ rewind Query หลัง restore อ่าน candidate facts จริงทั้ง branch-enabled false และ committed flag หลังเลือก โดย Batch 2 temporary/choice/string/Glue regressions ยังผ่าน
+
+Logs สุดท้ายอยู่ `%TEMP%/this-house-m0-qa/m1-batch3a-coherent-unit-20261015/verification.log` และ `focused-verification.log`; browser logs อยู่ `m1-batch3a-coherent-chromium-webkit-20261015/verification.log` กับ `m1-batch3a-coherent-firefox-20261015/verification.log` ใต้ QA root เดียวกัน screenshot/trace อยู่ TEMP ไม่เข้า Git Environment อื่นยังไม่ตรวจ ไม่มี full E2E/CI PASS ให้อ้างจาก subset
+
+ระหว่างพัฒนา: typecheck เคย exit 1 เพราะ inferred generation literal; lint เคย exit 1 จาก unused initial assignment หลังเพิ่ม pause receipt; format เคย exit 1 หลังเพิ่ม assertion แล้วจัดรูปแบบใหม่ แก้และตรวจซ้ำแล้วตามผลสุดท้ายข้างต้น ครั้งแรก Vitest ภายใน sandbox exit 1, failed suite/0 tests จาก cache rename EPERM จึงรันคำสั่งเดิมภายนอก sandbox โดยไม่เปลี่ยน dependencies/config ไม่ใช้ผล startup failure นี้แทน assertion failure Red regression ของ mixed components ใช้ `npx vitest run tests/unit/save-checkpoint.test.ts -t 'individually valid'` exit 1, 0 passed/3 failed/51 skipped เพราะ name filter; full/focused runs หลังแก้ไม่ skip Tests การแก้ receipt และ coherence validation อยู่ภายใน approved failure/checkpoint boundaries ไม่มี scope deviation
+
+ขอบเขตไฟล์: modified 7/new 7 รวม 14 ไฟล์ (source 10/tests 2/docs 2) ไม่แตะ architecture/dependencies/Phaser/Ink source/tags หรือ source-of-truth contracts อื่น ตรวจ DoD ทั้ง 8 แถวเทียบ exact baseline แล้วตรงกัน และไม่พบ fixture/version markers ใน production dist
+
+Remaining scope: Batch 3B LocalStorageSaveRepository, persisted profile identity, actual browser refresh/resume และ storage UI ยังไม่ implement/ยังไม่อนุมัติ ผล in-memory round-trip ไม่รับรอง durability หลังปิด browser M0 Conditional Acceptance — NOT DONE; Batch 1/2 Conditional Acceptance; Batch 3A Pending Review; M1 NOT DONE; ManagedGame/Firefox/A-01 OPEN และ pre-READY failure unverified ตามเดิม
 
 ## Milestones
 
@@ -235,7 +279,7 @@ M2 เป็นข้อเสนอขอบเขต technical validation จ�
 4. เชื่อม React UI เดิมให้เล่น fixture และ capture/restore safe line/choice checkpoints ผ่าน controller/SaveCoordinator/SaveRepository ตาม G-02/G-03; query อ่าน state ที่ restore แล้ว, Auto/Skip off และไม่ replay durable/one-shot effects รักษา profile versus playthrough scope ไม่ขยายเป็น release save-slot UI, puzzle หรือ audio system
 5. เพิ่ม unit/integration tests สำหรับ branch/rejoin, invalid tags/IDs และไม่มี partial commit, ledger/idempotency, checkpoint line/choice round-trip และ scope; browser regression ตรวจ fixture flow กับ normal mount/unmount, subscriptions และ pause/hidden ตาม Owner Decision โดยไม่เพิ่ม external postBoot visibility listeners หรือเปลี่ยน window focus/blur handlers
 
-แผน verification หลังได้รับ approval และ implement: `npm run narrative:compile`, `npm run narrative:validate`, `npm run typecheck`, `npm run lint`, `npm run format:check`, `npm test`, `npm run build` และ `npm run test:e2e:windows-chromium-webkit` รายงาน exit codes/passed/failed/skipped จริง; Firefox ต้องเก็บผลแยกตาม environment ไม่ใช้ subset ปิด full browser gate รอบนี้ยังไม่ได้รันแผนดังกล่าว
+แผน verification ราย batch: `npm run narrative:compile`, `npm run narrative:validate`, `npm run typecheck`, `npm run lint`, `npm run format:check`, `npm test`, `npm run build` และ `npm run test:e2e:windows-chromium-webkit` รายงาน exit codes/passed/failed/skipped จริง; Firefox ต้องเก็บผลแยกตาม environment ไม่ใช้ subset ปิด full browser gate ผลที่รันแล้วอยู่ในบันทึกแต่ละ Batch ข้างต้น ไม่ใช้ผลเก่าแทน source ปัจจุบัน
 
 คำถามค้าง: G-01/N-03/U-01–U-03 และ P questions คง gate เดิม ใช้ fixture เพื่อพิสูจน์ technical contracts โดยไม่ตัดสินค่าหรือเนื้อหาที่เจ้าของยังไม่ล็อก ManagedGame risk acceptance/Firefox/A-01 ไม่ถูกนับเป็น resolved จากผล M1
 
