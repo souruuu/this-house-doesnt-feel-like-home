@@ -1,17 +1,19 @@
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 import { Story } from 'inkjs';
+import { createStore } from 'zustand/vanilla';
 import { fixtureOutput, fixtureSource } from './narrative-compile.ts';
-
-interface FixtureReferences {
-  scope: string;
-  scenes: Record<string, string>;
-  speakers: string[];
-  expressions: Record<string, string>;
-  positions: string[];
-  events: string[];
-  assets: string[];
-}
+import {
+  createFixtureEventRegistry,
+  type EventRegistry,
+} from '../src/narrative/EventRegistry.ts';
+import {
+  bindFixtureQueries,
+  createNarrativeQueryPort,
+  type FixtureFacts,
+} from '../src/narrative/NarrativeQueryPort.ts';
+import { parseOutput, resetPresentation } from '../src/narrative/tags.ts';
+import type { FixtureReferences } from '../src/narrative/types.ts';
 
 export function assertAssetPath(path: string) {
   if (
@@ -36,41 +38,138 @@ export function validateTags(
   text: string,
   references: FixtureReferences,
 ) {
-  const values = new Map<string, string>();
-  for (const tag of tags) {
-    const match =
-      /^(line|speaker|expression|position|event):([A-Za-z0-9_.-]+)$/.exec(
-        tag.trim(),
-      );
-    if (!match) throw new Error(`Unknown/invalid tag: ${tag}`);
-    const [, key, value] = match;
-    if (values.has(key)) throw new Error(`Duplicate tag: ${key}`);
-    values.set(key, value);
-    if (key === 'speaker' && !references.speakers.includes(value))
-      throw new Error(`Unknown speaker: ${value}`);
-    if (key === 'event' && !references.events.includes(value))
-      throw new Error(`Unknown event: ${value}`);
-    if (key === 'position' && !references.positions.includes(value))
-      throw new Error(`Unknown position: ${value}`);
-    if (key === 'expression' && !Object.hasOwn(references.expressions, value))
-      throw new Error(`Unknown expression: ${value}`);
-  }
-  if (text.trim() && !values.has('line'))
-    throw new Error('Readable output requires a stable Line ID');
-  return values.get('line');
+  return parseOutput(
+    tags,
+    text,
+    references,
+    createFixtureEventRegistry(),
+    resetPresentation(Object.keys(references.scenes)[0]),
+  ).lineId;
 }
 
-export function validateFixture() {
-  const references = JSON.parse(
-    readFileSync('narrative/fixtures/references.json', 'utf8'),
-  ) as FixtureReferences;
+// Source declarations are separate from runtime visits through a shared rejoin.
+// This literal-tag index is deliberately scoped to our small technical fixture.
+export function indexFixtureSource(
+  source: string,
+  references: FixtureReferences,
+) {
+  const declarations = new Set<string>();
+  for (const sourceLine of source.split(/\r?\n/)) {
+    const content = sourceLine.split('//')[0];
+    for (const match of content.matchAll(
+      /#\s*(line|event):([A-Za-z0-9_.-]+)/g,
+    )) {
+      const [, kind, id] = match;
+      const key = `${kind}:${id}`;
+      if (declarations.has(key)) throw new Error(`Duplicate source ID: ${key}`);
+      declarations.add(key);
+      if (kind === 'line' && !Object.hasOwn(references.lines, id))
+        throw new Error(`Unknown source Line ID: ${id}`);
+      if (kind === 'event' && !references.events.includes(id))
+        throw new Error(`Unknown source Event ID: ${id}`);
+    }
+  }
+  for (const id of Object.keys(references.lines)) {
+    if (!declarations.has(`line:${id}`))
+      throw new Error(`Missing source Line ID: ${id}`);
+  }
+  for (const id of references.events) {
+    if (!declarations.has(`event:${id}`))
+      throw new Error(`Missing source Event ID: ${id}`);
+  }
+  return declarations;
+}
+
+export function validateCompiledFixture(
+  source: string,
+  compiled: string,
+  references: FixtureReferences,
+  registry: EventRegistry = createFixtureEventRegistry(),
+) {
   if (references.scope !== 'technical-fixture-only')
     throw new Error('Fixture must not be release content');
-  const source = readFileSync(fixtureSource, 'utf8');
+  indexFixtureSource(source, references);
   for (const knot of Object.values(references.scenes)) {
     if (!source.includes(`=== ${knot} ===`))
       throw new Error(`Missing fixture scene knot: ${knot}`);
   }
+  const lines = new Set<string>();
+  let terminalPaths = 0;
+  let tagOnlyOutputs = 0;
+  // Explicit query inputs cover both variants, without guessing production facts.
+  for (const enabled of [true, false]) {
+    const store = createStore<FixtureFacts>(() => ({
+      flags: { 'fixture.branch_enabled': enabled },
+    }));
+    const makeStory = () => {
+      const story = new Story(compiled);
+      bindFixtureQueries(story, createNarrativeQueryPort(store));
+      return story;
+    };
+    const first = makeStory();
+    const queue = [
+      {
+        state: first.state.ToJson(),
+        context: resetPresentation(Object.keys(references.scenes)[0]),
+      },
+    ];
+    let steps = 0;
+    while (queue.length) {
+      if (++steps > 256) throw new Error('Fixture traversal limit exceeded');
+      const item = queue.shift();
+      if (!item) break;
+      const story = makeStory();
+      story.state.LoadJson(item.state); // Tool traversal only, not player save/load.
+      let context = item.context;
+      while (story.canContinue) {
+        if (++steps > 256) throw new Error('Fixture traversal limit exceeded');
+        const text = story.Continue() ?? '';
+        const parsed = parseOutput(
+          story.currentTags ?? [],
+          text,
+          references,
+          registry,
+          context,
+        );
+        context = parsed.context;
+        if (parsed.lineId) lines.add(parsed.lineId);
+        if (!parsed.text && (story.currentTags?.length ?? 0) > 0)
+          tagOnlyOutputs++;
+      }
+      if (!story.currentChoices.length) terminalPaths++;
+      for (const choice of story.currentChoices) {
+        const parsed = parseOutput(
+          choice.tags ?? [],
+          choice.text,
+          references,
+          registry,
+          context,
+        );
+        if (parsed.event)
+          throw new Error('Choice must not dispatch before selection');
+        if (!parsed.lineId || parsed.context.sceneId !== context.sceneId)
+          throw new Error('Invalid choice identity/scene');
+        lines.add(parsed.lineId);
+        const branch = makeStory();
+        branch.state.LoadJson(story.state.ToJson());
+        branch.ChooseChoiceIndex(choice.index);
+        queue.push({ state: branch.state.ToJson(), context: { ...context } });
+        if (queue.length > 128)
+          throw new Error('Fixture branch limit exceeded');
+      }
+    }
+  }
+  if (!lines.size) throw new Error('Empty fixture');
+  for (const id of Object.keys(references.lines)) {
+    if (!lines.has(id)) throw new Error(`Unvisited fixture Line ID: ${id}`);
+  }
+  return { lineCount: lines.size, terminalPaths, tagOnlyOutputs };
+}
+
+export function validateFixture() {
+  const references: FixtureReferences = JSON.parse(
+    readFileSync('narrative/fixtures/references.json', 'utf8'),
+  );
   const manifest = JSON.parse(
     readFileSync('src/assets/manifest.json', 'utf8'),
   ) as Record<string, { path: string; status: string }>;
@@ -82,20 +181,11 @@ export function validateFixture() {
       throw new Error('M0 accepts technical placeholders only');
     assertAssetPath(asset.path);
   }
-  const story = new Story(readFileSync(fixtureOutput, 'utf8'));
-  const lines = new Set<string>();
-  while (story.canContinue) {
-    const text = story.Continue() ?? '';
-    const line = validateTags(story.currentTags ?? [], text, references);
-    if (line) {
-      if (lines.has(line)) throw new Error(`Duplicate Line ID: ${line}`);
-      lines.add(line);
-    }
-  }
-  if (story.currentChoices.length)
-    throw new Error('M0 linear probe must not introduce narrative engine work');
-  if (!lines.size) throw new Error('Empty compiler probe');
-  return lines.size;
+  return validateCompiledFixture(
+    readFileSync(fixtureSource, 'utf8'),
+    readFileSync(fixtureOutput, 'utf8'),
+    references,
+  );
 }
 
 if (
@@ -103,6 +193,6 @@ if (
   import.meta.url === pathToFileURL(process.argv[1]).href
 ) {
   console.log(
-    `Validated ${validateFixture()} technical lines and fixture references; release story not present.`,
+    `Validated technical fixture only: ${JSON.stringify(validateFixture())}; release story not present.`,
   );
 }

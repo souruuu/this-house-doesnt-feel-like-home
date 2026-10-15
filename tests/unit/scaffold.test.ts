@@ -7,6 +7,7 @@ import {
   validateTags,
 } from '../../scripts/narrative-validate.ts';
 import { fixtureOutput } from '../../scripts/narrative-compile.ts';
+import { bindFixtureQueries } from '../../src/narrative/NarrativeQueryPort.ts';
 import references from '../../narrative/fixtures/references.json';
 import { fitViewport } from '../../src/shell/viewport';
 import { GameBridge } from '../../src/world/GameBridge';
@@ -47,17 +48,22 @@ describe('M0 viewport and static assets', () => {
   });
 });
 
-describe('technical compiler/runtime compatibility, not narrative engine', () => {
+describe('technical compiler/runtime compatibility', () => {
   it('validates compiled scene/tag/asset references', () =>
-    expect(validateFixture()).toBe(2));
+    expect(validateFixture()).toMatchObject({
+      lineCount: 8,
+      terminalPaths: 4,
+    }));
   it('round-trips the cursor with the locked runtime', () => {
     const json = readFileSync(fixtureOutput, 'utf8');
     const story = new Story(json);
+    bindFixtureQueries(story, { getFlag: () => true });
     expect(JSON.parse(json).inkVersion).toBe(21);
     story.Continue();
     const saved = story.state.ToJson();
     const next = story.Continue();
     const restored = new Story(json);
+    bindFixtureQueries(restored, { getFlag: () => true });
     restored.state.LoadJson(saved);
     expect(restored.Continue()).toBe(next);
   });

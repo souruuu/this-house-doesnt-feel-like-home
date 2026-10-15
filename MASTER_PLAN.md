@@ -2,7 +2,7 @@
 
 Source of Truth ของลำดับงาน Definition of Done และหลักฐานตรวจ เพื่อไปถึง **Prototype บทนำ + Day 1–3** และ competition package ขอบเขตเกมเต็มอยู่ใน [PROJECT](PROJECT.md); เนื้อหารายฉากอยู่ใน [Narrative Map](sources/narrative_map_7_day_Updates.md)
 
-สถานะ: **M0 ได้รับ Conditional Acceptance เพื่อเตรียมเดินหน้าสู่ M1; confirmed listener ownership defect ยังไม่แก้ และ Windows Firefox ยังไม่ผ่าน verification** ไม่ถือว่า M0 ผ่าน Definition of Done ครบ; M0/A-01 และ quality gates ที่ยังไม่ผ่านคง OPEN M1 มีแผนรอ approval แต่ยังไม่ implement; M2–M7 ยังไม่เริ่ม Checkpoint `8c6a5ead70fc9239c860d589998afdf9127dc921` commit/push แล้วบน `feat/m0-project-scaffold`; เอกสารรอบนี้ยังไม่ commit/push
+สถานะ: **M0 คง Conditional Acceptance; M1 Batch 1 implementation พร้อม Owner Review บน `codex/m1-narrative-engine-batch-1` แต่ยังไม่ commit/push** ไม่ถือว่า M0 หรือ M1 ผ่าน Definition of Done ครบ; ManagedGame confirmed defect ยังไม่แก้, Windows Firefox verification และ A-01 ยัง OPEN Batch ถัดไปและ M2–M7 ยังไม่เริ่ม M1 stacked จาก M0 baseline `3c0010bb4d2adf3b3a185bebfb7079a9bf98a4f1`; M0 ต้อง merge ก่อน M1 และตรวจ integration ใหม่ก่อน M1 merge
 
 ## บันทึกงาน M0 — 2026-10-13
 
@@ -100,6 +100,61 @@ node --input-type=module -e "import fs from 'node:fs'; const path='narrative/fix
 node --input-type=module -e "import { chromium } from '@playwright/test'; const browser=await chromium.launch(); const page=await browser.newPage(); const errors=[]; page.on('pageerror',error=>errors.push(error.message)); await page.goto('http://127.0.0.1:4176'); await page.locator('[data-world-state=ready]').waitFor(); await page.getByRole('button',{name:'เต็มจอ',exact:true}).click(); await page.waitForFunction(()=>document.fullscreenElement!==null); await page.getByRole('button',{name:'ออกจากเต็มจอ',exact:true}).click(); await page.waitForFunction(()=>document.fullscreenElement===null); console.log(JSON.stringify({title:await page.title(),canvasCount:await page.locator('canvas').count(),fullscreenRoundTrip:true,errors})); await browser.close(); if(errors.length)process.exitCode=1;"
 ```
 
+## บันทึกงาน M1 Batch 1 — 2026-10-15
+
+Owner อนุมัติ implementation plan และ addendum B-01–B-03 พร้อมสร้าง branch จาก exact baseline `3c0010bb4d2adf3b3a185bebfb7079a9bf98a4f1` ก่อนสร้างตรวจ branch/HEAD/clean working tree แล้ว refs ของ M0 และ main ไม่เปลี่ยน การอนุมัติไม่รวม commit/push/merge หรือ Batch 2; รอบนี้หยุดส่ง review
+
+แผนที่ใช้: technical fixture branch/rejoin → shared tag parser/validator + typed EventRegistry/read-only query → session controller + dev-only React UI → negative/lifecycle/static regression tests โดยคง dependencies/architecture และ M0 guardrails ไม่มี release narrative, domain execution/ledger หรือ save/load
+
+- **B-01:** EventRegistry resolve ได้เฉพาะ presentation fixture IDs ที่มี scene context; domain category ถูก guard ก่อน execution Controller รวบรวม tag-only outputs จนถึง line/choices และ validate ทุก output/choice ก่อนส่ง notification ผ่าน injected FixturePresentationPort แล้ว publish ไม่มี domain mutation/ledger/world command ใหม่ Port ของ dev harness เก็บเพียง transient QA notifications ไม่ข้าม GameBridge ไปเรียก Phaser Tests ยืนยัน unknown ID/category, valid event ตามด้วย invalid tag และ invalid choice ส่ง notifications 0 ครั้ง
+- **B-02:** แยก literal source-ID declarations ออกจาก runtime visits; duplicate Line/Event source IDs fail ส่วน shared rejoin definition เดียวเดินซ้ำได้ Validator ใช้ inkjs จริงและ runtime snapshots เฉพาะ tooling traversal แตกทั้งสอง choices สำหรับ explicit query inputs true/false พร้อม bounds ไม่มี player save/load ผลจริง 8 unique Line IDs, 4 terminal paths, 2 tag-only outputs Negative cases ในแต่ละ branch และ loop termination ผ่าน
+- **B-03:** NarrativeController เป็นเจ้าของ Story ต่อ session; scene mapping มาจาก fixture references ไม่เพิ่ม tag ใหม่ Context persist ภายใน scene และ reset speaker/expression/position เมื่อเปลี่ยน scene ทุก input ตรวจ session/revision/index/lock/pause; pause/resume invalidate pending revisions และ dispose ถอด subscriptions Tests ตรวจ context ที่ไม่ว่างจริง, reentrant input, stale/double requests และ remount
+- React Continue/Choice UI ใช้ Button/tokens เดิม เป็น lazy dev/QA entry ผ่าน `import.meta.env.DEV`; keyboard/touch/focus/pause/portrait guards และ StrictMode async cancellation ทำงาน Production dist ไม่รวม fixture bytecode, fixture UI text, fixture events หรือ Ink compiler; nested iframe/relative assets ยังผ่าน
+
+Changed files รวม 18 ไฟล์: fixture/references (2), scripts/narrative-validate.ts, src/narrative types/tags/EventRegistry/NarrativeQueryPort/NarrativeController/fixtureSession (6), src/ui/NarrativeFixturePanel.tsx, src/shell/App.tsx, src/ui/styles.css, tests/unit/narrative.test.ts, tests/unit/scaffold.test.ts, tests/e2e/narrative.spec.ts, tests/e2e/static.spec.ts, README.md และ MASTER_PLAN.md Generated output/QA logs อยู่ ignored directory หรือ TEMP ไม่มี dependency install/version/lockfile, src/world, Phaser lifecycle, visibility registration หรือ window focus/blur handler เปลี่ยน
+
+### Verification ก่อน Independent Source Review / B-04 (ประวัติ)
+
+| คำสั่ง verification ที่รันจริง | Exit code | ผลก่อน B-04 |
+|---|---|---|
+| `npm run narrative:compile` | 0 | inkjs compiler 2.4.0, JSON format 21, technical fixture เท่านั้น |
+| `npm run narrative:validate` | 0 | 8 Line IDs / 4 terminal paths / 2 tag-only outputs; ตรวจ source IDs และทุก fixture branch |
+| `npm run typecheck` | 0 | App/scripts/tests/configs ผ่าน |
+| `npm run lint` | 0 | ESLint ผ่าน |
+| `npm run format:check` | 0 | Prettier ผ่าน; source-of-truth Markdown ถูก exclude ตาม config เดิม |
+| `npm test` | 0 | 53 passed / 0 failed / 0 skipped ใน 3 files (36 narrative tests ใหม่ + 17 baseline tests) |
+| `npm run build` | 0 | Compile/validate/typecheck/Vite ผ่าน; Phaser chunk-size warning คงเดิมประมาณ 1.39 MB / gzip 372 kB |
+| `npm run test:e2e:windows-chromium-webkit` | 0 | 12 passed / 0 failed / 0 skipped (47.2s); 6 narrative + 6 M0 shell/static regression checks |
+| `npm run test:e2e:firefox` | 1 | 0 passed / 6 failed / 0 skipped; browserType.launch: spawn UNKNOWN ก่อนรันเกม ไม่ใช่ app assertions ที่รันแล้วล้ม |
+
+Environment: Windows/PowerShell, Node.js 24.13.1/npm 11.8.0, dependencies เดิม Playwright 1.64.0; browser projects ทั้งสามคงเดิม ผล Chromium/WebKit เป็น subset ไม่ใช่ full E2E ผ่าน Firefox environment อื่นยังไม่ได้ตรวจ ไม่มีการ patch/reinstall browser ใน Batch นี้
+
+Evidence: `%TEMP%/this-house-m0-qa/m1-batch1-chromium-webkit-1791998284066/verification.log` และ test-results ของ run เดียวกัน; Firefox `%TEMP%/this-house-m0-qa/m1-batch1-firefox-1791998043277/verification.log` พร้อม failed-launch traces ผล subset รอบแรก 12 passed (51.1s) ก่อนปรับ pause revision แล้วรันซ้ำรอบสุดท้ายข้างต้น
+
+ผลรอบแก้ระหว่างทำ: narrative validation เคย exit 1 เพราะวาง choice Line tags นอก Ink choice-only brackets; typecheck เคย exit 2 จาก parameter ของ it.each และ lint เคย exit 1 จาก prefer-const ใน test แก้แล้วตรวจซ้ำผ่าน `npm test` ภายใน sandbox เคย exit 1 ด้วย EPERM realpath (3 suites โหลดไม่ได้, ไม่มี tests ที่รัน) จึงรันคำสั่งเดิมนอก sandbox ได้ผลผ่าน 51/52 และสุดท้าย 53 tests ไม่เปลี่ยน dependencies หรือ test config เพื่อหลบข้อผิดพลาด
+
+**Blocking verification:** Firefox ยังเปิดไม่ได้ จึงไม่ปิด full browser gate/A-01 ไม่พบ blocking Batch 1 implementation issue จาก checks ที่รัน **Non-blocking สำหรับ review Batch นี้:** Phaser chunk warning และ M0 listener defect ที่ Owner ยอมรับชั่วคราว; defect ยังต้องแก้ก่อน production หรือทันทีเมื่อ normal gameplay regression Pre-READY boot failure คง unproven risk ไม่เพิ่ม failure-injection
+
+**Deviations/limitations:** ไม่มี architecture/scope/dependency deviation; validator เป็น bounded literal-tag technical-fixture traversal ไม่ใช่ release graph validator Event dispatch เป็น synchronous QA notifications เท่านั้นและไม่มี world effects/durable transaction recovery; arbitrary production callbacks/real-device matrix ยังไม่ได้พิสูจน์ ไม่มีการใช้ผล remount regression เพื่อประกาศว่า M0 resource cleanup/known defect แก้แล้ว
+
+**Remaining work:** Owner Review ของ Batch 1 ก่อน Git approval; durable domain execution + committed-event ledger/atomic commit, checkpoint/save-load, backlog/profile persistence และระบบ Batch ถัดไปยังไม่เริ่ม คง G-01/N-03/U/P OPEN QUESTION และ M1 ไม่ใช่ DONE ต้อง merge M0 ก่อน M1 และรัน integration ใหม่ก่อนอนุมัติ M1 merge
+
+### B-04 — Final Readable Line Transition / รอ Owner Review
+
+Independent Source Review ให้ B-01/B-02/B-03 PASS และพบ B-04 blocking: Controller ใช้ canContinue หลังอ่าน output ทำให้ terminal readable line เข้า ended ก่อนผู้เล่น Continue เจ้าของอนุมัติ bug fix เฉพาะ approved Batch 1 scope โดยไม่ต้องเสนอแผนใหม่
+
+แก้ NarrativeController ให้ติดตามว่ารอบ advance นี้ได้รับ readable line ใหม่หรือไม่ ถ้าได้รับให้ publish phase line และซ่อน choices จนกว่าจะ Continue แม้ Ink ไม่มี output ถัดไปแล้ว เมื่อ Continue รอบถัดไปไม่พบ line/choices จึง publish ended ยังคง whole-output validation ก่อน dispatch และ session/revision/index/input-lock guards เดิม ไม่เก็บ event buffer ข้าม advance จึงไม่ replay presentation events
+
+เพิ่ม unit tests 2 รายการด้วย inkjs จริง: terminal line/event ต้องรอ Continue พร้อมทดสอบ reentrant lock/stale session/revision และ dispatch เพียงครั้งเดียว; readable line ก่อน choices ต้องรอ Continue และ clear choices เมื่อจบ ปรับ fixture tests ทั้งสอง branch และ browser assertion ให้ตรวจ fixture_end_001 เป็น line, มี Continue, ไม่มี end label/choices ก่อนกดครั้งสุดท้าย และ notification count ไม่เพิ่มเมื่อเข้า ended
+
+คำสั่ง red test ก่อนแก้ Controller: `npx vitest run tests/unit/narrative.test.ts -t 'waits for Continue on a terminal readable line|waits on a readable line before choices'` exit 1, 0 passed / 2 failed / 36 skipped (filter เฉพาะสอง regressions) พบ phase ended/choice แทน line ตาม defect จริง หลังแก้รัน full unit suite ไม่ใช้ filtered result อ้างว่าทั้งชุดผ่าน
+
+ผล verification B-04 บน Windows/PowerShell, Node 24.13.1/npm 11.8.0/dependencies เดิม: `npm run narrative:compile`, `npm run narrative:validate`, `npm run typecheck`, `npm run lint`, `npm run format:check`, `npm test`, `npm run build` ทุกคำสั่ง exit 0; validator 8 Line IDs / 4 terminal paths / 2 tag-only outputs; unit **55 passed / 0 failed / 0 skipped** ใน 3 files; build ผ่านพร้อม Phaser chunk warning เดิม `npm run test:e2e:windows-chromium-webkit` exit 0, **12 passed / 0 failed / 0 skipped** (52.4s) รวม terminal-line behavior, normal remount/input/pause และ static fixture exclusion
+
+Evidence B-04: `%TEMP%/this-house-m0-qa/m1-b04-chromium-webkit-1792044644084/verification.log` และ test-results รอบเดียวกัน Firefox ไม่ rerun ใน B-04 ตามขอบเขตเจ้าของ ผลเดิมยัง 0 passed / 6 failed / 0 skipped, exit 1 จาก spawn UNKNOWN ก่อนเข้าเกม; ไม่แก้ Windows Firefox และไม่อ้าง full E2E ผ่าน
+
+Diff เพิ่มจาก source-review snapshot จำกัด 5 ไฟล์เดิม: src/narrative/NarrativeController.ts, tests/unit/narrative.test.ts, tests/e2e/narrative.spec.ts, MASTER_PLAN.md, README.md ไม่มีไฟล์ใหม่เพิ่มจากรายการ 18 ไฟล์เดิม ไม่แก้ EventRegistry/parser/validator/query, architecture/DoD/dependencies หรือ Phaser lifecycle; M0 known defects/Firefox/A-01 คง OPEN รอ Owner Review B-04 ก่อน stage/commit/push/merge หรือ Batch ถัดไป ZIP review เดิมเป็น pre-B-04 snapshot และไม่ได้เขียนทับ
+
 ## Milestones
 
 | Milestone | ผลงานและลำดับพึ่งพา | Definition of Done |
@@ -115,7 +170,7 @@ node --input-type=module -e "import { chromium } from '@playwright/test'; const 
 
 M2 เป็นข้อเสนอขอบเขต technical validation จากคู่ฉากที่ล็อก ไม่ใช่การตัดสินใจเพิ่มเนื้อเรื่อง งานบทและ scene cards ยังต้องปิด N-03 ก่อนเรียก vertical slice นี้ว่าฉบับเล่นจริง
 
-## แผน M1 — Technical fixture only; รอ approval ก่อน implementation
+## แผน M1 ระดับ milestone — Technical fixture only; Batch ถัดไปยังรอ approval
 
 ยึด M1 Definition of Done เดิม, [ARCHITECTURE](ARCHITECTURE.md), [NARRATIVE_SYSTEM](docs/NARRATIVE_SYSTEM.md) และ G-02/G-03 ใน [GAME_STATE](docs/GAME_STATE.md) การเดินหน้ามีเงื่อนไขตาม Owner Decision ข้างต้น ไม่เปลี่ยน stack/dependencies, ไม่แตะ Phaser startup และไม่ผลิต release story หรือ final art
 

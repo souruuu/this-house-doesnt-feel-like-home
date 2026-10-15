@@ -91,6 +91,14 @@ button {
   opacity: 0.5;
   cursor: default;
 }
+.narrative-fixture {
+  border: var(--border-width) solid var(--color-border);
+  padding: var(--space-small);
+  margin-block: var(--space-small);
+}
+.narrative-fixture:focus-visible {
+  outline: var(--focus-width) solid var(--color-focus);
+}
 .rotate-prompt {
   position: absolute;
   inset: 0;
