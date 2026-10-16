@@ -29,15 +29,17 @@ npm run dev
 | `npm run typecheck` | ตรวจ TypeScript ทั้ง app และ test/config ที่เกี่ยวข้อง |
 | `npm test` | Vitest แบบจบการทำงาน เหมาะกับ CI |
 | `npm run test:watch` | Vitest watch ระหว่างพัฒนา |
-| `npm run test:e2e` | Playwright; config ต้องจัดการ web server ให้เอง |
-| `npm run test:e2e:windows-chromium-webkit` | Chromium/WebKit subset สำหรับ Windows; ไม่ใช่ full E2E และไม่เลือก Firefox |
-| `npm run test:e2e:firefox` | Firefox project แยก; ต้องรายงาน environment และ startup failures ตามจริง |
+| `npm run test:e2e` | Full Three-browser Suite: Chromium/Firefox/WebKit; config จัดการ web server ให้เอง ยัง Fail บน Windows environment ปัจจุบันจาก Firefox launch failure |
+| `npm run test:e2e:windows-chromium-webkit` | Required Automated Browser Subset สำหรับ M0–M1 ตาม Temporary Owner Exception; ทั้ง Chromium/WebKit ต้องผ่าน ไม่ใช่ Full Three-browser E2E PASS |
+| `npm run test:e2e:firefox` | Optional/Diagnostic Verification เฉพาะ M0–M1; คง Firefox project และรายงาน environment/startup failures ตามจริง ไม่เปลี่ยนผลเดิมเป็น PASS |
 | `npm run lint` | ESLint |
 | `npm run format:check` | Prettier check code/config; ไม่ reformat narrative/design Markdown |
 | `npm run narrative:compile` | compile Ink เป็น JSON ด้วย compiler ที่เข้ากับ inkjs ที่ล็อกใน M0 |
 | `npm run narrative:validate` | ตรวจ source-ID declarations และ traverse ทั้งสอง fixture branches สำหรับ query inputs true/false รวม scene/tag/event/asset references; ไม่ใช่ release story graph validator |
 | `npm run build` | compile/validate narrative + typecheck + Vite static build ไป `dist/` |
 | `npm run preview` | Vite preview ของ build ที่สร้างแล้ว |
+
+**Temporary Owner Exception — M0–M1:** นโยบายอยู่ใน [ARCHITECTURE](ARCHITECTURE.md#temporary-owner-exception-m0-m1-automated-verification) และ [Required Verification Matrix](MASTER_PLAN.md#m0-m1-required-verification-matrix) ใช้ subset ข้างต้นสำหรับ required automated browser verification ของ M0–M1; คำสั่ง full suite ในรายการตรวจด้านล่างยังรวม Firefox ไม่ใช่คำสั่งที่คาดว่าจะผ่านบน Windows ปัจจุบัน Quality checks อื่นยังต้องผ่าน ข้อยกเว้นไม่ครอบคลุม M2–M7/Production Release โดยอัตโนมัติ ไม่เปลี่ยน Full Game v1 browser contract, DoD หรือ Release Gates; Firefox/A-01 ยัง OPEN และ M0/M1 ยัง NOT DONE ไม่อ้าง Full E2E/CI PASS และไม่ปลด Developer Instruction Process Blocker ของ PR #7
 
 **N-02 CLOSED:** source/tag/EventRegistry/query/identity contract อยู่ใน [docs/NARRATIVE_SYSTEM.md](docs/NARRATIVE_SYSTEM.md) Batch 2 มี typed domain/presentation registry และ authoritative fixture store ที่ commit effects+ledger พร้อมกัน ผ่าน Independent Review และ merge แบบ conditional แล้ว Query binding policy ด้านล่างยังใช้ร่วมกันใน Controller/validator; Batch 3A เพิ่ม checkpoint/candidate restore สำหรับ technical fixture เท่านั้น โดยไม่เปลี่ยน domain transaction architecture
 

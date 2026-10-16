@@ -4,6 +4,29 @@ Source of Truth ของลำดับงาน Definition of Done และ�
 
 สถานะ: **M0 และ M1 Batch 1/2/3A merge เข้า remote main แล้วแบบ Conditional Integration Acceptance**: PR #2 `d33c5976bc3446acca8c27ce23c52e1a66dbc34a` → PR #3 `7cd44c19eb5d8634c90dd4dde95ecf77f8a06101` → PR #4 `f9cd7dcc89c5b595de66a7d0acaa3605c7157487` → PR #5 `e9731550f17227883681dd3d6b073f3097fdab0f` โดยรักษา Batch 3A commit `dee9efaacdf51d6839df41d86217f5eeb132fdc7` ใน ancestry Batch 1 B-01–B-03 PASS/B-04 FIX VERIFIED; Batch 2 query timing FIX VERIFIED; Batch 3A Independent Review PASS WITH NON-BLOCKING FOLLOW-UP 3A-F01 ยัง OPEN รอ Independent Review ของ write-safety evidence ใน Batch 3B-1 ปัจจุบัน Owner อนุมัติเฉพาะ 3B-1 จาก baseline PR #5 ยังไม่ stage/commit/push M0/M1 milestone ยัง **NOT DONE**; ManagedGame defect, Firefox/A-01 OPEN; pre-READY failure unverified residual risk; 3B-2/M2–M7 ยังไม่เริ่ม ข้อความรอ approvals เดิมด้านล่างเป็นประวัติ ณ รอบนั้น
 
+## M0-M1 Required Verification Matrix
+
+Owner Decision — 2026-10-16: ใช้ [Temporary Owner Exception](ARCHITECTURE.md#temporary-owner-exception-m0-m1-automated-verification) เฉพาะ M0–M1 Automated Verification ให้ Chromium/WebKit เป็น Required และ Firefox เป็น Optional/Diagnostic, Non-blocking ตาม Owner policy ไม่ขยายข้อยกเว้นไป M2–M7 หรือ Production Release โดยอัตโนมัติ
+
+| ระดับ | Verification / คำสั่งเดิม | เกณฑ์และข้อจำกัด |
+|---|---|---|
+| Required M0–M1 | Narrative Compile/Validate: `npm run narrative:compile`, `npm run narrative:validate` | ต้องผ่าน |
+| Required M0–M1 | Typecheck/Lint/Format: `npm run typecheck`, `npm run lint`, `npm run format:check` | ต้องผ่าน |
+| Required M0–M1 | Unit/Integration: `npm test` | ต้องผ่าน |
+| Required M0–M1 | Build: `npm run build` | ต้องผ่าน |
+| Required M0–M1 | Chromium E2E และ WebKit E2E: `npm run test:e2e:windows-chromium-webkit` | ทั้งสอง projects ต้องผ่าน; เป็น subset ไม่ใช่ Full Three-browser E2E PASS |
+| Optional/Diagnostic M0–M1 | Firefox E2E: `npm run test:e2e:firefox` ใน environment ที่ตรวจได้ | บันทึก environment, exit code และ passed/failed/skipped ตามจริง; Windows launch failures เดิมยังเป็น failed evidence ไม่จำเป็นต้องรันซ้ำใน documentation-only batch นี้ |
+| Deferred Compatibility | Firefox บน environment ที่เปิด browser ได้จริง; Edge/Safari/iOS/Android real-browser/device verification | กลับมาตรวจตาม milestone ที่เกี่ยวข้อง; WebKit ไม่แทน Safari/iOS จริง และ Edge ยังไม่พิสูจน์ |
+| Production Release | Browser Contract ใน ARCHITECTURE และ Release Gates เดิมด้านล่าง | ต้องกลับมาประเมิน browser matrix และเก็บหลักฐานตาม contract ก่อน release; ไม่ได้รับข้อยกเว้นนี้ |
+
+`npm run test:e2e` ยังคงเป็น Full Three-browser Suite รวม Firefox และยัง Fail บน Windows environment ปัจจุบัน การปรับ required matrix ไม่เปลี่ยนผล verification เก่าเป็น PASS ไม่ลบ/skip Firefox tests และไม่เปลี่ยน scripts/config ดูการใช้คำสั่งใน [README](README.md)
+
+Definition of Done ทั้ง **8 แถวคงเดิม**, Release Gates ไม่ได้รับการยกเว้น, M0/M1 ยัง **NOT DONE**, Firefox/A-01 ยัง **OPEN** และผล Full E2E ยังไม่ครบ ManagedGame listener ownership defect ยัง OPEN; pre-READY boot failure ยังเป็น Unverified residual risk บันทึก batch/ผลตรวจเดิมคงเป็นประวัติ ณ รอบนั้น ไม่ใช้ policy ใหม่นี้แก้ผลย้อนหลัง
+
+**Remaining Process Blocker — PR #7:** ณ preflight ของรอบเอกสารนี้ PR ยังคง Open / Draft / Not Merged, head `21f2d6ec9546da898968fa92fe860f4fb4c69b27`, 1 commit / 17 reviewed files; remote main `6a44b987fc0f512400f784a2d4cb8e8611b68509` Developer Instruction ส่วน Pull request instructions ระบุว่า “Do not mark the PR ready for review when tests fail or verification is incomplete.” Owner Exception ไม่ลบล้างข้อกำหนดที่มีลำดับสูงกว่า จึงยังไม่เปลี่ยน PR #7 เป็น Ready และไม่ Merge หรือใช้วิธีอื่นข้าม gate การแก้ policy รอบนี้ไม่ใช่ Approval ให้ Merge PR #7
+
+ขอบเขตรอบนี้: documentation-only ใน ARCHITECTURE/MASTER_PLAN/README บน branch แยกจาก exact remote main baseline ข้างต้น ตรวจ diff/links, DoD 8 แถว, Release Gates, Browser Support Table และความคงเดิมของ implementation/config/scripts/tests พร้อม `npm run format:check` และ `git diff --check` แล้วหยุดรอ Independent Documentation Review และ Git Approval ไม่ stage/commit/push/สร้าง PR ในรอบนี้
+
 ## บันทึกงาน M0 — 2026-10-13
 
 ### Owner Decision: M0 Conditional Acceptance

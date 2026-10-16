@@ -108,6 +108,17 @@ Desktop/laptop first; logical viewport **1920×1080, 16:9** มือถือ l
 
 “Current” ให้อ้างวันที่ตรวจ release ไม่ใส่เลข browser ตายตัวใน design doc Playwright Chromium/Firefox/WebKit ใช้ตรวจ regression ได้ แต่ไม่แทนการตรวจจริงบน Edge, Safari หรือมือถือ รายการหลักฐานตรวจอยู่ใน [MASTER_PLAN](MASTER_PLAN.md)
 
+### Temporary Owner Exception (M0-M1 Automated Verification)
+
+Owner Decision — 2026-10-16: เฉพาะ automated verification ของ **M0–M1** ให้ Chromium และ WebKit เป็น Required; Firefox เป็น Optional/Diagnostic และ Non-blocking ภายใต้ข้อยกเว้นชั่วคราวนี้ ส่วน quality checks อื่นยังต้องผ่านตาม [Required Verification Matrix](MASTER_PLAN.md#m0-m1-required-verification-matrix) คำว่า Prototype ใน decision นี้จำกัดที่ M0–M1 ไม่ครอบคลุม Prototype Day 1–3 ทั้งหมด
+
+- คง Full Game v1 Desktop Browser Support Contract ในตารางข้างต้น ไม่ประกาศว่า Firefox รองรับแล้วหรือไม่รองรับถาวร ข้อยกเว้นไม่ครอบคลุม M2–M7 หรือ Production Release โดยอัตโนมัติ ก่อน Production Release ต้องกลับมาตรวจ Browser Compatibility ตาม contract เดิมและ Release Gates
+- Firefox/A-01 ยัง **OPEN**; เก็บ failed results เดิมตามจริง ไม่เปลี่ยน Failed เป็น Passed และไม่อ้าง Full Three-browser E2E PASS จาก Chromium/WebKit subset คง Firefox project/tests และคำสั่งตรวจแยกตาม [README](README.md)
+- หลักฐาน Windows Firefox launch failure จากการตรวจเดิม: NativeErrorCode **14001**, Windows SideBySide Event ID **33**, `mozglue` dependency resolution failure เกิดก่อน Game Assertions; Deep Root Cause ยัง **Unknown** ไม่ถือว่าเป็นหลักฐานว่าเกมผ่านหรือไม่ผ่าน assertions และไม่ซ่อม environment ในรอบเอกสารนี้
+- Chromium/WebKit ไม่พิสูจน์ Firefox compatibility; Playwright WebKit ไม่ใช่ Safari/iOS real-device PASS และ Edge real-browser verification ยังไม่พิสูจน์ ต้องเก็บหลักฐานตาม environment และ milestone ที่เกี่ยวข้อง
+
+นี่เป็น Temporary Verification Policy ไม่เปลี่ยน Definition of Done หรือยกเว้น Release Gates และไม่ลบล้าง Developer Instruction เรื่อง Ready for Review; process blocker ของ PR #7 บันทึกใน [MASTER_PLAN](MASTER_PLAN.md#m0-m1-required-verification-matrix)
+
 ## Static build / deployment
 
 - Vite build ต้องออก `dist/index.html` และ assets ที่ host แบบ static ได้ ไม่ต้องมี server functions หรือ runtime backend
