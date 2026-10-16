@@ -111,3 +111,131 @@ button {
   text-align: center;
   font-size: 1.25rem;
 }
+/* Emergency demo layout only; U-01/U-02/U-03 remain open. */
+.demo-shell {
+  --color-letterbox: #000;
+  background: #000;
+}
+.demo-overlay {
+  color: var(--color-text);
+}
+.demo-menu {
+  position: absolute;
+  inset: 170px 590px 180px;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 24px;
+  text-align: center;
+  background: var(--color-panel);
+  pointer-events: auto;
+}
+.demo-menu h1 {
+  font-size: 52px;
+  line-height: 1.5;
+  margin: 0;
+}
+.demo-menu p {
+  line-height: 1.7;
+  margin: 0;
+}
+.demo-disclaimer {
+  font-size: 27px;
+}
+.demo-narrative {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.demo-narrative:focus-visible {
+  outline: 4px solid var(--color-border);
+  outline-offset: -4px;
+}
+.demo-dialogue {
+  position: absolute;
+  left: 220px;
+  right: 220px;
+  bottom: 40px;
+  min-height: 270px;
+  padding: 24px 40px;
+  background: var(--color-panel);
+  border: 2px solid var(--color-border);
+  pointer-events: auto;
+}
+.demo-speaker {
+  font-size: 34px;
+  font-weight: 600;
+  min-height: 42px;
+  margin: 0;
+}
+.demo-text {
+  font-size: 40px;
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+  margin: 8px 0 16px;
+}
+.demo-dialogue .ui-button {
+  display: block;
+  margin-left: auto;
+  min-height: 64px;
+}
+.demo-choices {
+  position: absolute;
+  left: 610px;
+  width: 700px;
+  top: 145px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  pointer-events: auto;
+}
+.demo-choices .ui-button {
+  text-align: left;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  font-size: 34px;
+  line-height: 1.5;
+  min-height: 112px;
+  padding: 24px;
+}
+.demo-day {
+  position: absolute;
+  top: 24px;
+  left: 610px;
+  background: var(--color-panel);
+  padding: 12px 24px;
+  font-size: 32px;
+}
+.demo-toolbar {
+  position: absolute;
+  right: 40px;
+  top: 24px;
+  display: flex;
+  gap: 16px;
+  pointer-events: auto;
+}
+.demo-pause {
+  position: absolute;
+  inset: 190px 590px;
+  padding: 48px;
+  background: var(--color-panel);
+  border: 2px solid var(--color-border);
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 24px;
+}
+.demo-pause h2,
+.demo-pause p {
+  margin: 0;
+  line-height: 1.6;
+}
+.demo-message {
+  position: absolute;
+  top: 100px;
+  right: 40px;
+  background: var(--color-panel);
+  padding: 16px;
+}

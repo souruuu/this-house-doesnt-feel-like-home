@@ -18,6 +18,8 @@ test('same static dist runs at a nested path inside an iframe', async ({
   await expect(game.locator('[data-world-state="ready"]')).toHaveCount(1);
   await expect(game.locator('canvas')).toHaveCount(1);
   await expect(game.locator('[data-fixture-phase]')).toHaveCount(0);
+  await game.getByRole('button', { name: 'เริ่มเกม', exact: true }).click();
+  await expect(game.locator('[data-line-id="demo.D1N-L001"]')).toHaveCount(1);
   await game.getByRole('button', { name: 'พัก', exact: true }).click();
   await expect(game.locator('[data-world-paused="true"]')).toHaveCount(1);
   await game.getByRole('button', { name: 'เล่นต่อ', exact: true }).click();
@@ -38,7 +40,7 @@ test('same static dist runs at a nested path inside an iframe', async ({
     expect(code).not.toContain('เริ่มรอบทดสอบใหม่');
     expect(code).not.toContain('ทดสอบระบบข้อความ');
     expect(code).not.toContain('technical_fixture');
-    expect(code).not.toContain('inkVersion');
+    expect(code).not.toContain('class InkParser');
   }
   expect(errors).toEqual([]);
 });

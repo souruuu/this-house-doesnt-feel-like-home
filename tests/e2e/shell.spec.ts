@@ -32,7 +32,7 @@ test('Thai shell, shared bounds, remount, pause and keyboard ownership', async (
   page.on('console', (message) => {
     if (message.type() === 'error') errors.push(message.text());
   });
-  await page.goto('/');
+  await page.goto('/?fixture=1');
   await expect(page).toHaveTitle('บ้านที่ไม่รู้สึกเหมือนบ้าน');
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
   await expect(page.locator('[data-world-state="ready"]')).toHaveCount(1);
@@ -123,7 +123,7 @@ test('touch portrait blocks UI and pauses world; landscape uses same shell', asy
     hasTouch: true,
   });
   const page = await context.newPage();
-  await page.goto('http://127.0.0.1:4173');
+  await page.goto('http://127.0.0.1:4173/?fixture=1');
   await expect(page.getByRole('alert')).toContainText(
     'กรุณาหมุนอุปกรณ์เป็นแนวนอนเพื่อเล่น',
   );

@@ -46,6 +46,12 @@ export function parseOutput(
     throw new Error(`Unknown scene: ${sceneId}`);
   if (event && event.sceneId !== sceneId)
     throw new Error(`Event scene mismatch: ${event.id}`);
+  if (
+    event?.category === 'domain' &&
+    event.action.kind === 'record-demo-fact' &&
+    event.action.evidenceLineId !== lineId
+  )
+    throw new Error('Demo fact requires its exact evidence line');
   const context =
     sceneId === previous.sceneId ? { ...previous } : resetPresentation(sceneId);
   const speaker = values.get('speaker');

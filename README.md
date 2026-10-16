@@ -6,6 +6,18 @@ Interactive Game Website — M0 scaffold + M1 technical fixture (dev/QA)
 
 **Checkpoint:** คง implementation และ dependency versions ปัจจุบัน หยุดทดลอง Phaser internals/startup override/failure-injection และไม่มี lifecycle fix ใหม่ ผล probe กับ Phaser 4.2.1 จริงยืนยันว่า ManagedGame ลบ external visibilitychange listener จาก postBoot โดยไม่ตั้งใจ 3/3 รอบ ส่วน pre-READY boot failure เป็น residual risk ที่ยังไม่พิสูจน์ด้วย runtime failure-injection ดูหลักฐานแยกกันใน MASTER_PLAN ไม่เปลี่ยน Definition of Done และไม่ถือว่า checkpoint ผ่าน lifecycle gate
 
+## Emergency Day 1–3 Demo — 17 October 2026
+
+Owner อนุมัติ emergency implementation จาก main `6a44b987fc0f512400f784a2d4cb8e8611b68509` บน `codex/emergency-day1-day3-playable-demo` ไม่รวม PR #7/#8 ดู [Content Authority / CR Provenance](sources/emergency-demo-2026-10-17/README.md) ข้อความสถานะ batch เก่าด้านบน/ล่างเป็นประวัติ ไม่ใช่สถานะ emergency build
+
+Production entry คือ Main Menu → Notice/Prologue → Day 1–3 เก้าฉาก → Demo End; Instant Text, Continue/choices, pause และ portrait guard ไม่มี Production Save/Resume/Auto/Skip/Settings รีเฟรชหรือปิดหน้าจะสูญเสียความคืบหน้า ไม่ใช้ technical fixture เป็น production story
+
+Development fixture regression ใช้ `/?fixture=1` เท่านั้นและยังแยกจาก production bundle `npm run narrative:compile` และ `npm run narrative:validate` ตรวจทั้ง fixture และ production แยก scopes; production validation ตรวจ SHA-256 ของ approved handoff และข้อความ/ชื่อผู้พูดครบ 152 Line/Choice IDs ผ่าน controller จริงใน 64 deterministic runs ไม่ใช่การอ้าง exhaustive combination ทั้งหมด
+
+รัน `npm run build` แล้วสร้าง static ZIP ด้วย `powershell -NoProfile -File scripts/package-demo.ps1` (Windows) ZIP อยู่ TEMP นอก repository มี root `index.html` และตรวจ bytes ทุก entry เทียบ `dist` ใช้ artifact เดียวกันสำหรับ Vercel preview/itch.io ไม่รวม source/tests/narrative compiler
+
+Firefox M0–M1 Exception ไม่ใช่ Production Release Exception ต้องรายงาน browser results แยกตามจริง ไม่มี Full E2E/CI PASS หรือ M0–M7 DONE โดยอัตโนมัติ ManagedGame/Firefox/A-01 และ pre-READY risk คงเดิม Production artwork เป็น composite ของทีมตาม manifest ไม่ invent final identity
+
 ## เริ่มใช้งานเอกสาร
 
 อ่าน [PROJECT.md](PROJECT.md) → [MASTER_PLAN.md](MASTER_PLAN.md) → [ARCHITECTURE.md](ARCHITECTURE.md); [AGENTS.md](AGENTS.md) เป็นแผนที่อ่านตามงาน

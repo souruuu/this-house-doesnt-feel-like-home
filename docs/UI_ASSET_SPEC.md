@@ -14,6 +14,14 @@ Source of Truth ของ game viewport, UI, controls, accessibility และ h
 
 ตำแหน่ง dialogue/choices, safe areas, stage anchors และขนาดอุปกรณ์ขั้นต่ำยังไม่ล็อก ดู U-01 ตัวเลขตัวอย่างจากแชทเดิมไม่ใช่ final artist coordinates
 
+## Emergency Demo UI exception — 17 October 2026
+
+Owner อนุมัติ functional baseline สำหรับ [Emergency Day 1–3](../sources/emergency-demo-2026-10-17/README.md): logical 1920×1080, composite portrait artwork แบบ contain พร้อม black sidebars; React Main Menu/Start, Thai dialogue/speaker/Continue, vertical choices บนพื้นที่ portrait, pause menu และ Demo End/return อยู่เหนือ Phaser world/character placeholders
+
+ใช้ภาพ composite เช้า/เย็น/กลางคืนจากโฟลเดอร์ทีมที่ Owner ระบุ โดย semantic manifest เก็บ source URL ไม่อ้างว่า layering/export/anchors หรือ U-01/U-02/U-03 finalized ตัวละครใช้ labeled placeholders; ชื่อที่ยังไม่รู้ต้องเป็น label anonymous ตามบท รวมกันต์ก่อน D303-L010A และในบรรทัดบอกชื่อเอง
+
+Instant Text เป็น baseline; ไม่มี Production Save/Load/Resume, Auto/Skip/Settings หรือปุ่มหลอก ไม่มี artwork/font/music ที่คัดลอกจาก UX reference ต้องแจ้ง refresh/close สูญเสียความคืบหน้า ขอบเขตนี้ไม่ยกเลิก full-game UI contracts ด้านล่าง
+
 ## Language และ UI surfaces
 
 **Thai only** สำหรับข้อความที่ผู้เล่นเห็น ชื่อ code/asset IDs คงภาษาอังกฤษได้ ไม่เพิ่ม localization ภาษาอังกฤษใน v1

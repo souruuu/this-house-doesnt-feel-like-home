@@ -1,4 +1,4 @@
-import type { FixtureDomainAction, NarrativeEvent } from './types.ts';
+import type { DomainEvent, NarrativeEvent } from './types.ts';
 
 interface EventIdentity {
   id: string;
@@ -8,7 +8,7 @@ interface EventIdentity {
 export type EventDefinition = EventIdentity &
   (
     | { category: 'presentation' }
-    | { category: 'domain'; action: FixtureDomainAction }
+    | { category: 'domain'; action: DomainEvent['action'] }
   );
 
 export class EventRegistry {

@@ -1,8 +1,30 @@
+export interface DemoWorldView {
+  readonly background: 'morning' | 'evening' | 'night';
+  readonly characterLabel: string | null;
+}
+
 // Session-owned imperative boundary; never holds save or narrative state.
 export class GameBridge {
   private listeners = new Set<(paused: boolean) => void>();
   private paused = false;
   private disposed = false;
+  private view: DemoWorldView = { background: 'morning', characterLabel: null };
+  private viewListeners = new Set<(view: DemoWorldView) => void>();
+
+  setPresentation(view: DemoWorldView) {
+    if (this.disposed) return;
+    this.view = view;
+    this.viewListeners.forEach((listener) => listener(view));
+  }
+
+  subscribePresentation(listener: (view: DemoWorldView) => void) {
+    if (this.disposed) throw new Error('Bridge is disposed');
+    this.viewListeners.add(listener);
+    listener(this.view);
+    return () => {
+      this.viewListeners.delete(listener);
+    };
+  }
 
   setPaused(paused: boolean) {
     if (this.disposed || paused === this.paused) return;
@@ -22,5 +44,6 @@ export class GameBridge {
   dispose() {
     this.disposed = true;
     this.listeners.clear();
+    this.viewListeners.clear();
   }
 }
