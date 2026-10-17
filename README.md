@@ -10,7 +10,9 @@ Interactive Game Website — M0 scaffold + M1 technical fixture (dev/QA)
 
 Owner อนุมัติ emergency implementation จาก main `6a44b987fc0f512400f784a2d4cb8e8611b68509` บน `codex/emergency-day1-day3-playable-demo` ไม่รวม PR #7/#8 ดู [Content Authority / CR Provenance](sources/emergency-demo-2026-10-17/README.md) ข้อความสถานะ batch เก่าด้านบน/ล่างเป็นประวัติ ไม่ใช่สถานะ emergency build
 
-Production entry คือ Main Menu → Notice/Prologue → Day 1–3 เก้าฉาก → Demo End; Instant Text, Continue/choices, pause และ portrait guard ไม่มี Production Save/Resume/Auto/Skip/Settings รีเฟรชหรือปิดหน้าจะสูญเสียความคืบหน้า ไม่ใช้ technical fixture เป็น production story
+Production entry คือ Main Menu → Notice/Prologue → Day 1–3 เก้าฉาก → Demo End ไม่ใช้ technical fixture เป็น production story Owner UI Correction / Checkpoint A เพิ่ม Main Menu ครบ Start/Load/Options/Gallery/About และ Options จริง; Load แจ้งว่า Production Save/Load ยังไม่พร้อม, Gallery เป็น empty state, Music/Sound sliders disabled เพราะไม่มีระบบเสียง ไม่อ้างว่ามีระบบเบื้องหลังเหล่านี้
+
+Reading preferences อยู่ใน app session: Text Speed 25–60 graphemes/s (default 40), Typewriter default ON พร้อม Instant Text/reduced-motion fallback, Auto-Forward Time 1–6 วินาที (default 2) เชื่อม Auto ของ Checkpoint B: รอ reveal จบแล้วจึงเริ่ม delay และส่ง Continue ผ่าน Controller ครั้งเดียวต่อ intention; Auto หยุดเมื่อ choice/pause/menu/hidden/blur/portrait/day transition/error/ending และไม่กลับ ON เอง ส่วน Skip แสดง unavailable เพราะยังติด D1 production read-profile decision ไม่มี persistence หรือ Production Save/Resume รีเฟรช/ปิดหน้าเริ่มเล่นใหม่และ preferences กลับค่าทดลองตั้งต้น A ได้ Conditional Visual Direction Approval; B ยังรอ Owner Visual/UX Review พร้อมภาพ/คลิปจริง ไม่ปิด U-01/U-02/U-03 หรือ Final Visual Acceptance และยังไม่เริ่ม Checkpoint C/packaging/release
 
 Development fixture regression ใช้ `/?fixture=1` เท่านั้นและยังแยกจาก production bundle `npm run narrative:compile` และ `npm run narrative:validate` ตรวจทั้ง fixture และ production แยก scopes; production validation ตรวจ SHA-256 ของ approved handoff และข้อความ/ชื่อผู้พูดครบ 152 Line/Choice IDs ผ่าน controller จริงใน 64 deterministic runs ไม่ใช่การอ้าง exhaustive combination ทั้งหมด
 
@@ -181,3 +183,7 @@ npm run preview
 
 Baseline ไม่ได้แปลว่า production content พร้อมทั้งหมด A-01 และผลตรวจ M0/M1 ให้ดู ARCHITECTURE/MASTER_PLAN ส่วน G-01/N-03/U-01–U-03/P-01–P-02 เป็น OPEN QUESTION ตาม gate เดิม Batch ถัดไปรอ Owner Review/approval และไม่ commit/push โดยไม่มี approval
 
+
+### Dusty Midnight Blue A+B correction (Owner-approved experiment)
+
+The emergency demo uses exclusive Reading/Display/Audio Options panes, safe dialogue click-to-reveal/continue and compact Skip/Auto/▶ controls. Skip reports unavailable (D1 remains blocked). Auto retains ON intent while waiting for a manual choice, then resumes only after full reveal and a fresh configured delay; Pause/menu/blur/hidden/rotate/end require explicit reactivation. Preferences remain app-session-only. Original artist portrait artwork is unchanged; AI visual targets are references only. No production Save/Load/audio/gallery implementation or final U-01/U-02/U-03 approval. Full relevant verification and visual evidence must pass the scoped conditional Git gate; never infer release/three-browser/CI PASS. See [UI contract](docs/UI_ASSET_SPEC.md) and [batch plan](MASTER_PLAN.md).

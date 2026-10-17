@@ -22,6 +22,28 @@ Static artifact audit: 8 files ไม่มี raw TypeScript/Ink/Markdown, sour
 
 Review gate คงเดิม: ส่ง consolidated implementation/verification report ก่อนปิด batch หรือ stage/commit/push/Draft PR แม้มี batch authorization แล้ว ห้าม Ready/Merge/force push/เปลี่ยน main หรือประกาศ milestone DONE DoD 8 แถวและ Release Gates ด้านล่างคงเดิม
 
+### Owner UI Correction — Checkpoint A / 17 October 2026
+
+Owner ไม่รับ Visual/UI pass เดิมเป็น Visual Acceptance และอนุมัติ Revised Concrete Plan ภายใต้ Final UI Scope Clarification: Load/Gallery/audio controls เป็น temporary unavailable/empty UI ไม่ขยาย Production Save/Resume, CG collection หรือ audio infrastructure D2/D3/D4 อนุมัติให้ทดลอง; D1 production profile/read history ยังไม่อนุมัติ ไม่เพิ่ม persistent state หรือใช้ fixture profile เป็น production
+
+ดำเนินการเฉพาะ Checkpoint A ก่อน: Main Menu ครบ Start/Load/Options/Gallery/About → Options/navigation/focus และ reading/display controls → screenshots desktop/mobile + relevant verification → **หยุดรอ Owner Visual Approval ก่อนเริ่ม Checkpoint B** ใช้ app-session preferences เท่านั้น Text Speed เชื่อม reveal เดิมและ Typewriter default ON เป็น shared reading foundation ตาม D2; Auto-Forward Time เลือกค่าได้ แต่ Auto runtime, Skip footer/unavailable presentation, gameplay visual correction และ day transitions ยังรอ Checkpoint B ไม่อ้างว่าระบบ Auto ทำงานแล้ว
+
+รักษา 13 uncommitted files เดิมด้วย snapshot/hash ก่อนแก้และ incremental changes; ไม่ reset/revert/stash/discard ไม่แก้ approved Ink, Controller, registry, domain/ledger, ManagedGame, dependencies หรือ DoD ขั้นตอนตรวจ: compile/validate/typecheck/lint/format/unit/build, Chromium/WebKit สำหรับ A และ fixture/reveal regressions; ผล full Day 1–3 E2E/ZIP ใหม่เป็นงาน verification ของ source หลัง B/C ไม่ใช้ผลเก่าแทน ผลจริงของ A ต้องรายงานพร้อม screenshot ก่อน Owner review; ยังไม่ stage/commit/push/PR/deploy M0/M1 NOT DONE และ known risks เดิมคงอยู่
+
+### Owner UI Correction — Checkpoint B / 17 October 2026
+
+Owner conditionally approved A ในระดับ Visual Direction และอนุมัติ B ตาม `Checkpoint_B_Gameplay_Visual_Blueprint.md` + static mockups 5 ภาพเป็น supplementary reference เท่านั้น ไม่ใช่ production assets/final coordinates/font contract คง minor A polish ใน backlog ไม่รื้อ Main Menu/Options ไม่ integrate Narrative Enrichment A
+
+ขอบเขต B: แยก DialoguePanel speaker/body/footer, portrait-only choices และ compact responsive geometry ที่แชร์ React/Phaser → bounded UI Auto timer หลัง reveal พร้อม session/revision/generation guards → Phaser neutral character cue จาก Controller speaker context → day-only presentation card → unit/focused UI regressions, desktop/mobile screenshots, Blueprint comparison และ short interaction recording → **STOP รอ Owner Visual/UX Review ก่อน C** ไม่มี full packaging/release/Git/deploy approval
+
+D1 คง BLOCKED: Skip visible unavailable ไม่เพิ่ม profile/read IDs หรือ persistent state Auto OFF เมื่อ choice/pause/menu/hidden/blur/portrait/error/end/new session และไม่กลับ ON เองหลัง Resume Day card อิง scene/day ที่ Controller publish แล้ว ไม่เพิ่ม Ink step/event/time ในเรื่อง; experimental 300ms fade ภายใน 650ms presentation guard และ static reduced-motion fallback ไม่เปลี่ยน transaction architecture/approved content/knowledge guards/ManagedGame/dependencies/DoD
+
+หลักฐานที่ต้องตรวจใน B: typecheck/lint/format/compile/validate/unit/build, focused Chromium/WebKit UI (Auto/Continue/choices/overflow/touch/guards/day/cue/terminal line) + A/fixture regressions ตามความจำเป็น Firefox แยก diagnostic ตามจริง ไม่เรียก subset ว่า full E2E PASS ไม่ปิด D1/U-01/U-02/U-03/known risks หรือถือว่า tests ผ่านเท่ากับ Final Visual Acceptance
+
+### Owner-approved Dusty Midnight Blue — A+B Correction / 17 October 2026
+
+One-Approval scope: preserve Checkpoint B snapshot 29/29 → shared temporary tokens and Main/Options/Info → compact safe-click Dialogue/Skip notice/Choice states → UI-owned Auto intent across Choice, cancel on Pause/Menu/blur/hidden/rotate → full relevant Chromium/WebKit regression, protected hashes, visual comparisons and two interaction videos → conditional Git gate/update existing Draft PR #9 only if all required criteria pass. No C/merge/deploy, no narrative enrichment, D1/profile, GameBridge/transaction/ManagedGame/dependency changes. Original artist portrait art only; AI references never production assets. U-01/U-02/U-03 and M0/M1 remain open/NOT DONE. Risks: Thai physical sizing, pointer selection/scroll exclusion, stale timers and visual deltas from portrait art. If mandatory tests or material UI mismatches remain, stop before Git and report; Firefox launcher remains a documented diagnostic limitation, never a three-browser PASS.
+
 ## บันทึกงาน M0 — 2026-10-13
 
 ### Owner Decision: M0 Conditional Acceptance

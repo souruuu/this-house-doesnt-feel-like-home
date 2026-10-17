@@ -1,4 +1,6 @@
 export interface DemoWorldView {
+  readonly viewportScale?: number;
+  readonly layout?: 'menu' | 'gameplay';
   readonly background: 'morning' | 'evening' | 'night';
   readonly characterLabel: string | null;
 }

@@ -6,9 +6,12 @@ for (const route of [
   'budget-and-name',
 ]) {
   test(`production Day 1-3 completes: ${route}`, async ({ page }, testInfo) => {
-    test.setTimeout(180_000); // Full approved story, not a short component smoke test.
+    test.setTimeout(360_000); // Full approved story, not a short component smoke test.
     const errors: string[] = [];
     page.on('pageerror', (error) => errors.push(error.message));
+    page.on('console', (message) => {
+      if (message.type() === 'error') errors.push(message.text());
+    });
     page.on('response', (response) => {
       if (response.status() >= 400)
         errors.push(`${response.status()} ${response.url()}`);
@@ -20,12 +23,17 @@ for (const route of [
     await expect(page.locator('[data-world-state="ready"]')).toHaveCount(1);
     await expect(page.locator('canvas')).toHaveCount(1);
     await page.screenshot({ path: testInfo.outputPath('menu.png') });
-    await page.getByRole('button', { name: 'เริ่มเกม', exact: true }).click();
+    await page.getByRole('button', { name: 'Start', exact: true }).click();
     const narrative = page.getByRole('region', { name: 'บทสนทนา' });
     await expect(narrative).toHaveAttribute('data-line-id', 'demo.D1N-L001');
     await page.getByRole('button', { name: 'พัก', exact: true }).click();
     await expect(page.getByRole('dialog', { name: 'พักเกม' })).toBeVisible();
     await expect(narrative).toHaveAttribute('inert', '');
+    // Narrative-path coverage uses an explicit supported reading preference.
+    // Default typewriter and first/second Continue have dedicated UI tests.
+    await page
+      .getByRole('checkbox', { name: 'แสดงข้อความทันที', exact: true })
+      .check();
     await page.getByRole('button', { name: 'เล่นต่อ', exact: true }).click();
     const visited = new Set<string>();
     const choices = new Set<string>();
@@ -49,6 +57,7 @@ for (const route of [
         if (id === 'demo.D303-L015')
           await page.setViewportSize({ width: 844, height: 390 });
         previous = id;
+        await expect(narrative).toHaveAttribute('data-revealing', 'false');
         await page
           .getByRole('button', { name: 'อ่านต่อ', exact: true })
           .click();
@@ -120,7 +129,7 @@ for (const route of [
       .getByRole('button', { name: 'กลับหน้าหลัก', exact: true })
       .click();
     await expect(
-      page.getByRole('button', { name: 'เริ่มเกม', exact: true }),
+      page.getByRole('button', { name: 'Start', exact: true }),
     ).toBeVisible();
     expect(errors).toEqual([]);
   });
@@ -138,11 +147,11 @@ test('production touch portrait pauses input; landscape and reload start remain 
   await expect(page.getByRole('alert')).toContainText('กรุณาหมุนอุปกรณ์');
   await expect(page.locator('.demo-overlay')).toHaveAttribute('inert', '');
   await page.setViewportSize({ width: 844, height: 390 });
-  await page.getByRole('button', { name: 'เริ่มเกม', exact: true }).tap();
+  await page.getByRole('button', { name: 'Start', exact: true }).tap();
   await expect(page.locator('[data-line-id="demo.D1N-L001"]')).toHaveCount(1);
   await page.reload();
   await expect(
-    page.getByRole('button', { name: 'เริ่มเกม', exact: true }),
+    page.getByRole('button', { name: 'Start', exact: true }),
   ).toBeVisible();
   await expect(
     page.getByText('เดโมนี้ยังไม่บันทึกความคืบหน้า', { exact: false }),

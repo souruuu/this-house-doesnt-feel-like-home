@@ -18,3 +18,22 @@
   --probe-inset: 64px;
   --probe-width: 1240px;
 }
+
+/* Temporary monochrome demo treatment, not final visual identity or U-03 defaults. */
+.demo-shell {
+  --demo-panel: #171717;
+  --demo-dialogue-panel: rgb(16 16 16 / 96%);
+  --demo-text: #fafafa;
+  --demo-muted: #c5c5c5;
+  --demo-border: #a3a3a3;
+  --demo-focus: #fafafa;
+  --demo-radius: 10px;
+  /* Owner-approved Dusty Midnight Blue correction experiment; not final U-03 identity. */
+  --vn-ink: #101d2d;
+  --vn-surface: #1c2b33;
+  --vn-text: #f4f0e7;
+  --vn-muted: #aab9c3;
+  --vn-accent: #d7b27c;
+  --vn-rule: #86a5a8;
+  --vn-font: 'Leelawadee UI', Tahoma, sans-serif;
+}
