@@ -12,7 +12,7 @@ async function stable(p: Page) {
 }
 async function start(p: Page, instant = true, delay = 1) {
   await p.goto(url);
-  await expect(p).toHaveTitle('บ้านที่ไม่รู้สึกเหมือนบ้าน');
+  await expect(p).toHaveTitle('หลังเคาน์เตอร์');
   await button(p, 'Options').click();
   if (instant)
     await p.getByRole('checkbox', { name: 'แสดงข้อความทันที' }).check();

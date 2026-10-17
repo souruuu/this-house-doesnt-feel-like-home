@@ -175,6 +175,8 @@ Placeholder ไม่ขัดกับการเตรียมโครง U
 
 ## OPEN QUESTION
 
+Post-A+B Owner FINAL authorization (17 October 2026) permits four verified original cutouts for gameplay only and the player-facing title **หลังเคาน์เตอร์**. [Scoped stage mapping/provenance, safe non-occluded fallback and temporary motion](DEMO_CHARACTER_STAGE.md) govern this experiment; no Main Menu characters/cover, original scene replacement, new narrative events or final U-01/U-02/U-03 closure. Info/Notice stays inside the left menu safe area; Options retains its separate layout. Back controls have no underline/pointer glow and retain keyboard focus. Existing A+B reading/Auto/input contracts above remain in effect.
+
 **U-01 — Layout/stage/input (ก่อน final art และ M6):** Exact stage positions/anchor/scale, dialogue/choice bounds, safe areas, supported minimum viewport/touch target และ keyboard navigation ของ hotspot/puzzle เป็นอย่างไร? ที่ล็อกคือ viewport/composition strategy และ narrative keys ไม่ใช่ pixel coordinates ทุกส่วน
 
 **U-02 — Asset export contract (ก่อนส่ง artist ผลิต final assets):** ทีมจะใช้ naming template/manifest แบบใด, sprite dimensions/format, pose/expression list, layer/mask format, image/audio export/compression และ editable-source format อะไร? ต้นฉบับยังไม่มี production contract เหล่านี้ จึงให้รายการข้อมูลและตัวอย่างโดยไม่ยกระดับเป็นค่าที่ล็อก

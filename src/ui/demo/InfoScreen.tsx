@@ -15,7 +15,7 @@ const content = {
   },
   about: {
     title: 'About',
-    heading: 'บ้านที่ไม่รู้สึกเหมือนบ้าน',
+    heading: 'หลังเคาน์เตอร์',
     body: 'ช่วงทดลองเล่นวันที่ 1–3 ของ This House Doesn’t Feel Like Home งานภาพและการนำเสนอยังอยู่ระหว่างพัฒนา',
   },
 } as const;
@@ -40,7 +40,7 @@ export function InfoScreen({
         <p>{info.body}</p>
       </div>
       <DemoControl
-        className="vn-return"
+        className="vn-return vn-back-main"
         aria-label="กลับหน้าหลัก"
         data-screen-initial
         {...guard}

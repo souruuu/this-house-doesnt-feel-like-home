@@ -278,7 +278,7 @@ export function DialoguePanel({
           {view.phase === 'ended' ? (
             <DemoControl
               {...guard}
-              className="demo-continue demo-return-menu"
+              className="demo-continue demo-return-menu vn-back-main"
               onActivate={onHome}
             >
               {returnLabel}

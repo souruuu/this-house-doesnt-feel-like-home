@@ -15,6 +15,26 @@
     "source": "https://drive.google.com/file/d/1riQOTUaKZOlQARqkaVi31oW6tAm4kxTR/view",
     "path": "assets/demo/shop-evening.png"
   },
+  "demo.character.som": {
+    "status": "owner-approved-demo-cutout",
+    "path": "assets/demo/characters/som.png",
+    "provenance": "src/assets/demo-character-provenance.json"
+  },
+  "demo.character.manao": {
+    "status": "owner-approved-demo-cutout",
+    "path": "assets/demo/characters/manao.png",
+    "provenance": "src/assets/demo-character-provenance.json"
+  },
+  "demo.character.nut": {
+    "status": "owner-approved-demo-cutout",
+    "path": "assets/demo/characters/nut.png",
+    "provenance": "src/assets/demo-character-provenance.json"
+  },
+  "demo.character.kant": {
+    "status": "owner-approved-demo-cutout",
+    "path": "assets/demo/characters/kant.png",
+    "provenance": "src/assets/demo-character-provenance.json"
+  },
   "demo.shop.night": {
     "status": "demo-composite",
     "source": "https://drive.google.com/file/d/1RMNudgiUrkK6M4Q4QoZOGqIDCrAYWZPC/view",

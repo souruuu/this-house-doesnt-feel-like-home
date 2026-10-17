@@ -1,8 +1,16 @@
+import type { DemoCharacterPlacement } from './demoCharacterCues';
+
 export interface DemoWorldView {
   readonly viewportScale?: number;
   readonly layout?: 'menu' | 'gameplay';
   readonly background: 'morning' | 'evening' | 'night';
   readonly characterLabel: string | null;
+  // Transient renderer projection only; never an Ink tag or saved domain fact.
+  readonly characterStage?: {
+    readonly contextKey: string;
+    readonly characters: readonly DemoCharacterPlacement[];
+  };
+  readonly reducedMotion?: boolean;
 }
 
 // Session-owned imperative boundary; never holds save or narrative state.

@@ -23,7 +23,9 @@ import {
   demoPortrait,
   demoMenuPortrait,
   demoGameplayLayout,
+  demoCharacterLayout,
 } from '../world/demoStage.ts';
+import { resolveDemoCharacters } from '../world/demoCharacterCues';
 import { DialoguePanel } from '../ui/demo/DialoguePanel';
 import { useDemoPlayback } from '../ui/demo/useDemoPlayback';
 import { useDayTransition } from '../ui/demo/useDayTransition';
@@ -69,6 +71,10 @@ function worldView(
           : 'morning',
     characterLabel:
       view.phase === 'line' ? names[view.presentation.speaker] || null : null,
+    characterStage: {
+      contextKey: `${view.sessionId}/${scene}`,
+      characters: resolveDemoCharacters(view),
+    },
   };
 }
 
@@ -121,10 +127,14 @@ export function DemoApp() {
   const presentation = useMemo<DemoWorldView>(
     () => ({
       ...worldView(view, session),
-      layout: session ? 'gameplay' : 'menu',
+      layout:
+        !session || view?.presentation.sceneId === 'NOTICE'
+          ? 'menu'
+          : 'gameplay',
       viewportScale: bounds.scale || 1,
+      reducedMotion,
     }),
-    [view, session, bounds.scale],
+    [view, session, bounds.scale, reducedMotion],
   );
   const lineKey = `${view?.sessionId ?? 'menu'}/${view?.presentation.sceneId ?? ''}/${view?.line?.id ?? ''}`;
   const reveal = useDialogueReveal({
@@ -150,6 +160,7 @@ export function DemoApp() {
   });
   const scale = bounds.scale || 1;
   const gameplay = demoGameplayLayout(scale);
+  const characterLayout = demoCharacterLayout(scale);
   const overlayStyle: CSSProperties & {
     [key: `--${'demo' | 'vn'}-${string}`]: string;
   } = {
@@ -176,6 +187,8 @@ export function DemoApp() {
     '--vn-menu-art-left': `${demoMenuPortrait.x}px`,
     '--vn-menu-art-width': `${demoMenuPortrait.width}px`,
     '--vn-heading-font': `${Math.max(80, 28 / scale)}px`,
+    '--vn-stage-choice-left': `${characterLayout.choiceLeft}px`,
+    '--vn-stage-choice-width': `${characterLayout.choiceWidth}px`,
   };
 
   useEffect(() => {
@@ -411,8 +424,12 @@ export function DemoApp() {
       data-paused={paused}
       data-menu-screen={!session}
       data-panel-open={panel !== null}
+      data-pause-open={userPaused}
       data-compact={scale < 0.6}
       data-reduced-motion={reducedMotion}
+      data-stage-character={Boolean(
+        presentation.characterStage?.characters.length,
+      )}
     >
       <div
         className="viewport-frame"
@@ -564,7 +581,11 @@ export function DemoApp() {
                   </p>
                   <div className="demo-pause-footer">
                     <p>กลับหน้าหลักแล้วความคืบหน้ารอบนี้จะหาย</p>
-                    <DemoControl {...inputProps} onActivate={home}>
+                    <DemoControl
+                      className="vn-back-main"
+                      {...inputProps}
+                      onActivate={home}
+                    >
                       กลับหน้าหลัก
                     </DemoControl>
                   </div>

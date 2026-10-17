@@ -23,7 +23,7 @@ export function MainMenu({
         data-menu-character-slot="awaiting-approved-art"
         aria-hidden="true"
       />
-      <h1>บ้านที่ไม่รู้สึกเหมือนบ้าน</h1>
+      <h1>หลังเคาน์เตอร์</h1>
       <nav className="vn-menu-nav" aria-label="เมนูหลัก">
         {entries.map((entry) => (
           <DemoControl

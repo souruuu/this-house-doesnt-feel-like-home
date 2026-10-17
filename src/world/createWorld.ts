@@ -3,6 +3,7 @@ import { resolveAssetUrl } from '../assets/manifest';
 import { LOGICAL_HEIGHT, LOGICAL_WIDTH } from '../shell/viewport';
 import type { GameBridge } from './GameBridge';
 import { ManagedGame } from './ManagedGame';
+import { DemoCharacterStage } from './DemoCharacterStage';
 import {
   containArtwork,
   demoMenuPortrait,
@@ -15,6 +16,8 @@ export function createWorld(
   demo = false,
 ) {
   let unsubscribePresentation = () => {};
+  let characterStage: DemoCharacterStage | undefined;
+  let worldPaused = false;
   class PlaceholderScene extends Phaser.Scene {
     constructor() {
       super('m0-placeholder');
@@ -26,6 +29,11 @@ export function createWorld(
           this.load.image(
             `demo.shop.${time}`,
             resolveAssetUrl(`demo.shop.${time}`),
+          );
+        for (const character of ['som', 'manao', 'nut', 'kant'] as const)
+          this.load.image(
+            `demo.character.${character}`,
+            resolveAssetUrl(`demo.character.${character}`),
           );
         this.load.once('loaderror', () => {
           parent.dataset.worldState = 'error';
@@ -45,14 +53,17 @@ export function createWorld(
       if (demo) {
         this.cameras.main.setBackgroundColor('#000000');
         const background = this.add.image(960, 540, 'demo.shop.morning');
-        const cue = this.add.graphics();
+        characterStage = new DemoCharacterStage(this, parent);
+        characterStage.setPaused(worldPaused);
+        const cue = this.add.graphics().setDepth(20);
         const label = this.add
           .text(0, 0, '', {
             fontFamily: "'Leelawadee UI', Tahoma, sans-serif",
             fontSize: '30px',
             color: '#f4f0e7',
           })
-          .setOrigin(0, 0.5);
+          .setOrigin(0, 0.5)
+          .setDepth(21);
         unsubscribePresentation = bridge.subscribePresentation((view) => {
           const key = `demo.shop.${view.background}`;
           if (!this.textures.exists(key)) {
@@ -69,6 +80,7 @@ export function createWorld(
           background
             .setPosition(x + fitted.width / 2, fitted.y + fitted.height / 2)
             .setScale(fitted.scale);
+          characterStage?.present(view);
           const placement = demoGameplayLayout(view.viewportScale ?? 1).cue;
           const visible =
             view.layout !== 'menu' &&
@@ -127,6 +139,8 @@ export function createWorld(
     banner: false,
   });
   const unsubscribe = bridge.subscribePause((paused) => {
+    worldPaused = paused;
+    characterStage?.setPaused(paused);
     if (paused) game.pause();
     else game.resume();
     parent.dataset.worldPaused = String(paused);
@@ -137,6 +151,7 @@ export function createWorld(
     destroyed = true;
     unsubscribe();
     unsubscribePresentation();
+    characterStage?.dispose();
     game.destroy(true);
     // destroy() is deferred to a frame, including when the page was hidden.
     if (game.isRunning && !game.loop.running) game.loop.wake();

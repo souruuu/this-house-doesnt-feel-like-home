@@ -18,7 +18,7 @@ for (const route of [
     });
     await page.goto('http://127.0.0.1:4174/nested/game/');
     await expect(
-      page.getByRole('heading', { name: 'บ้านที่ไม่รู้สึกเหมือนบ้าน' }),
+      page.getByRole('heading', { name: 'หลังเคาน์เตอร์' }),
     ).toBeVisible();
     await expect(page.locator('[data-world-state="ready"]')).toHaveCount(1);
     await expect(page.locator('canvas')).toHaveCount(1);

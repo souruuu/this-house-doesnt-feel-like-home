@@ -33,7 +33,7 @@ test('Thai shell, shared bounds, remount, pause and keyboard ownership', async (
     if (message.type() === 'error') errors.push(message.text());
   });
   await page.goto('/?fixture=1');
-  await expect(page).toHaveTitle('บ้านที่ไม่รู้สึกเหมือนบ้าน');
+  await expect(page).toHaveTitle('หลังเคาน์เตอร์');
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
   await expect(page.locator('[data-world-state="ready"]')).toHaveCount(1);
   await expect(page.locator('canvas')).toHaveCount(1);

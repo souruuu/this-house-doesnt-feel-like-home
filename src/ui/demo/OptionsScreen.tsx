@@ -53,7 +53,7 @@ export function OptionsScreen({
             </DemoControl>
           ))}
           <DemoControl
-            className="vn-return"
+            className="vn-return vn-back-main"
             aria-label={fromPause ? 'กลับเมนูเกม' : 'กลับหน้าหลัก'}
             data-screen-initial
             {...guard}

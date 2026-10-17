@@ -13,7 +13,7 @@ test('same static dist runs at a nested path inside an iframe', async ({
   await page.goto('http://127.0.0.1:4174/iframe');
   const game = page.frameLocator('iframe');
   await expect(
-    game.getByRole('heading', { name: 'บ้านที่ไม่รู้สึกเหมือนบ้าน' }),
+    game.getByRole('heading', { name: 'หลังเคาน์เตอร์' }),
   ).toBeVisible();
   await expect(game.locator('[data-world-state="ready"]')).toHaveCount(1);
   await expect(game.locator('canvas')).toHaveCount(1);

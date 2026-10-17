@@ -24,7 +24,7 @@ for (const viewport of [
       if (r.status() >= 400) errors.push(`${r.status()} ${r.url()}`);
     });
     await page.goto(url);
-    await expect(page).toHaveTitle('บ้านที่ไม่รู้สึกเหมือนบ้าน');
+    await expect(page).toHaveTitle('หลังเคาน์เตอร์');
     await expect(page.locator('[data-world-state="ready"]')).toHaveCount(1);
     const stage = (await page.locator('.logical-stage').boundingBox())!;
     const scale = stage.width / 1920;
