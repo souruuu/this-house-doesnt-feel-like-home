@@ -14,6 +14,32 @@ Source of Truth ของ game viewport, UI, controls, accessibility และ h
 
 ตำแหน่ง dialogue/choices, safe areas, stage anchors และขนาดอุปกรณ์ขั้นต่ำยังไม่ล็อก ดู U-01 ตัวเลขตัวอย่างจากแชทเดิมไม่ใช่ final artist coordinates
 
+## Emergency Demo UI exception — 17 October 2026
+
+Owner อนุมัติ functional baseline สำหรับ [Emergency Day 1–3](../sources/emergency-demo-2026-10-17/README.md): logical 1920×1080, composite portrait artwork แบบ contain พร้อม black sidebars; React Main Menu/Start, Thai dialogue/speaker/Continue, vertical choices บนพื้นที่ portrait, pause menu และ Demo End/return อยู่เหนือ Phaser world/character placeholders
+
+ใช้ภาพ composite เช้า/เย็น/กลางคืนจากโฟลเดอร์ทีมที่ Owner ระบุ โดย semantic manifest เก็บ source URL ไม่อ้างว่า layering/export/anchors หรือ U-01/U-02/U-03 finalized ตัวละครใช้ labeled placeholders; ชื่อที่ยังไม่รู้ต้องเป็น label anonymous ตามบท รวมกันต์ก่อน D303-L010A และในบรรทัดบอกชื่อเอง
+
+Owner UI Correction ล่าสุด supersede ข้อเสนอ Instant Text default เดิม: shared reading foundation ของ Checkpoint A ใช้ Typewriter default ON, Text Speed 25–60 grapheme clusters/second (default 40) ผ่าน `Intl.Segmenter` ภาษาไทย Options มี Instant Text และ reduced motion ที่มีผลจริง; OS reduced motion ยังมีผลแม้ผู้เล่นไม่เลือกเพิ่ม และ fallback Instant เมื่อ Segmenter ไม่มี First Continue ระหว่าง reveal แสดงให้ครบก่อน; Continue ถัดไปจึงเดินเรื่อง ไม่เพิ่ม event/เปลี่ยนบท
+
+Checkpoint A ใช้ชื่อเกมซ้ายบนและ vertical menu ครบ Start/Load/Options/Gallery/About พร้อม contained shop artwork ด้านขวาและ original dark shop-window/warm amber treatment ใช้ English labels เฉพาะ controls ที่ Owner ระบุเป็น temporary demo exception ไม่เปลี่ยน Thai-only contract ของ Full Game v1 Owner conditionally approved ภาพ A และอนุมัติ B: Gameplay ใช้ centered portrait/black sidebars, speaker header (omit เมื่อ speaker:none), body-only scroll และ footer Skip/Auto/▶ ตาม supplementary Gameplay Visual Blueprint ไม่ใช้ mockup PNG/sample text/font เป็น production assets ไม่สร้างตัวละครใหม่; optional menu character slot ยังไม่มี artwork ไม่ request path ปลอม
+
+Options เป็น screen จริงจาก Main Menu/Pause มี Reading/Display/Audio และ return-origin/focus guards Load เปิดคำอธิบายว่ายังโหลดไม่ได้, Gallery เปิด empty state ไม่เป็น CG/Endings collection, About ใช้ข้อมูลโปรเจกต์จริง; Music/Sound sliders disabled ชัดเจนว่าไม่มีระบบเสียง Auto-Forward Time เป็นค่า app-session ที่เชื่อม UI Auto timer ใน B: เริ่ม delay หลัง full reveal, ตรวจ live session/revision ก่อน Controller Continue และ consume generation ก่อน dispatch; manual input/pause/menu/focus/visibility/transition/choice/end ยกเลิกทันที ไม่ replay events หรือเลือก choices แทน D1 profile persistence ยังไม่อนุมัติ: ไม่เพิ่ม production storage หรือใช้ fixture profile แทน Skip ใน footer แสดง disabled พร้อม unavailable reason ตาม Owner ไม่แสร้งใช้ backlog แทน global read IDs ไม่มี Production Save/Load/Resume/audio assets หรือฟอนต์ที่คัดลอกจาก reference ต้องแจ้ง refresh/close สูญเสียความคืบหน้า
+
+Stage/layout/theme/type/touch targets และ settings เป็นค่าทดลอง; A ผ่าน Conditional Visual Direction ส่วน B ยังรอ Owner Visual/UX Review และต้องหยุดก่อน C ไม่ปิด U-01/U-02/U-03 ไม่ยกเลิก full-game contracts ด้านล่าง และไม่ถือว่า Final Visual Acceptance ผ่านเพราะ automated tests
+
+Checkpoint B responsive proposal ใช้ shared `demoGameplayLayout` ใน React/Phaser ภาพ 2480×3508 contain กลาง stage 1920×1080 เช่นเดิม Desktop dialogue ใกล้ 67% กว้าง/24% สูง; compact landscape ขยายเกือบเต็ม stage โดยรักษา physical text/targets ไม่ scale ตัวอักษรจนเล็ก Choices อยู่ใน portrait corridor เหนือ dialogue แสดงตามจำนวน/ข้อความจริงและ scroll เมื่อจำเป็น Amber outline + marker/focus/pressed ไม่หน่วง choice transaction Phaser แสดง neutral name cue จาก Controller speaker เท่านั้น; narrator-only ไม่มี cue และละ cue ที่ short mobile breakpoint เพื่อรักษาพื้นที่อ่าน ไม่สร้าง character identity/asset ใหม่
+
+Day indicator/card ใช้ day จาก approved scene context เท่านั้น ไม่อนุมาน time-of-day ใหม่จากแสง/ชื่อไฟล์ One card ต่อ day boundary, 300ms fade และ UI guard รวม 650ms; reduced-motion เป็น static โดยไม่เพิ่ม Continue/Ink step ขณะ guard หยุด Auto/reveal/input ชั่วคราว ไม่มี story-time/domain change และไม่ replay first line
+
+### Dusty Midnight Blue A+B Correction — latest scoped Owner decision
+
+Temporary palette: navy #101D2D / panel #1C2B33 / cream #F4F0E7 / secondary #AAB9C3 / sage #86A5A8 / focus-active amber #D7B27C. This supersedes the previous warm-green experimental treatment only; original morning/evening/night composites retain their pixels/contain transform. The five AI references supply UI mood/composition, never production scene assets or story text. Existing system Thai font fallback is retained; no unverified font files embedded. U-01/U-02/U-03 remain OPEN.
+
+Options shows exactly one Reading/Display/Audio pane. Load/Gallery/audio remain truthful unavailable/empty UI. Safe dialogue-region click finishes reveal then advances once; drag, selection, scroll, interactive children, stale gesture, pending choice and modal states cannot advance. Footer is text-led Skip/Auto/▶; Skip only announces a temporary unavailable notice, never invokes narrative skip. Auto intent survives Choice while execution waits for manual selection; after a safe new full reveal the configured delay starts fresh. Pause/menu/blur/hidden/rotate/end/error/new session cancels timers and requires explicit Auto reactivation. No catch-up, profile/read-ID persistence or domain contract changes. Brief single-choice confirmation is UI-only and input-locked before the public Controller request is revalidated.
+
+Day HUD and full-frame typographic intertitle use only approved runtime day labels; no generated subtitle, card or story-time change. Existing 650ms guard/300ms fade remains presentation-only with static reduced-motion fallback. This decision supersedes earlier B wording that Auto turns OFF at Choice, framed day card, permanently disabled Skip explanation and the provisional layout; it does not change full-game controls/DoD/release gates below. Final Owner Visual Acceptance is pending; C/merge/deploy remain unauthorized.
+
 ## Language และ UI surfaces
 
 **Thai only** สำหรับข้อความที่ผู้เล่นเห็น ชื่อ code/asset IDs คงภาษาอังกฤษได้ ไม่เพิ่ม localization ภาษาอังกฤษใน v1

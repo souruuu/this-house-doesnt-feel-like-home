@@ -24,8 +24,16 @@ export function createNarrativeQueryPort(
 }
 
 export function bindFixtureQueries(story: Story, queries: NarrativeQueryPort) {
+  bindNarrativeQueries(story, queries, 'fixture_flag');
+}
+
+export function bindNarrativeQueries(
+  story: Story,
+  queries: NarrativeQueryPort,
+  externalName: 'fixture_flag' | 'demo_flag',
+) {
   story.BindExternalFunction(
-    'fixture_flag',
+    externalName,
     (id: unknown) => {
       if (typeof id !== 'string') throw new Error('Query ID must be a string');
       return queries.getFlag(id);

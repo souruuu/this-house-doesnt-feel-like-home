@@ -1,6 +1,7 @@
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { pathToFileURL } from 'node:url';
+import { compileDemo } from './narrative-production.ts';
 
 // Build tooling only. The runtime/compiler pair comes from the same exact package.
 const require = createRequire(import.meta.url);
@@ -22,5 +23,8 @@ if (
   import.meta.url === pathToFileURL(process.argv[1]).href
 ) {
   compileFixture();
-  console.log(`Compiled technical fixture only: ${fixtureOutput}`);
+  compileDemo();
+  console.log(
+    `Compiled isolated technical fixture and production demo: ${fixtureOutput}`,
+  );
 }

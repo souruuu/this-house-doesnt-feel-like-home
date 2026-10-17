@@ -4,5 +4,20 @@
     "status": "placeholder",
     "path": "assets/placeholders/world.svg",
     "credit": "Repository technical placeholder; no production art mapping"
+  },
+  "demo.shop.morning": {
+    "status": "demo-composite",
+    "source": "https://drive.google.com/file/d/1qA5CfHUJhf9jRQKPbXbnOqoUvplFu1_l/view",
+    "path": "assets/demo/shop-morning.png"
+  },
+  "demo.shop.evening": {
+    "status": "demo-composite",
+    "source": "https://drive.google.com/file/d/1riQOTUaKZOlQARqkaVi31oW6tAm4kxTR/view",
+    "path": "assets/demo/shop-evening.png"
+  },
+  "demo.shop.night": {
+    "status": "demo-composite",
+    "source": "https://drive.google.com/file/d/1RMNudgiUrkK6M4Q4QoZOGqIDCrAYWZPC/view",
+    "path": "assets/demo/shop-night.png"
   }
 }

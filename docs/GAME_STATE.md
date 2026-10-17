@@ -2,6 +2,12 @@
 
 Source of Truth ของ durable schema/ownership/invariants และ persistence ข้อเท็จจริงเรื่อง/ผลของ choice อยู่ใน [Narrative Map](../sources/narrative_map_7_day_Updates.md) ไม่ใช้ schema นี้แต่งข้อมูลที่เด็กยังไม่เล่าหรือสิทธิที่ยังไม่ให้
 
+## Emergency Demo scope — 17 October 2026
+
+ใช้ [Owner-approved CR/handoff](../sources/emergency-demo-2026-10-17/README.md) สำหรับข้อเท็จจริง Day 1–3 ที่ supersede baseline เดิม Demo store เก็บเฉพาะ approved evidence-backed facts, owner/ชนิด seen หรือ told/Line ID และ per-run committed-event ledger ใน atomic update ไม่มี TSPR values, permission grants, Promise formulas หรือ production save schema ที่เดาขึ้น
+
+Production Save/Resume deferred เฉพาะ Emergency Demo; refresh/close เริ่มเล่นใหม่และ UI แจ้งข้อจำกัด ไม่มีการอ่าน/เขียน fixture slots/profile เป็น production progress ข้อกำหนด G-02/G-03 และ full-game save/release gates ด้านล่างคงเดิม ไม่ถือว่าผ่านจากการเลื่อนงานนี้
+
 ## Ownership และ logical schema
 
 Zustand เป็น authoritative in-memory durable state เปลี่ยนผ่าน domain actions ที่ตรวจ invariant; `SaveCoordinator` เป็นเจ้าของ save/load orchestration โดยรวบรวม durable state snapshot จาก Zustand และ Ink snapshot ผ่าน `NarrativeController` แล้วประสานกับ `SaveRepository`; transient UI/animation/drag coordinates/engine instances ไม่ใช่ durable domain state
