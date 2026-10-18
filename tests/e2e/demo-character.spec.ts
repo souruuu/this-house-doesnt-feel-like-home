@@ -57,12 +57,12 @@ async function begin(p: Page, target = url) {
   await expect(p).toHaveTitle('หลังเคาน์เตอร์');
   await expect(p.locator('[data-world-state="ready"]')).toHaveCount(1);
   await expect(p.locator('canvas')).toHaveCount(1);
-  await button(p, 'Options').click();
+  await button(p, 'ตั้งค่า').click();
   await p
     .getByRole('checkbox', { name: 'แสดงข้อความทันที', exact: true })
     .check();
   await button(p, 'กลับหน้าหลัก').click();
-  await button(p, 'Start').click();
+  await button(p, 'เริ่มเกม').click();
 }
 async function reach(p: Page, id: string) {
   for (let i = 0; i < 200; i++) {
@@ -107,7 +107,7 @@ for (const viewport of [
     await shot(page, info, 'title-no-menu-characters');
     const rect = (await page.locator('.logical-stage').boundingBox())!;
     const scale = rect.width / 1920;
-    for (const name of ['Gallery', 'About', 'Load']) {
+    for (const name of ['แกลเลอรี', 'เกี่ยวกับ', 'โหลดเกม']) {
       await button(page, name).click();
       const panel = page.getByRole('dialog', { name, exact: true });
       const r = (await panel.boundingBox())!;
@@ -130,7 +130,7 @@ for (const viewport of [
       await back.click();
       await expect(button(page, name)).toBeFocused();
     }
-    await button(page, 'Options').click();
+    await button(page, 'ตั้งค่า').click();
     for (const [name, pane] of [
       ['การอ่าน', 'reading'],
       ['หน้าจอ', 'display'],
@@ -148,7 +148,7 @@ for (const viewport of [
       .getByRole('checkbox', { name: 'แสดงข้อความทันที', exact: true })
       .check();
     await button(page, 'กลับหน้าหลัก').click();
-    await button(page, 'Start').click();
+    await button(page, 'เริ่มเกม').click();
     const notice = (await page.locator('.demo-dialogue').boundingBox())!;
     expect(notice.x + notice.width).toBeLessThan(
       rect.x + demoMenuPortrait.x * scale,
@@ -294,7 +294,7 @@ test('Post-AB real Phaser cancellation, reduced motion and development remount',
   await page.setViewportSize({ width: 844, height: 390 });
   await expect(page.getByRole('alert')).toHaveCount(0);
   await button(page, 'พัก').click();
-  await button(page, 'Options').click();
+  await button(page, 'ตั้งค่า').click();
   await button(page, 'หน้าจอ').click();
   await page
     .getByRole('checkbox', { name: 'ลดการเคลื่อนไหว', exact: true })

@@ -4,17 +4,17 @@ import type { DemoInfoPage } from './demoPreferences';
 
 const content = {
   load: {
-    title: 'Load',
+    title: 'โหลดเกม',
     heading: 'ยังไม่พร้อมโหลดเกม',
     body: 'เดโมนี้ยังไม่มีระบบบันทึกและโหลดความคืบหน้า การรีเฟรชหรือปิดหน้าจะเริ่มเล่นใหม่',
   },
   gallery: {
-    title: 'Gallery',
+    title: 'แกลเลอรี',
     heading: 'ยังไม่มีภาพเพิ่มเติม',
     body: 'พื้นที่นี้เตรียมไว้สำหรับภาพที่ได้รับอนุมัติในอนาคต ยังไม่มีแกลเลอรีให้เปิดชมในเดโมนี้',
   },
   about: {
-    title: 'About',
+    title: 'เกี่ยวกับ',
     heading: 'หลังเคาน์เตอร์',
     body: 'ช่วงทดลองเล่นวันที่ 1–3 ของ This House Doesn’t Feel Like Home งานภาพและการนำเสนอยังอยู่ระหว่างพัฒนา',
   },

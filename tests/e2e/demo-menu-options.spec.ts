@@ -34,7 +34,13 @@ for (const viewport of [
     expect(title.x + title.width).toBeLessThan(
       stage.x + demoMenuPortrait.x * scale,
     );
-    for (const name of ['Start', 'Load', 'Options', 'Gallery', 'About']) {
+    for (const name of [
+      'เริ่มเกม',
+      'โหลดเกม',
+      'ตั้งค่า',
+      'แกลเลอรี',
+      'เกี่ยวกับ',
+    ]) {
       await expect(button(page, name)).toBeVisible();
       expect(
         (await button(page, name).boundingBox())!.height,
@@ -44,35 +50,32 @@ for (const viewport of [
     await page.screenshot({
       path: info.outputPath(`menu-${viewport.width}x${viewport.height}.png`),
     });
-    const before = await button(page, 'Options').evaluate(
-      (el) => getComputedStyle(el).textShadow,
+    const before = await button(page, 'ตั้งค่า').evaluate(
+      (el) => getComputedStyle(el).backgroundColor,
     );
-    await button(page, 'Options').hover();
+    await button(page, 'ตั้งค่า').hover();
     await expect
       .poll(() =>
-        button(page, 'Options').evaluate(
-          (el) => getComputedStyle(el).textShadow,
+        button(page, 'ตั้งค่า').evaluate(
+          (el) => getComputedStyle(el).backgroundColor,
         ),
       )
       .not.toBe(before);
-    await expect(button(page, 'Options').locator('.vn-nav-marker')).toHaveCSS(
-      'opacity',
-      '1',
-    );
+    await expect(button(page, 'ตั้งค่า')).toHaveCSS('text-shadow', 'none');
     await page.screenshot({
       path: info.outputPath(`hover-${viewport.width}x${viewport.height}.png`),
     });
-    await button(page, 'Start').focus();
+    await button(page, 'เริ่มเกม').focus();
     await page.keyboard.press('Tab');
-    await expect(button(page, 'Load')).toBeFocused();
+    await expect(button(page, 'โหลดเกม')).toBeFocused();
     await page.keyboard.press('Tab');
-    await expect(button(page, 'Options')).toBeFocused();
+    await expect(button(page, 'ตั้งค่า')).toBeFocused();
     await page.screenshot({
       path: info.outputPath(`focus-${viewport.width}x${viewport.height}.png`),
     });
     await page.keyboard.press('Enter');
     await expect(
-      page.getByRole('dialog', { name: 'Options', exact: true }),
+      page.getByRole('dialog', { name: 'ตั้งค่า', exact: true }),
     ).toBeVisible();
     await expect(page.locator('.demo-main-surface')).toHaveAttribute(
       'inert',
@@ -118,7 +121,7 @@ for (const viewport of [
     await page.keyboard.press('Tab');
     await expect(button(page, 'การอ่าน')).toBeFocused();
     await page.keyboard.press('Escape');
-    await expect(button(page, 'Options')).toBeFocused();
+    await expect(button(page, 'ตั้งค่า')).toBeFocused();
     expect(errors).toEqual([]);
   });
 }
@@ -128,9 +131,9 @@ test('Load/Gallery/About have honest content and return focus without saves or i
 }, info) => {
   await page.goto(url);
   for (const [name, text] of [
-    ['Load', 'ยังไม่พร้อมโหลดเกม'],
-    ['Gallery', 'ยังไม่มีภาพเพิ่มเติม'],
-    ['About', 'ช่วงทดลองเล่นวันที่ 1–3'],
+    ['โหลดเกม', 'ยังไม่พร้อมโหลดเกม'],
+    ['แกลเลอรี', 'ยังไม่มีภาพเพิ่มเติม'],
+    ['เกี่ยวกับ', 'ช่วงทดลองเล่นวันที่ 1–3'],
   ] as const) {
     await button(page, name).click();
     const dialog = page.getByRole('dialog', { name, exact: true });
@@ -149,7 +152,7 @@ test('reading preferences are functional, pause return is safe, and profile pers
   page,
 }) => {
   await page.goto(url);
-  await button(page, 'Options').click();
+  await button(page, 'ตั้งค่า').click();
   const speed = page.getByRole('slider', { name: 'Text Speed', exact: true });
   const delay = page.getByRole('slider', {
     name: 'Auto-Forward Time',
@@ -168,7 +171,7 @@ test('reading preferences are functional, pause return is safe, and profile pers
   await page.keyboard.press('ArrowLeft');
   await expect(delay).toHaveValue('5.5');
   await button(page, 'กลับหน้าหลัก').click();
-  await button(page, 'Start').click();
+  await button(page, 'เริ่มเกม').click();
   await expect(view(page)).toHaveAttribute('data-line-id', 'demo.D1N-L001');
   await expect(view(page)).toHaveAttribute('data-revealing', 'true');
   await button(page, 'อ่านต่อ').click();
@@ -176,7 +179,7 @@ test('reading preferences are functional, pause return is safe, and profile pers
   const id = await view(page).getAttribute('data-line-id');
   const run = await view(page).getAttribute('data-run-id');
   await button(page, 'พัก').click();
-  await button(page, 'Options').click();
+  await button(page, 'ตั้งค่า').click();
   await expect(speed).toHaveValue('60');
   await expect(delay).toHaveValue('5.5');
   await page
@@ -186,7 +189,7 @@ test('reading preferences are functional, pause return is safe, and profile pers
   await expect(view(page)).toHaveAttribute('data-line-id', id!);
   await button(page, 'กลับเมนูเกม').click();
   await expect(page.getByRole('dialog', { name: 'พักเกม' })).toBeVisible();
-  await expect(button(page, 'Options')).toBeFocused();
+  await expect(button(page, 'ตั้งค่า')).toBeFocused();
   await button(page, 'เล่นต่อ').click();
   await expect(view(page)).toHaveAttribute('data-run-id', run!);
   await expect(view(page)).toHaveAttribute('data-line-id', id!);
@@ -195,8 +198,8 @@ test('reading preferences are functional, pause return is safe, and profile pers
   await expect(view(page)).toHaveAttribute('data-revealing', 'false');
   expect(await page.evaluate(() => Object.keys(localStorage))).toEqual([]);
   await page.reload();
-  await expect(button(page, 'Start')).toBeVisible();
-  await button(page, 'Options').click();
+  await expect(button(page, 'เริ่มเกม')).toBeVisible();
+  await button(page, 'ตั้งค่า').click();
   await expect(speed).toHaveValue('40'); // D1 profile persistence is not implemented.
 });
 
@@ -207,13 +210,13 @@ test('selected text speed changes the actual revealed line duration', async ({
   await page.goto(url);
   const elapsed: number[] = [];
   for (const speed of [25, 60]) {
-    await button(page, 'Options').click();
+    await button(page, 'ตั้งค่า').click();
     const input = page.getByRole('slider', { name: 'Text Speed', exact: true });
     await input.focus();
     await page.keyboard.press(speed === 25 ? 'Home' : 'End');
     await expect(input).toHaveValue(String(speed));
     await button(page, 'กลับหน้าหลัก').click();
-    await button(page, 'Start').click();
+    await button(page, 'เริ่มเกม').click();
     await expect(view(page)).toHaveAttribute('data-revealing', 'true');
     const start = Date.now();
     await expect(view(page)).toHaveAttribute('data-revealing', 'false', {
@@ -231,7 +234,7 @@ test('fullscreen follows native state or reports browser rejection; failure does
   page,
 }, info) => {
   await page.goto(url);
-  await button(page, 'Options').click();
+  await button(page, 'ตั้งค่า').click();
   await button(page, 'หน้าจอ').click();
   await expect(button(page, 'Windowed')).toHaveAttribute(
     'aria-pressed',
@@ -270,7 +273,7 @@ test('fullscreen follows native state or reports browser rejection; failure does
       /ไม่สามารถ|ไม่รองรับ/,
     );
   await button(page, 'กลับหน้าหลัก').click();
-  await button(page, 'Start').click();
+  await button(page, 'เริ่มเกม').click();
   await expect(view(page)).toHaveAttribute('data-phase', 'line');
 });
 
@@ -301,9 +304,9 @@ test('OS reduced motion wins, native fullscreen denial is truthful, external han
       }),
     });
   });
-  await expect(button(page, 'Options')).toHaveCSS('transition-duration', '0s');
+  await expect(button(page, 'ตั้งค่า')).toHaveCSS('transition-duration', '0s');
   for (let cycle = 0; cycle < 3; cycle++) {
-    await button(page, 'Options').click();
+    await button(page, 'ตั้งค่า').click();
     await button(page, 'กลับหน้าหลัก').click();
   }
   await page.evaluate(() => {
@@ -323,7 +326,7 @@ test('OS reduced motion wins, native fullscreen denial is truthful, external han
   expect(
     await page.evaluate(() => Reflect.get(window, 'readExternalProbe')()),
   ).toEqual({ sameBlur: true, sameFocus: true, externalCalls: 1 });
-  await button(page, 'Options').click();
+  await button(page, 'ตั้งค่า').click();
   await button(page, 'หน้าจอ').click();
   await button(page, 'Fullscreen').click();
   await expect(page.locator('p[role="status"]')).toContainText(
@@ -337,7 +340,7 @@ test('OS reduced motion wins, native fullscreen denial is truthful, external han
     page.getByText('อุปกรณ์ตั้งค่าลดการเคลื่อนไหวอยู่', { exact: false }),
   ).toBeVisible();
   await button(page, 'กลับหน้าหลัก').click();
-  await button(page, 'Start').click();
+  await button(page, 'เริ่มเกม').click();
   await expect(view(page)).toHaveAttribute('data-revealing', 'false');
   await expect(page.locator('canvas')).toHaveCount(1);
 });
@@ -355,11 +358,11 @@ test('portrait guard remains; touch landscape opens and returns from Options', a
   await expect(page.locator('.demo-overlay')).toHaveAttribute('inert', '');
   await page.screenshot({ path: info.outputPath('portrait-390x844.png') });
   await page.setViewportSize({ width: 844, height: 390 });
-  await button(page, 'Options').tap();
+  await button(page, 'ตั้งค่า').tap();
   await expect(
-    page.getByRole('dialog', { name: 'Options', exact: true }),
+    page.getByRole('dialog', { name: 'ตั้งค่า', exact: true }),
   ).toBeVisible();
   await button(page, 'กลับหน้าหลัก').tap();
-  await expect(button(page, 'Start')).toBeVisible();
+  await expect(button(page, 'เริ่มเกม')).toBeVisible();
   await context.close();
 });

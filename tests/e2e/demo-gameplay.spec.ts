@@ -13,7 +13,7 @@ async function stable(p: Page) {
 async function start(p: Page, instant = true, delay = 1) {
   await p.goto(url);
   await expect(p).toHaveTitle('หลังเคาน์เตอร์');
-  await button(p, 'Options').click();
+  await button(p, 'ตั้งค่า').click();
   if (instant)
     await p.getByRole('checkbox', { name: 'แสดงข้อความทันที' }).check();
   const time = p.getByRole('slider', { name: 'Auto-Forward Time' });
@@ -24,7 +24,7 @@ async function start(p: Page, instant = true, delay = 1) {
     await p.keyboard.press('ArrowRight');
   }
   await button(p, 'กลับหน้าหลัก').click();
-  await button(p, 'Start').click();
+  await button(p, 'เริ่มเกม').click();
   await expect(view(p)).toHaveAttribute('data-line-id', 'demo.D1N-L001');
 }
 async function resize(p: Page, width: number, height: number) {
@@ -251,12 +251,12 @@ test('Auto waits full reveal and delay, retains choice intent, resumes after man
   // Use a long line at slow speed so transport latency cannot finish the short
   // prologue before the manual key reaches the browser. Keep the same assertions.
   await button(page, 'พัก').click();
-  await button(page, 'Options').click();
+  await button(page, 'ตั้งค่า').click();
   await page.getByRole('slider', { name: 'Text Speed' }).focus();
   await page.keyboard.press('Home');
   await button(page, 'กลับเมนูเกม').click();
   await button(page, 'กลับหน้าหลัก').click();
-  await button(page, 'Start').click();
+  await button(page, 'เริ่มเกม').click();
   await expect(view(page)).toHaveAttribute('data-line-id', 'demo.D1N-L001');
   await expect(view(page)).toHaveAttribute('data-revealing', 'true');
   const id = await view(page).getAttribute('data-line-id');
@@ -283,7 +283,7 @@ test('B Auto cancels without catch-up on pause/options, hidden, blur, portrait a
   await expect(button(page, 'Auto')).toBeDisabled();
   await expect(view(page)).toHaveAttribute('data-auto', 'false');
   await shot(page, info, 'pause');
-  await button(page, 'Options').click();
+  await button(page, 'ตั้งค่า').click();
   await button(page, 'กลับเมนูเกม').click();
   await button(page, 'เล่นต่อ').click();
   await expect(button(page, 'Auto')).toHaveAttribute('aria-pressed', 'false');
@@ -324,7 +324,7 @@ test('B Auto cancels without catch-up on pause/options, hidden, blur, portrait a
   const oldRun = await view(page).getAttribute('data-run-id');
   await button(page, 'พัก').click();
   await button(page, 'กลับหน้าหลัก').click();
-  await button(page, 'Start').click();
+  await button(page, 'เริ่มเกม').click();
   await expect(view(page)).not.toHaveAttribute('data-run-id', oldRun!);
   await page.waitForTimeout(1200);
   await expect(view(page)).toHaveAttribute('data-line-id', 'demo.D1N-L001');

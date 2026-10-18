@@ -8,26 +8,26 @@ test('safe dialogue clicks exclude selection, drag, scroll and controls; first r
   page,
 }, info) => {
   await page.goto(url);
-  await button(page, 'Options').click();
+  await button(page, 'ตั้งค่า').click();
   await page.getByRole('slider', { name: 'Text Speed' }).focus();
   await page.keyboard.press('Home');
   await button(page, 'กลับหน้าหลัก').click();
   // Revocation also spans a menu-only cycle with no Controller revision yet.
-  const startBounds = (await button(page, 'Start').boundingBox())!;
+  const startBounds = (await button(page, 'เริ่มเกม').boundingBox())!;
   await page.mouse.move(startBounds.x + 20, startBounds.y + 20);
   await page.mouse.down();
-  await button(page, 'Options').focus();
+  await button(page, 'ตั้งค่า').focus();
   await page.keyboard.press('Enter');
   await expect(
-    page.getByRole('dialog', { name: 'Options', exact: true }),
+    page.getByRole('dialog', { name: 'ตั้งค่า', exact: true }),
   ).toBeVisible();
   await page.keyboard.press('Escape');
   await expect(
-    page.getByRole('dialog', { name: 'Options', exact: true }),
+    page.getByRole('dialog', { name: 'ตั้งค่า', exact: true }),
   ).toHaveCount(0);
   await page.mouse.up();
   await expect(view(page)).toHaveCount(0);
-  await button(page, 'Start').click();
+  await button(page, 'เริ่มเกม').click();
   const panel = page.locator('.demo-dialogue');
   let revision = await view(page).getAttribute('data-view-revision');
   const bounds = (await panel.boundingBox())!;
@@ -124,9 +124,9 @@ for (const viewport of [
       if (r.status() >= 400) errors.push(`${r.status()} ${r.url()}`);
     });
     await expect(page.locator('.vn-menu-art-frame')).toBeHidden();
-    await expect(button(page, 'Load')).toContainText('(ยังไม่พร้อม)');
+    await expect(button(page, 'โหลดเกม')).toContainText('(ยังไม่พร้อม)');
     await page.screenshot({ path: info.outputPath('main-menu.png') });
-    await button(page, 'Options').click();
+    await button(page, 'ตั้งค่า').click();
     for (const [label, pane, sliders] of [
       ['การอ่าน', 'reading', 2],
       ['หน้าจอ', 'display', 0],
@@ -143,8 +143,8 @@ for (const viewport of [
     }
     await expect(button(page, 'เสียง')).toBeFocused();
     await page.keyboard.press('Escape');
-    await expect(button(page, 'Options')).toBeFocused();
-    for (const name of ['Load', 'Gallery', 'About']) {
+    await expect(button(page, 'ตั้งค่า')).toBeFocused();
+    for (const name of ['โหลดเกม', 'แกลเลอรี', 'เกี่ยวกับ']) {
       await button(page, name).click();
       const dialog = page.getByRole('dialog', { name, exact: true });
       await expect(dialog).toBeVisible();
@@ -157,7 +157,7 @@ for (const viewport of [
       await page.keyboard.press('Escape');
       await expect(button(page, name)).toBeFocused();
     }
-    await button(page, 'Options').click();
+    await button(page, 'ตั้งค่า').click();
     const speed = page.getByRole('slider', { name: 'Text Speed', exact: true });
     await speed.click();
     await expect(speed).toBeFocused();
@@ -169,14 +169,14 @@ for (const viewport of [
     await expect(instant).toBeFocused();
     await page.locator('.vn-screen-header h2').click();
     await expect(
-      page.getByRole('dialog', { name: 'Options', exact: true }),
+      page.getByRole('dialog', { name: 'ตั้งค่า', exact: true }),
     ).toBeFocused();
     await page.keyboard.press('Tab');
     await expect(button(page, 'การอ่าน')).toBeFocused();
     await page.keyboard.press('Shift+Tab');
     await expect(instant).toBeFocused();
     await page.keyboard.press('Escape');
-    await expect(button(page, 'Options')).toBeFocused();
+    await expect(button(page, 'ตั้งค่า')).toBeFocused();
     expect(errors).toEqual([]);
   });
 }
@@ -219,12 +219,12 @@ test('Choice idle, hover, keyboard and single committed feedback are separate st
   page,
 }, info) => {
   await page.goto(url);
-  await button(page, 'Options').click();
+  await button(page, 'ตั้งค่า').click();
   await page
     .getByRole('checkbox', { name: 'แสดงข้อความทันที', exact: true })
     .check();
   await button(page, 'กลับหน้าหลัก').click();
-  await button(page, 'Start').click();
+  await button(page, 'เริ่มเกม').click();
   await button(page, 'อ่านต่อ').click();
   await button(page, 'อ่านต่อ').click();
   await expect(view(page)).toHaveAttribute('data-phase', 'choice');

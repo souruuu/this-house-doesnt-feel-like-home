@@ -22,7 +22,7 @@ async function reach(page: Page, lineId: string) {
 }
 async function start(page: Page) {
   await page.goto(production);
-  await page.getByRole('button', { name: 'Start', exact: true }).click();
+  await page.getByRole('button', { name: 'เริ่มเกม', exact: true }).click();
   await expect(narrative(page)).toHaveAttribute(
     'data-line-id',
     'demo.D1N-L001',
@@ -62,12 +62,12 @@ for (const viewport of [
     });
     // Keep the CSS-only DOM stress deterministic; reveal behavior has its own
     // real-hook tests, and the new default is covered by menu/options tests.
-    await page.getByRole('button', { name: 'Options', exact: true }).click();
+    await page.getByRole('button', { name: 'ตั้งค่า', exact: true }).click();
     await page.getByRole('checkbox', { name: 'แสดงข้อความทันที' }).check();
     await page
       .getByRole('button', { name: 'กลับหน้าหลัก', exact: true })
       .click();
-    await page.getByRole('button', { name: 'Start', exact: true }).click();
+    await page.getByRole('button', { name: 'เริ่มเกม', exact: true }).click();
     await reach(page, 'demo.D101-L001');
     await page.screenshot({
       path: testInfo.outputPath(
@@ -179,10 +179,12 @@ test('typewriter finish/advance, pause, hidden and reduced motion preserve contr
   if ((await narrative(page).getAttribute('data-revealing')) === 'true')
     await next(page).click();
   await page.getByRole('button', { name: 'พัก', exact: true }).click();
+  await page.getByRole('button', { name: 'ตั้งค่า', exact: true }).click();
   const instant = page.getByRole('checkbox', { name: 'แสดงข้อความทันที' });
   await expect(instant).not.toBeChecked();
   await instant.check();
   await instant.uncheck();
+  await page.getByRole('button', { name: 'กลับเมนูเกม', exact: true }).click();
   await page.getByRole('button', { name: 'เล่นต่อ', exact: true }).click();
   await expect(narrative(page)).toHaveAttribute('data-revealing', 'false'); // toggle does not restart displayed line
   await next(page).click();
@@ -236,7 +238,9 @@ test('typewriter finish/advance, pause, hidden and reduced motion preserve contr
   await page.emulateMedia({ reducedMotion: 'no-preference' });
   await expect(narrative(page)).toHaveAttribute('data-revealing', 'false');
   await page.getByRole('button', { name: 'พัก', exact: true }).click();
+  await page.getByRole('button', { name: 'ตั้งค่า', exact: true }).click();
   await instant.check();
+  await page.getByRole('button', { name: 'กลับเมนูเกม', exact: true }).click();
   await page.getByRole('button', { name: 'เล่นต่อ', exact: true }).click();
   await next(page).click();
   await expect(narrative(page)).toHaveAttribute('data-revealing', 'false');
@@ -259,7 +263,9 @@ test('missing Segmenter uses instant text and fullscreen rejection remains playa
     page.getByRole('status').filter({ hasText: 'ไม่สามารถแสดงเต็มจอได้' }),
   ).toBeVisible();
   await page.getByRole('button', { name: 'พัก', exact: true }).click();
+  await page.getByRole('button', { name: 'ตั้งค่า', exact: true }).click();
   await page.getByRole('checkbox', { name: 'แสดงข้อความทันที' }).uncheck();
+  await page.getByRole('button', { name: 'กลับเมนูเกม', exact: true }).click();
   await page.getByRole('button', { name: 'เล่นต่อ', exact: true }).click();
   await next(page).click();
   await expect(narrative(page)).toHaveAttribute('data-revealing', 'false');
@@ -281,7 +287,7 @@ test('portrait guard blocks touch, returns to landscape and touch choice selects
   await expect(page.locator('.demo-overlay')).toHaveAttribute('inert', '');
   await page.screenshot({ path: testInfo.outputPath('portrait-390x844.png') });
   await page.setViewportSize({ width: 844, height: 390 });
-  await page.getByRole('button', { name: 'Start', exact: true }).tap();
+  await page.getByRole('button', { name: 'เริ่มเกม', exact: true }).tap();
   for (const id of ['demo.D1N-L001', 'demo.D1N-L002']) {
     await expect(narrative(page)).toHaveAttribute('data-line-id', id);
     if ((await narrative(page).getAttribute('data-revealing')) === 'true')

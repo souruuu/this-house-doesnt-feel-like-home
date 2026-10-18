@@ -1522,3 +1522,585 @@ button {
 .demo-dialogue[role='alert'] p {
   margin: 0;
 }
+
+/* UI Phase 1 (Owner D-2/D-3/D-4, 18 Oct 2026): paper/wood/bevel language for
+   Main Menu, info panels, Notice, Pause and Options. Gameplay stays Dusty
+   Midnight Blue. Sizes are logical px; touch targets use the shared
+   --demo-control-size (max(logical, 44 / scale)). */
+.demo-shell[data-menu-screen='true'] .demo-overlay,
+.demo-shell:has(.demo-narrative[data-scene-id='NOTICE']) .demo-overlay {
+  /* Opaque layer over the Phaser menu portrait. The artist file is untouched;
+     multiply drops its white ground onto the paper tone (D-2b). */
+  background-color: var(--paper);
+  background-image: url('/assets/demo/menu/menu-cover-day.png');
+  background-size: 1920px 1080px;
+  background-repeat: no-repeat;
+  background-blend-mode: multiply;
+}
+.demo-shell .vn-main-menu h1,
+.demo-shell[data-compact='true'] .vn-main-menu h1 {
+  top: 84px;
+  left: 96px;
+  width: auto;
+  max-width: 784px;
+  font-family: var(--font-title);
+  font-size: 112px;
+  font-weight: 400;
+  line-height: 1.3;
+  letter-spacing: 0;
+  white-space: nowrap;
+  color: var(--ink-brown);
+  -webkit-text-stroke: 12px #fff6e2;
+  paint-order: stroke fill;
+  text-shadow: 6px 7px 0 var(--sky);
+}
+.demo-shell[data-compact='true'] .vn-main-menu h1 {
+  top: 36px;
+}
+.demo-shell .vn-menu-nav,
+.demo-shell[data-compact='true'] .vn-menu-nav {
+  top: 330px;
+  left: 150px;
+  width: auto;
+  gap: 28px;
+}
+.demo-shell[data-compact='true'] .vn-menu-nav {
+  top: 214px;
+  gap: 12px;
+}
+.demo-shell .ui-button.vn-bevel {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  min-width: 0;
+  min-height: max(88px, var(--demo-control-size));
+  padding: 6px 24px;
+  border: 5px solid var(--bevel-edge);
+  border-radius: 0;
+  background: var(--bevel-fill);
+  color: #1f3138;
+  box-shadow:
+    inset 4px 4px 0 #f1f6fb,
+    inset -4px -4px 0 #93a6b6,
+    6px 8px 0 rgb(60 45 30 / 28%);
+  font-family: var(--font-display);
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: center;
+  text-decoration: none;
+  text-shadow: none;
+  transition: none;
+}
+.demo-shell .vn-menu-nav .ui-button.vn-bevel {
+  align-self: start;
+  width: calc(var(--vn-menu-font) * 10);
+  font-size: calc(var(--vn-menu-font) * 0.95);
+}
+.demo-shell .vn-bevel .vn-nav-marker {
+  display: none;
+}
+.demo-shell .ui-button.vn-bevel:hover {
+  background: #dde6ef;
+  color: #1f3138;
+  border-color: var(--bevel-edge);
+  text-decoration: none;
+  text-shadow: none;
+}
+.demo-shell .ui-button.vn-bevel:focus-visible,
+.demo-shell .ui-button.vn-bevel[aria-current='page'] {
+  background: #f3d9a0;
+  border-color: var(--amber-edge);
+  color: #3a2410;
+  box-shadow:
+    inset 4px 4px 0 #fff0cb,
+    inset -4px -4px 0 #d9a85a,
+    6px 8px 0 rgb(60 45 30 / 28%);
+  text-decoration: none;
+}
+.demo-shell .ui-button.vn-bevel:focus-visible {
+  outline: 4px solid var(--amber-edge);
+  outline-offset: 5px;
+}
+.demo-shell .ui-button.vn-bevel:active {
+  transform: translate(3px, 4px);
+  box-shadow:
+    inset 4px 4px 0 #93a6b6,
+    inset -2px -2px 0 #f1f6fb,
+    2px 3px 0 rgb(60 45 30 / 28%);
+}
+.demo-shell .ui-button.vn-bevel[data-unavailable='true'],
+.demo-shell .ui-button.vn-bevel:disabled {
+  background: #e3e8ec;
+  border-color: #8a9aa1;
+  color: #3d4a50;
+  box-shadow:
+    inset 4px 4px 0 #f6f8fa,
+    inset -4px -4px 0 #c3ccd2,
+    6px 8px 0 rgb(60 45 30 / 16%);
+}
+.demo-shell .ui-button.vn-bevel[data-unavailable='true']:focus-visible {
+  border-color: var(--amber-edge);
+}
+.demo-shell .vn-bevel .vn-availability {
+  color: #4f5d64;
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: max(22px, calc(var(--vn-menu-font) * 0.55));
+}
+.vn-menu-characters {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.vn-menu-character {
+  position: absolute;
+  width: auto;
+  filter: drop-shadow(0 12px 14px rgb(40 50 70 / 30%));
+  user-select: none;
+}
+.vn-menu-character[data-menu-character='som'] {
+  left: 1010px;
+  top: 720px;
+  height: 420px;
+}
+.vn-menu-character[data-menu-character='manao'] {
+  left: 1330px;
+  top: 735px;
+  height: 400px;
+}
+.demo-shell[data-panel-open='true'] .vn-menu-characters {
+  visibility: visible;
+}
+.demo-shell .vn-menu-note,
+.demo-shell[data-compact='true'] .vn-menu-note {
+  left: 130px;
+  bottom: 30px;
+  width: auto;
+  max-width: 640px;
+  padding: 10px 22px;
+  border-radius: 10px;
+  background: rgb(251 246 234 / 92%);
+  color: var(--ink-brown);
+  font-family: var(--font-body);
+  font-size: max(24px, var(--vn-footnote-size));
+  line-height: 1.5;
+}
+.demo-shell[data-compact='true'] .vn-menu-note {
+  bottom: 14px;
+}
+.demo-shell[data-menu-screen='true'] .demo-toolbar .ui-button,
+.demo-shell:has(.demo-narrative[data-scene-id='NOTICE'])
+  .demo-toolbar
+  .ui-button {
+  min-height: var(--demo-control-size);
+  padding: 4px 28px;
+  border: 4px solid var(--bevel-edge);
+  border-radius: 0;
+  background: var(--bevel-fill);
+  color: #1f3138;
+  box-shadow:
+    inset 3px 3px 0 #f1f6fb,
+    inset -3px -3px 0 #93a6b6;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: var(--demo-control-font);
+}
+.demo-shell[data-menu-screen='true'] .demo-toolbar .ui-button:hover,
+.demo-shell:has(.demo-narrative[data-scene-id='NOTICE'])
+  .demo-toolbar
+  .ui-button:hover {
+  background: #dde6ef;
+  border-color: var(--bevel-edge);
+}
+.demo-shell[data-menu-screen='true'] .demo-toolbar .ui-button:focus-visible,
+.demo-shell:has(.demo-narrative[data-scene-id='NOTICE'])
+  .demo-toolbar
+  .ui-button:focus-visible {
+  background: #f3d9a0;
+  border-color: var(--amber-edge);
+  outline: 4px solid var(--amber-edge);
+  outline-offset: 4px;
+}
+
+/* Paper sign surfaces: info panels, Options, Pause, Notice. */
+.demo-shell .vn-screen-backdrop {
+  background: rgb(40 28 20 / 22%);
+}
+.demo-shell .vn-screen,
+.demo-shell .vn-screen.vn-info-screen,
+.demo-shell .vn-screen.vn-options-screen,
+.demo-shell .demo-pause.vn-paper-sign {
+  color: var(--ink-brown);
+  font-family: var(--font-body);
+  background: var(--paper-2);
+  border: 8px solid var(--wood);
+  border-radius: 22px;
+  box-shadow:
+    0 0 0 6px #d7b27c,
+    14px 18px 0 rgb(0 0 0 / 30%);
+}
+.demo-shell .vn-screen.vn-info-screen {
+  /* Stays in the paper zone left of the shop (right edge incl. ring <= 900). */
+  left: 60px;
+  top: 64px;
+  width: 820px;
+  height: 952px;
+  padding: 40px 48px;
+}
+.demo-shell .vn-screen-header {
+  position: relative;
+  padding-bottom: 40px;
+}
+.demo-shell .vn-screen-header::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 14px;
+  height: 6px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--wood) 0 18px,
+    transparent 18px 28px
+  );
+}
+.demo-shell .vn-screen-header h2 {
+  color: var(--ink-brown);
+  font-family: var(--font-display);
+  font-weight: 700;
+  text-shadow: 4px 4px 0 #bfe3f4;
+}
+.demo-shell .vn-screen-header p {
+  color: #5a4636;
+}
+.demo-shell .vn-info-content,
+.demo-shell[data-compact='true'] .vn-info-content {
+  overscroll-behavior: contain;
+  scrollbar-color: var(--wood) var(--paper-2);
+}
+.demo-shell .vn-info-content h3 {
+  color: var(--ink-brown);
+  font-family: var(--font-display);
+  font-weight: 600;
+}
+.demo-shell .vn-info-content p {
+  color: #4a3a2c;
+}
+.demo-shell .vn-screen .ui-button {
+  color: var(--ink-brown);
+  font-family: var(--font-display);
+  font-weight: 600;
+}
+.demo-shell .vn-screen .ui-button:hover,
+.demo-shell .vn-screen .ui-button[aria-pressed='true'] {
+  color: var(--ink-brown);
+}
+.demo-shell .vn-screen .ui-button:focus-visible,
+.demo-shell .vn-screen input:focus-visible {
+  outline: 4px solid var(--amber-edge);
+  outline-offset: 4px;
+}
+/* Back to Main: no underline, no hover glow, visible keyboard focus only. */
+.demo-shell .vn-screen .vn-return,
+.demo-shell .vn-screen .vn-return:hover {
+  color: var(--ink-brown);
+  text-decoration: none;
+  text-shadow: none;
+  filter: none;
+}
+.demo-shell .vn-screen .ui-button.vn-return:focus-visible {
+  outline: 4px solid var(--amber-edge);
+  outline-offset: 4px;
+}
+.demo-shell .vn-return-context {
+  color: #5a4636;
+}
+.demo-shell .vn-screen.vn-options-screen {
+  background: var(--paper-2);
+}
+.demo-shell .vn-options-nav {
+  border-right: 3px dashed rgb(107 68 48 / 55%);
+}
+.demo-shell .vn-screen .ui-button.vn-section-link {
+  min-height: var(--demo-control-size);
+  border: 0;
+  border-left: 8px solid transparent;
+  border-radius: 0 10px 10px 0;
+  background: transparent;
+  color: var(--ink-brown);
+}
+.demo-shell .vn-screen .ui-button.vn-section-link:hover {
+  background: rgb(107 68 48 / 8%);
+}
+.demo-shell .vn-screen .ui-button.vn-section-link[aria-current] {
+  border-left-color: var(--amber-edge);
+  background: #f3d9a0;
+  color: #3a2410;
+  font-weight: 700;
+}
+.demo-shell .vn-screen .vn-options-content {
+  background: rgb(251 246 234 / 88%);
+  border: 3px solid rgb(107 68 48 / 25%);
+  border-radius: 14px;
+  overscroll-behavior: contain;
+  scrollbar-color: var(--wood) var(--paper);
+}
+.demo-shell .vn-setting-section h3 {
+  color: var(--ink-brown);
+  font-family: var(--font-display);
+  font-weight: 600;
+}
+.demo-shell .vn-range-setting output,
+.demo-shell .vn-unavailable-setting > span > span,
+.demo-shell .vn-range-ends,
+.demo-shell .vn-setting-note,
+.demo-shell .vn-unavailable-setting {
+  color: #5a4636;
+}
+.demo-shell .vn-range-setting input[type='range'],
+.demo-shell .vn-range-setting input[type='range']:focus-visible,
+.demo-shell .vn-toggle-setting input {
+  accent-color: var(--wood);
+}
+.demo-shell .vn-unavailable-setting input[type='range'] {
+  accent-color: #8a9aa1;
+}
+.demo-shell .vn-screen .vn-display-modes .ui-button {
+  border: 4px solid var(--bevel-edge);
+  border-radius: 0;
+  background: var(--bevel-fill);
+  color: #1f3138;
+  box-shadow:
+    inset 3px 3px 0 #f1f6fb,
+    inset -3px -3px 0 #93a6b6;
+}
+.demo-shell .vn-screen .vn-display-modes .ui-button[aria-pressed='true'] {
+  border-color: var(--amber-edge);
+  background: #f3d9a0;
+  color: #3a2410;
+  text-decoration: none;
+}
+
+/* Pause: a sign on the left, not a centered modal (mock 6). */
+.demo-shell .demo-pause-backdrop {
+  display: block;
+  background: rgb(14 20 30 / 62%);
+  backdrop-filter: blur(3px);
+}
+.demo-shell .demo-pause.vn-paper-sign {
+  position: absolute;
+  left: 150px;
+  top: 110px;
+  width: 640px;
+  max-height: 860px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 46px 54px 40px;
+  gap: 24px;
+  scrollbar-color: var(--wood) var(--paper-2);
+}
+.demo-shell[data-compact='true'] .demo-pause.vn-paper-sign {
+  top: 36px;
+  max-height: 1008px;
+  padding: 30px 44px;
+  gap: 16px;
+}
+.demo-shell .demo-pause.vn-paper-sign h2 {
+  color: var(--ink-brown);
+  font-family: var(--font-display);
+  font-size: 84px;
+  font-weight: 700;
+  line-height: 1.1;
+  text-align: center;
+  text-shadow: 4px 4px 0 #bfe3f4;
+}
+.demo-shell[data-compact='true'] .demo-pause.vn-paper-sign h2 {
+  font-size: 72px;
+}
+.vn-dashed-rule {
+  flex-shrink: 0;
+  width: 100%;
+  height: 6px;
+  margin: 0 0 8px;
+  border: 0;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--wood) 0 18px,
+    transparent 18px 28px
+  );
+}
+.demo-shell .demo-pause .ui-button.vn-pause-action {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  min-height: max(96px, var(--demo-control-size));
+  padding: 6px 24px;
+  border-radius: 12px;
+  font-family: var(--font-display);
+  font-size: max(42px, var(--demo-control-font));
+  font-weight: 700;
+  line-height: 1.2;
+  text-decoration: none;
+  text-shadow: none;
+  transition: none;
+}
+.demo-shell .demo-pause .ui-button.vn-pause-resume {
+  border: 5px solid var(--amber-edge);
+  background: var(--amber);
+  color: #3a2410;
+  box-shadow:
+    inset 4px 4px 0 #ffd58f,
+    inset -4px -4px 0 #d08a22,
+    6px 8px 0 rgb(60 45 30 / 28%);
+}
+.demo-shell .demo-pause .ui-button.vn-pause-resume:hover {
+  background: #f5bf63;
+}
+.demo-shell .demo-pause .ui-button.vn-bevel {
+  border-radius: 12px;
+}
+.vn-pause-icon {
+  font-size: 0.8em;
+}
+/* Back to Main in Pause: framed, but no hover glow/underline. */
+.demo-shell .demo-pause .ui-button.vn-pause-home,
+.demo-shell .demo-pause .ui-button.vn-pause-home:hover {
+  border: 5px solid var(--danger);
+  background: transparent;
+  color: #8a2f1c;
+  box-shadow: none;
+  text-decoration: none;
+  text-shadow: none;
+  filter: none;
+}
+.demo-shell .demo-pause .ui-button.vn-pause-action:focus-visible {
+  outline: 4px solid var(--amber-edge);
+  outline-offset: 5px;
+}
+.demo-shell .demo-pause .ui-button.vn-pause-resume:active,
+.demo-shell .demo-pause .ui-button.vn-bevel:active {
+  transform: translate(3px, 4px);
+}
+.demo-shell .demo-pause .demo-setting-note,
+.demo-shell .demo-pause .demo-pause-footer p {
+  color: #5a4636;
+  font-family: var(--font-body);
+  font-size: max(24px, var(--vn-footnote-size));
+  line-height: 1.55;
+  text-align: center;
+}
+.demo-shell .demo-pause .demo-pause-footer {
+  border-top: 0;
+  padding-top: 14px;
+  gap: 14px;
+}
+
+/* Notice (in-session, before Day 1): same paper zone as the menu panels. */
+.demo-narrative[data-scene-id='NOTICE'] .demo-dialogue,
+.demo-shell[data-compact='true']
+  .demo-narrative[data-scene-id='NOTICE']
+  .demo-dialogue {
+  left: 60px;
+  width: 820px;
+  border: 8px solid var(--wood);
+  border-radius: 22px;
+  background: var(--paper-2);
+  color: var(--ink-brown);
+  box-shadow:
+    0 0 0 6px #d7b27c,
+    14px 18px 0 rgb(0 0 0 / 30%);
+}
+.demo-narrative[data-scene-id='NOTICE'] .demo-text-scroll {
+  overscroll-behavior: contain;
+  scrollbar-color: var(--wood) var(--paper-2);
+}
+.demo-narrative[data-scene-id='NOTICE'] .demo-speaker {
+  color: var(--ink-brown);
+  font-family: var(--font-display);
+  font-weight: 600;
+}
+.demo-shell
+  .demo-narrative[data-scene-id='NOTICE']
+  .demo-dialogue-footer
+  .ui-button {
+  color: var(--ink-brown);
+}
+.demo-shell
+  .demo-narrative[data-scene-id='NOTICE']
+  .demo-dialogue-footer
+  .ui-button:disabled:not(.demo-skip),
+.demo-shell
+  .demo-narrative[data-scene-id='NOTICE']
+  .demo-dialogue-footer
+  .demo-skip {
+  color: #5a4636;
+}
+.demo-shell
+  .demo-narrative[data-scene-id='NOTICE']
+  .demo-dialogue-footer
+  .ui-button:not(:disabled):hover {
+  background: rgb(107 68 48 / 10%);
+  color: var(--ink-brown);
+}
+.demo-shell
+  .demo-narrative[data-scene-id='NOTICE']
+  .demo-dialogue-footer
+  .ui-button:focus-visible,
+.demo-narrative[data-scene-id='NOTICE'] .demo-text-scroll:focus-visible {
+  outline: 4px solid var(--amber-edge);
+  outline-offset: 2px;
+}
+.demo-narrative[data-scene-id='NOTICE'] .demo-auto-mark {
+  border-color: #5a4636;
+}
+.demo-narrative[data-scene-id='NOTICE'] .demo-choice-region {
+  left: 60px;
+  width: 820px;
+}
+.demo-shell .demo-narrative[data-scene-id='NOTICE'] .demo-choices .ui-button {
+  border: 5px solid var(--bevel-edge);
+  border-radius: 0;
+  background: var(--bevel-fill);
+  color: #1f3138;
+  box-shadow:
+    inset 4px 4px 0 #f1f6fb,
+    inset -4px -4px 0 #93a6b6,
+    6px 8px 0 rgb(60 45 30 / 28%);
+  font-family: var(--font-display);
+  font-weight: 600;
+}
+.demo-shell
+  .demo-narrative[data-scene-id='NOTICE']
+  .demo-choices
+  .ui-button:hover {
+  background: #dde6ef;
+  border-color: var(--bevel-edge);
+}
+.demo-shell
+  .demo-narrative[data-scene-id='NOTICE']
+  .demo-choices
+  .ui-button:focus-visible,
+.demo-shell
+  .demo-narrative[data-scene-id='NOTICE']
+  .demo-choices
+  .ui-button[data-committed='true'] {
+  background: #f3d9a0;
+  border-color: var(--amber-edge);
+  color: #3a2410;
+  outline: 4px solid var(--amber-edge);
+  outline-offset: 4px;
+}
+.demo-shell[data-reduced-motion='true'] .vn-bevel:active,
+.demo-shell[data-reduced-motion='true'] .vn-pause-action:active {
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .demo-shell .vn-bevel:active,
+  .demo-shell .vn-pause-action:active {
+    transform: none;
+  }
+}

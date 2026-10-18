@@ -26,9 +26,9 @@ export function OptionsScreen({
 }) {
   const [section, setSection] = useState('reading');
   return (
-    <DemoScreen label="Options" className="vn-options-screen" onClose={onClose}>
+    <DemoScreen label="ตั้งค่า" className="vn-options-screen" onClose={onClose}>
       <header className="vn-screen-header">
-        <h2>Options</h2>
+        <h2>ตั้งค่า</h2>
         <p>ปรับจังหวะการอ่านและการแสดงผล</p>
       </header>
       <div className="vn-options-layout">

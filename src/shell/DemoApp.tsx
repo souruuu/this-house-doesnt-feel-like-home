@@ -33,6 +33,7 @@ import { useDialogueReveal } from '../ui/useDialogueReveal.ts';
 import { MainMenu } from '../ui/demo/MainMenu';
 import { OptionsScreen } from '../ui/demo/OptionsScreen';
 import { InfoScreen } from '../ui/demo/InfoScreen';
+import { PauseMenu } from '../ui/demo/PauseMenu';
 import {
   createDemoPreferences,
   type DemoPanel,
@@ -538,62 +539,15 @@ export function DemoApp() {
               </div>
             ) : null}
             {userPaused && !panel ? (
-              <div className="demo-pause-backdrop">
-                <div
-                  className="demo-pause"
-                  ref={pauseRef}
-                  role="dialog"
-                  aria-modal="true"
-                  aria-label="พักเกม"
-                  onKeyDown={trapFocus}
-                >
-                  <h2>พักเกม</h2>
-                  <DemoControl {...inputProps} onActivate={closePause}>
-                    เล่นต่อ
-                  </DemoControl>
-                  <DemoControl
-                    data-open-options
-                    {...inputProps}
-                    onActivate={() => openPanel('options')}
-                  >
-                    Options
-                  </DemoControl>
-                  <label className="demo-instant">
-                    <input
-                      type="checkbox"
-                      checked={instant}
-                      onChange={(event) =>
-                        setPreferences((previous) => ({
-                          ...previous,
-                          instant: event.target.checked,
-                        }))
-                      }
-                      onKeyDown={(event) => {
-                        if (event.repeat && event.key === ' ')
-                          event.preventDefault();
-                      }}
-                    />
-                    แสดงข้อความทันที
-                  </label>
-                  <p className="demo-setting-note">
-                    Auto หยุดเมื่อพักเกมและต้องเปิดใหม่หลังเล่นต่อ ·
-                    ปิดแสดงข้อความทันทีเพื่ออ่านทีละช่วง
-                    {reducedMotion
-                      ? ' · อุปกรณ์ตั้งค่าลดการเคลื่อนไหว จะแสดงข้อความทันที'
-                      : ''}
-                  </p>
-                  <div className="demo-pause-footer">
-                    <p>กลับหน้าหลักแล้วความคืบหน้ารอบนี้จะหาย</p>
-                    <DemoControl
-                      className="vn-back-main"
-                      {...inputProps}
-                      onActivate={home}
-                    >
-                      กลับหน้าหลัก
-                    </DemoControl>
-                  </div>
-                </div>
-              </div>
+              <PauseMenu
+                pauseRef={pauseRef}
+                guard={inputProps}
+                reducedMotion={reducedMotion}
+                onKeyDown={trapFocus}
+                onResume={closePause}
+                onOptions={() => openPanel('options')}
+                onHome={home}
+              />
             ) : null}
             {panel === 'options' ? (
               <OptionsScreen
