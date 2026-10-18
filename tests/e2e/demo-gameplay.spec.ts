@@ -1,5 +1,5 @@
 import { expect, test, type Page, type TestInfo } from '@playwright/test';
-import { demoPortrait } from '../../src/world/demoStage';
+import { DEMO_WINDOW } from '../../src/world/demoStage';
 
 test.use({ hasTouch: true });
 const url = 'http://127.0.0.1:4174/nested/game/';
@@ -102,7 +102,7 @@ for (const viewport of [
       const world = page.locator('[data-world-character-cue]');
       await expect(world).toHaveAttribute(
         'data-world-character-cue',
-        viewport.width === 844 ? '' : 'เด็กหญิง',
+        '', // D-5: no on-stage speaker chip at any size
       );
       const panel = page.locator('.demo-dialogue'),
         footer = page.locator('.demo-dialogue-footer');
@@ -116,7 +116,10 @@ for (const viewport of [
       const foot = (await footer.boundingBox())!;
       const bounds = (await panel.boundingBox())!;
       expect(header.y + header.height).toBeLessThanOrEqual(text.y);
-      expect(text.y + text.height).toBeLessThanOrEqual(foot.y);
+      if (viewport.width === 844)
+        // Touch compact (mock 7): controls sit beside the text.
+        expect(text.x + text.width).toBeLessThanOrEqual(foot.x + 1);
+      else expect(text.y + text.height).toBeLessThanOrEqual(foot.y);
       expect(foot.y + foot.height).toBeLessThanOrEqual(
         bounds.y + bounds.height,
       );
@@ -128,8 +131,9 @@ for (const viewport of [
       ).toBeGreaterThanOrEqual(16 / scale);
       for (const name of ['Skip — ยังไม่พร้อม', 'Auto', 'อ่านต่อ']) {
         const r = (await button(page, name).boundingBox())!;
-        // Touch: real 44 css px. Mouse: the 64-logical target scaled uniformly.
-        const min = viewport.width === 844 ? 43.9 : 64 * scale - 0.5;
+        // Touch compact: real 44 css px. Otherwise the 48-logical footer
+        // target of mock 3 (48 css px at 1920) scaled uniformly.
+        const min = viewport.width === 844 ? 43.9 : 48 * scale - 0.5;
         expect(r.height).toBeGreaterThanOrEqual(min);
         expect(r.width).toBeGreaterThanOrEqual(min);
         expect(r.x + r.width).toBeLessThanOrEqual(stage.x + stage.width);
@@ -175,16 +179,15 @@ for (const viewport of [
       await expect(page.locator('.demo-speaker-header')).toHaveCount(0);
       await expect(world).toHaveAttribute('data-world-character-cue', '');
       await shot(page, info, `narrator-${viewport.width}`);
-      expect((await panel.boundingBox())!.height).toBeLessThan(bounds.height);
+      // Mock 4: every line kind uses the same fixed box (no jump between lines).
+      expect((await panel.boundingBox())!.height).toBeCloseTo(bounds.height, 0);
       await next(page); // New authored girl dialogue, then the same original choice.
       await next(page);
       const choices = page.locator('[data-demo-choice]');
       await expect(choices).toHaveCount(2); // Actual approved first shop choice, not mockup count.
       const cb = (await page.locator('.demo-choices').boundingBox())!;
-      expect(cb.x).toBeGreaterThan(stage.x + demoPortrait.x * scale);
-      expect(cb.x + cb.width).toBeLessThan(
-        stage.x + (demoPortrait.x + demoPortrait.width) * scale,
-      );
+      expect(cb.x).toBeGreaterThan(stage.x + DEMO_WINDOW.x * scale);
+      expect(cb.x + cb.width).toBeLessThan(stage.x + 1920 * scale);
       expect(cb.y + cb.height).toBeLessThan((await panel.boundingBox())!.y);
       await expect(choices.first()).toBeFocused();
       await expect(button(page, 'Auto')).toBeEnabled();
@@ -281,7 +284,8 @@ test('Auto waits full reveal and delay, retains choice intent, resumes after man
   await button(page, 'Auto').press('Enter');
   await expect(view(page)).toHaveAttribute('data-revealing', 'true');
   await button(page, 'อ่านต่อ').press('Enter');
-  await expect(button(page, 'Auto')).toHaveAttribute('aria-pressed', 'false');
+  // D-6: manual input finishes the reveal but keeps Auto on.
+  await expect(button(page, 'Auto')).toHaveAttribute('aria-pressed', 'true');
   await expect(view(page)).toHaveAttribute('data-line-id', id!);
   await expect(view(page)).toHaveAttribute('data-revealing', 'false');
   await shot(page, info, 'full-reveal-after-manual');
@@ -289,24 +293,37 @@ test('Auto waits full reveal and delay, retains choice intent, resumes after man
   await expect(view(page)).toHaveAttribute('data-line-id', 'demo.D1N-L002');
 });
 
-test('B Auto cancels without catch-up on pause/options, hidden, blur, portrait and new run', async ({
+test('D-6 Auto suspends without catch-up on pause/options, hidden, blur, portrait; a new run starts off', async ({
   page,
 }, info) => {
-  test.setTimeout(45_000);
+  test.setTimeout(90_000);
   await start(page);
-  const id = await view(page).getAttribute('data-line-id');
+  const state = async () =>
+    `${await view(page).getAttribute('data-phase')}/${await view(page).getAttribute('data-line-id')}`;
+  // Move past the Notice choice so several lines can auto-advance.
+  await reach(page, 'demo.D1P-L001');
   await button(page, 'Auto').click();
+  await expect(view(page)).toHaveAttribute('data-auto', 'true');
   await button(page, 'พัก').click();
   await expect(page.locator('.demo-main-surface')).toHaveAttribute('inert', '');
+  let before = await state(); // Auto may step once before the click lands
   await expect(button(page, 'Auto')).toBeDisabled();
-  await expect(view(page)).toHaveAttribute('data-auto', 'false');
+  await expect(view(page)).toHaveAttribute('data-auto', 'true'); // intent kept
+  await expect(view(page)).toHaveAttribute('data-auto-execution', 'paused');
   await shot(page, info, 'pause');
   await button(page, 'ตั้งค่า').click();
+  await page.waitForTimeout(1300); // longer than the 1 s delay
   await button(page, 'กลับเมนูเกม').click();
   await button(page, 'เล่นต่อ').click();
-  await expect(button(page, 'Auto')).toHaveAttribute('aria-pressed', 'false');
+  expect(await state()).toBe(before); // nothing advanced while paused
+  await expect(button(page, 'Auto')).toHaveAttribute('aria-pressed', 'true');
+  await expect.poll(state, { timeout: 6000 }).not.toBe(before); // resumes
   for (const signal of ['hidden', 'blur', 'portrait']) {
-    await button(page, 'Auto').click();
+    await stable(page);
+    if ((await view(page).getAttribute('data-phase')) === 'choice') {
+      await page.locator('[data-demo-choice]').first().click();
+      await expect(view(page)).toHaveAttribute('data-phase', 'line');
+    }
     if (signal === 'hidden')
       await page.evaluate(() => {
         Object.defineProperty(document, 'hidden', {
@@ -319,13 +336,19 @@ test('B Auto cancels without catch-up on pause/options, hidden, blur, portrait a
       await page.evaluate(() => window.dispatchEvent(new Event('blur')));
     if (signal === 'portrait')
       await page.setViewportSize({ width: 390, height: 844 });
-    await expect(view(page)).toHaveAttribute('data-auto', 'false');
+    await expect(page.locator('.demo-shell')).toHaveAttribute(
+      'data-paused',
+      'true',
+    );
+    before = await state(); // Auto may step once before the signal lands
+    await expect(view(page)).toHaveAttribute('data-auto', 'true');
     if (signal === 'portrait') {
       await expect(page.getByRole('alert')).toContainText('กรุณาหมุนอุปกรณ์');
       await shot(page, info, 'portrait-guard');
     }
     await page.waitForTimeout(1150);
-    await expect(view(page)).toHaveAttribute('data-line-id', id!);
+    expect(await state()).toBe(before);
+    const resumed = Date.now();
     if (signal === 'hidden')
       await page.evaluate(() => {
         Reflect.deleteProperty(document, 'hidden');
@@ -336,9 +359,11 @@ test('B Auto cancels without catch-up on pause/options, hidden, blur, portrait a
     if (signal === 'portrait')
       await page.setViewportSize({ width: 844, height: 390 });
     await stable(page);
-    await expect(button(page, 'Auto')).toHaveAttribute('aria-pressed', 'false');
+    await expect(button(page, 'Auto')).toHaveAttribute('aria-pressed', 'true');
+    // Full 1 s delay restarts: no catch-up step sooner, then play resumes.
+    await expect.poll(state, { timeout: 6000 }).not.toBe(before);
+    expect(Date.now() - resumed).toBeGreaterThanOrEqual(900);
   }
-  await button(page, 'Auto').click();
   const oldRun = await view(page).getAttribute('data-run-id');
   await button(page, 'พัก').click();
   await button(page, 'กลับหน้าหลัก').click();
@@ -376,8 +401,11 @@ test('B approved route proves day-only cards, named cues/knowledge guard, longes
       transition: el.getAttribute('data-transition'),
       inert: el.hasAttribute('inert'),
       revealing: el.getAttribute('data-revealing'),
-      cue: document.querySelector<HTMLElement>('[data-world-character-cue]')
-        ?.dataset.worldCharacterCue,
+      // D-5: names live only on the dialogue plate; the stage chip is gone.
+      cue: el.querySelector('.demo-speaker')?.textContent ?? '',
+      stageCue: document.querySelector<HTMLElement>(
+        '[data-world-character-cue]',
+      )?.dataset.worldCharacterCue,
     }));
     const id = snapshot.id,
       day = snapshot.day;
@@ -417,6 +445,7 @@ test('B approved route proves day-only cards, named cues/knowledge guard, longes
     const phase = snapshot.phase;
     const cue = snapshot.cue;
     if (cue) cues.add(cue);
+    expect(snapshot.stageCue).toBe('');
     if (id === 'demo.D103-L014')
       await page.emulateMedia({ reducedMotion: 'reduce' });
     if (id === 'demo.D201-L001')
@@ -445,7 +474,7 @@ test('B approved route proves day-only cards, named cues/knowledge guard, longes
       await expect(page.locator('.demo-speaker')).toHaveText('เด็กชายที่ชายคา');
       await expect(page.locator('[data-world-character-cue]')).toHaveAttribute(
         'data-world-character-cue',
-        'เด็กชายที่ชายคา',
+        '',
       );
       await shot(page, info, 'kan-disclosure-anonymous-cue');
     }

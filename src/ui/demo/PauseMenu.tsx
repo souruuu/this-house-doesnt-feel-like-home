@@ -50,7 +50,7 @@ export function PauseMenu({
           ตั้งค่า
         </DemoControl>
         <p className="demo-setting-note">
-          Auto หยุดเมื่อพักเกมและต้องเปิดใหม่หลังเล่นต่อ
+          Auto จะพักตอนพักเกมและกลับมาต่อเองเมื่อเล่นต่อ
           {reducedMotion
             ? ' · อุปกรณ์ตั้งค่าลดการเคลื่อนไหว จะแสดงข้อความทันที'
             : ''}

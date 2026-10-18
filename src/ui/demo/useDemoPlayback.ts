@@ -47,7 +47,9 @@ export function createAutoForward(
         if (!enabled || generation !== expected) return;
         pending = null;
         generation++; // Consume before any callback can synchronously reenter.
-        if (!isCurrent() || !advance()) setEnabled(false);
+        // D-6: a stale or suspended moment never turns Auto off; the hook
+        // re-arms a full delay when the view or the blocking state changes.
+        if (isCurrent()) advance();
       }, delay);
     },
   };
@@ -64,24 +66,33 @@ export function useDemoPlayback({
   blocked,
   revealing,
   delaySeconds,
+  resetKey = '',
 }: {
   controller: Controller | undefined;
   view: NarrativeView | null;
   blocked: boolean;
   revealing: boolean;
   delaySeconds: number;
+  // Changes (e.g. viewport size) restart the full delay without stopping Auto.
+  resetKey?: string;
 }) {
   const [auto] = useState(createAutoForward);
   const enabled = useSyncExternalStore(auto.subscribe, auto.getSnapshot);
   useEffect(() => {
+    // Auto ends only at the end of the demo (or via its own button).
     if (
       !controller ||
       !view ||
       !['line', 'choice'].includes(view.phase) ||
-      blocked ||
       view.presentation.sceneId === 'DEMO_END'
     ) {
       auto.stop();
+      return;
+    }
+    // Pause, panels, blur, hidden tab, resize and fullscreen only suspend:
+    // the pending timer is dropped and a full delay restarts afterwards.
+    if (blocked) {
+      auto.cancelPending();
       return;
     }
     if (enabled && view.phase === 'line' && !revealing && !view.paused) {
@@ -103,7 +114,16 @@ export function useDemoPlayback({
       );
     }
     return auto.cancelPending;
-  }, [auto, controller, view, enabled, blocked, revealing, delaySeconds]);
+  }, [
+    auto,
+    controller,
+    view,
+    enabled,
+    blocked,
+    revealing,
+    delaySeconds,
+    resetKey,
+  ]);
   useEffect(() => auto.stop, [auto, view?.sessionId]);
   const execution = blocked
     ? 'paused'

@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import { demoPortrait, demoMenuPortrait } from '../../src/world/demoStage';
+import { DEMO_MENU_PAPER_ZONE, DEMO_WINDOW } from '../../src/world/demoStage';
 
 const production = 'http://127.0.0.1:4174/nested/game/';
 const narrative = (page: Page) => page.getByRole('region', { name: 'บทสนทนา' });
@@ -57,7 +57,7 @@ for (const viewport of [
       const scale = stage.width / 1920;
       const menu = (await page.locator('.vn-main-menu h1').boundingBox())!;
       expect(menu.x + menu.width).toBeLessThan(
-        stage.x + demoMenuPortrait.x * scale,
+        stage.x + DEMO_MENU_PAPER_ZONE * scale,
       );
       await page.screenshot({
         path: testInfo.outputPath(
@@ -100,9 +100,9 @@ for (const viewport of [
       expect(metrics.scroll).toBeGreaterThan(metrics.height);
       expect(metrics.scrollWidth).toBeLessThanOrEqual(metrics.width + 1);
       const button = (await next(page).boundingBox())!;
-      // Touch: real 44 css px. Mouse: the 64-logical target scaled uniformly.
+      // Touch: real 44 css px. Mouse: mock 3's 48-logical target scaled uniformly.
       expect(button.height).toBeGreaterThanOrEqual(
-        viewport.width === 844 ? 43.9 : 64 * scale - 0.5,
+        viewport.width === 844 ? 43.9 : 48 * scale - 0.5,
       );
       expect(button.y + button.height).toBeLessThan(stage.y + stage.height);
       await expect(page.locator('.demo-speaker')).toBeVisible();
@@ -128,10 +128,8 @@ for (const viewport of [
       expect(await choices.count()).toBeGreaterThan(1);
       const bounds = (await page.locator('.demo-choices').boundingBox())!;
       const dialogue = (await page.locator('.demo-dialogue').boundingBox())!;
-      expect(bounds.x).toBeGreaterThan(stage.x + demoPortrait.x * scale);
-      expect(bounds.x + bounds.width).toBeLessThan(
-        stage.x + (demoPortrait.x + demoPortrait.width) * scale,
-      );
+      expect(bounds.x).toBeGreaterThan(stage.x + DEMO_WINDOW.x * scale);
+      expect(bounds.x + bounds.width).toBeLessThan(stage.x + 1920 * scale);
       expect(bounds.y + bounds.height).toBeLessThan(dialogue.y);
       await expect(choices.first()).toBeFocused();
       const id = await narrative(page).getAttribute('data-line-id');

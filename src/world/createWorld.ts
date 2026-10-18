@@ -5,9 +5,11 @@ import type { GameBridge } from './GameBridge';
 import { ManagedGame } from './ManagedGame';
 import { DemoCharacterStage } from './DemoCharacterStage';
 import {
-  containArtwork,
-  demoMenuPortrait,
-  demoGameplayLayout,
+  DEMO_OCCLUSION,
+  DEMO_STAGE_ART,
+  DEMO_TABLE_POLYGON,
+  demoStageArt,
+  type DemoStageTime,
 } from './demoStage';
 
 export function createWorld(
@@ -25,10 +27,15 @@ export function createWorld(
 
     preload() {
       if (demo) {
-        for (const time of ['morning', 'evening', 'night'] as const)
+        const base = import.meta.env.BASE_URL;
+        for (const art of new Set(
+          Object.values(demoStageArt).map((item) => item.texture),
+        ))
           this.load.image(
-            `demo.shop.${time}`,
-            resolveAssetUrl(`demo.shop.${time}`),
+            art,
+            base +
+              Object.values(demoStageArt).find((item) => item.texture === art)!
+                .path,
           );
         for (const character of ['som', 'manao', 'nut', 'kant'] as const)
           this.load.image(
@@ -49,74 +56,87 @@ export function createWorld(
       });
     }
 
+    // Counter occlusion without new art: the untouched stage image is drawn
+    // again, clipped to the table polygon, above the character layer. The
+    // time-of-day tint is baked in so the table matches the tinted background.
+    private foreground(time: DemoStageTime) {
+      const { texture, tint } = demoStageArt[time];
+      const key = `${texture}.table-mask.${time}`;
+      if (this.textures.exists(key)) return key;
+      const source = this.textures.get(texture).getSourceImage() as
+        HTMLImageElement | HTMLCanvasElement;
+      const canvas = this.textures.createCanvas(
+        key,
+        DEMO_STAGE_ART.width,
+        DEMO_STAGE_ART.height,
+      )!;
+      const context = canvas.getContext();
+      context.beginPath();
+      DEMO_TABLE_POLYGON.forEach(([x, y], index) =>
+        index ? context.lineTo(x, y) : context.moveTo(x, y),
+      );
+      context.closePath();
+      context.clip();
+      context.drawImage(
+        source,
+        0,
+        0,
+        DEMO_STAGE_ART.width,
+        DEMO_STAGE_ART.height,
+      );
+      if (tint) {
+        context.globalCompositeOperation = tint.blend;
+        context.fillStyle = `rgb(${tint.color >> 16} ${(tint.color >> 8) & 255} ${tint.color & 255} / ${tint.alpha})`;
+        context.fillRect(0, 0, DEMO_STAGE_ART.width, DEMO_STAGE_ART.height);
+      }
+      canvas.refresh();
+      return key;
+    }
+
     create() {
       if (demo) {
         this.cameras.main.setBackgroundColor('#000000');
-        const background = this.add.image(960, 540, 'demo.shop.morning');
+        const background = this.add
+          .image(960, 540, demoStageArt.morning.texture)
+          .setDisplaySize(DEMO_STAGE_ART.width, DEMO_STAGE_ART.height);
         characterStage = new DemoCharacterStage(this, parent);
         characterStage.setPaused(worldPaused);
-        const cue = this.add.graphics().setDepth(20);
-        const label = this.add
-          .text(0, 0, '', {
-            fontFamily: "'Leelawadee UI', Tahoma, sans-serif",
-            fontSize: '30px',
-            color: '#f4f0e7',
-          })
-          .setOrigin(0, 0.5)
-          .setDepth(21);
+        const table = this.add
+          .image(960, 540, this.foreground('morning'))
+          .setDepth(15);
+        // Evening/night tint on the background only: below the characters
+        // (depth 10); the table foreground carries the same tint.
+        const tint = this.add
+          .rectangle(960, 540, DEMO_STAGE_ART.width, DEMO_STAGE_ART.height)
+          .setDepth(1)
+          .setBlendMode(Phaser.BlendModes.MULTIPLY)
+          .setVisible(false);
+        // No speaker chip on the stage (D-5): names live only on the dialogue.
+        parent.dataset.worldCharacterCue = '';
         unsubscribePresentation = bridge.subscribePresentation((view) => {
-          const key = `demo.shop.${view.background}`;
-          if (!this.textures.exists(key)) {
+          const art = demoStageArt[view.background];
+          if (!this.textures.exists(art.texture)) {
             parent.dataset.worldState = 'error';
             return;
           }
-          background.setTexture(key);
-          const source = this.textures.get(key).getSourceImage();
-          const fitted = containArtwork(source.width, source.height);
-          const x = view.layout === 'menu' ? demoMenuPortrait.x : fitted.x;
-          this.cameras.main.setBackgroundColor(
-            view.layout === 'menu' ? '#101d2d' : '#000000',
-          );
-          background
-            .setPosition(x + fitted.width / 2, fitted.y + fitted.height / 2)
-            .setScale(fitted.scale);
+          background.setTexture(art.texture);
+          table
+            .setTexture(this.foreground(view.background))
+            .setVisible(
+              DEMO_OCCLUSION === 'mask' && view.layout === 'gameplay',
+            );
+          if (art.tint)
+            tint.setFillStyle(art.tint.color, art.tint.alpha).setVisible(true);
+          else tint.setVisible(false);
           characterStage?.present(view);
-          const placement = demoGameplayLayout(view.viewportScale ?? 1).cue;
-          const visible =
-            view.layout !== 'menu' &&
-            placement !== null &&
-            view.characterLabel !== null;
-          cue.clear().setVisible(visible);
-          label.setVisible(visible);
-          parent.dataset.worldCharacterCue = visible
-            ? view.characterLabel!
-            : '';
-          if (visible && placement) {
-            label
-              .setText(view.characterLabel!)
-              .setFontSize(placement.fontSize)
-              .setPosition(
-                placement.x + 20,
-                placement.y + placement.height / 2,
-              );
-            cue
-              .fillStyle(0x1c2b33, 0.94)
-              .lineStyle(2, 0x86a5a8)
-              .fillRoundedRect(
-                placement.x,
-                placement.y,
-                label.width + 40,
-                placement.height,
-                8,
-              )
-              .strokeRoundedRect(
-                placement.x,
-                placement.y,
-                label.width + 40,
-                placement.height,
-                8,
-              );
-          }
+          parent.dataset.worldStage = JSON.stringify({
+            time: view.background,
+            texture: art.texture,
+            tint: art.tint
+              ? { color: art.tint.color, alpha: art.tint.alpha }
+              : null,
+            occlusion: DEMO_OCCLUSION,
+          });
         });
         parent.dataset.worldState = 'ready';
         return;

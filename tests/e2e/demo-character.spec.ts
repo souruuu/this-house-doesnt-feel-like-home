@@ -1,5 +1,5 @@
 import { expect, test, type Page, type TestInfo } from '@playwright/test';
-import { demoMenuPortrait, demoPortrait } from '../../src/world/demoStage';
+import { DEMO_MENU_PAPER_ZONE, DEMO_WINDOW } from '../../src/world/demoStage';
 
 test.use({ hasTouch: true });
 const url = 'http://127.0.0.1:4174/nested/game/';
@@ -116,7 +116,9 @@ for (const viewport of [
         const panel = page.getByRole('dialog', { name, exact: true });
         const r = (await panel.boundingBox())!;
         expect(r.x).toBeGreaterThanOrEqual(rect.x);
-        expect(r.x + r.width).toBeLessThan(rect.x + demoMenuPortrait.x * scale);
+        expect(r.x + r.width).toBeLessThan(
+          rect.x + DEMO_MENU_PAPER_ZONE * scale,
+        );
         expect(r.y + r.height).toBeLessThanOrEqual(rect.y + rect.height);
         await shot(page, info, name.toLowerCase() + '-safe-bounds');
         const back = button(page, 'กลับหน้าหลัก');
@@ -155,7 +157,7 @@ for (const viewport of [
       await button(page, 'เริ่มเกม').click();
       const notice = (await page.locator('.demo-dialogue').boundingBox())!;
       expect(notice.x + notice.width).toBeLessThan(
-        rect.x + demoMenuPortrait.x * scale,
+        rect.x + DEMO_MENU_PAPER_ZONE * scale,
       );
       await shot(page, info, 'notice-safe-bounds');
       const captures: Record<string, string> = {
@@ -186,17 +188,18 @@ for (const viewport of [
           expect(visible[0].character).toBe(expected);
           const actor = visible[0];
           expect(actor.position).toBe('left');
-          expect(actor.x).toBeGreaterThan(demoPortrait.x);
+          expect(actor.x).toBeGreaterThan(DEMO_WINDOW.x);
           expect(actor.x + actor.width).toBeLessThan(
-            demoPortrait.x + demoPortrait.width,
+            DEMO_WINDOW.x + DEMO_WINDOW.width,
           );
           expect(actor.y).toBeGreaterThan(0);
           const dialogue = (await page
             .locator('.demo-dialogue')
             .boundingBox())!;
-          expect(rect.y + (actor.y + actor.height) * scale).toBeLessThan(
-            dialogue.y,
-          );
+          // Only the part hidden behind the table (y > 665) may sit under
+          // the box (touch compact uses a taller box, mock 7).
+          expect(rect.y + 665 * scale).toBeLessThan(dialogue.y);
+          expect(rect.y + actor.y * scale).toBeLessThan(dialogue.y);
           await shot(page, info, 'character-' + captures[id]);
           evidence.push({ id, renderer: s });
           seen.add(captures[id]);
@@ -230,9 +233,7 @@ for (const viewport of [
             actor = s.slots.find((s) => s.visible)!;
           const c = (await page.locator('.demo-choice-region').boundingBox())!;
           expect(c.x).toBeGreaterThan(rect.x + (actor.x + actor.width) * scale);
-          expect(c.x + c.width).toBeLessThan(
-            rect.x + (demoPortrait.x + demoPortrait.width) * scale,
-          );
+          expect(c.x + c.width).toBeLessThan(rect.x + 1920 * scale);
           const revision = await view(page).getAttribute('data-view-revision');
           await shot(page, info, 'choice-beside-character');
           await expect(view(page)).toHaveAttribute(

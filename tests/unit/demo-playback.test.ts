@@ -46,7 +46,7 @@ it('a superseded callback cannot advance or disable a newly enabled operation', 
   expect(fresh).toHaveBeenCalledTimes(1);
 });
 
-it('rejects an invalidated live guard at the physical continue boundary', () => {
+it('rejects an invalidated live guard without turning Auto off (D-6)', () => {
   vi.useFakeTimers();
   const auto = createAutoForward(),
     advance = vi.fn(() => true);
@@ -56,7 +56,9 @@ it('rejects an invalidated live guard at the physical continue boundary', () => 
   safe = false;
   vi.advanceTimersByTime(1000);
   expect(advance).not.toHaveBeenCalled();
-  expect(auto.getSnapshot()).toBe(false);
+  expect(auto.getSnapshot()).toBe(true); // suspended moment, intent kept
+  vi.advanceTimersByTime(10000);
+  expect(advance).not.toHaveBeenCalled(); // consumed: no catch-up replay
 });
 
 it('restarts the entire delay without catch-up when timing is changed', () => {
@@ -100,7 +102,7 @@ it('uses the real controller guard: a manually consumed request cannot replay fa
   session.controller.continue(request); // Manual interaction wins the same request.
   const live = session.controller.getSnapshot();
   vi.advanceTimersByTime(1000);
-  expect(auto.getSnapshot()).toBe(false);
+  expect(auto.getSnapshot()).toBe(true); // stale request: no advance, Auto stays on
   expect(session.controller.getSnapshot()).toBe(live);
   expect(session.store.getState().committedEventIds).toEqual(ledger);
   session.controller.dispose();
@@ -141,5 +143,28 @@ it('a delivered choice-wait timer cannot consume a new line timer', () => {
   expect(advance).not.toHaveBeenCalled();
   callbacks[1]();
   callbacks[1]();
+  expect(advance).toHaveBeenCalledTimes(1);
+});
+
+it('D-6: suspension (pause/blur/resize) keeps Auto on and restarts a full delay; only stop() turns it off', () => {
+  vi.useFakeTimers();
+  const auto = createAutoForward(),
+    advance = vi.fn(() => true);
+  auto.enable();
+  auto.schedule(2000, () => true, advance);
+  vi.advanceTimersByTime(1500);
+  auto.cancelPending(); // e.g. pause opened / window blurred / resized
+  vi.advanceTimersByTime(5000);
+  expect(advance).not.toHaveBeenCalled();
+  expect(auto.getSnapshot()).toBe(true);
+  auto.schedule(2000, () => true, advance); // resumed: full delay again
+  vi.advanceTimersByTime(1999);
+  expect(advance).not.toHaveBeenCalled();
+  vi.advanceTimersByTime(1);
+  expect(advance).toHaveBeenCalledTimes(1);
+  auto.stop(); // the Auto button or the demo end
+  expect(auto.getSnapshot()).toBe(false);
+  auto.schedule(2000, () => true, advance);
+  vi.advanceTimersByTime(5000);
   expect(advance).toHaveBeenCalledTimes(1);
 });

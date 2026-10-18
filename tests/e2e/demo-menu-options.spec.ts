@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import { demoMenuPortrait } from '../../src/world/demoStage';
+import { DEMO_MENU_PAPER_ZONE } from '../../src/world/demoStage';
 
 const url = 'http://127.0.0.1:4174/nested/game/';
 const button = (page: Page, name: string) =>
@@ -36,7 +36,7 @@ for (const viewport of [
         .getByRole('heading', { level: 1 })
         .boundingBox())!;
       expect(title.x + title.width).toBeLessThan(
-        stage.x + demoMenuPortrait.x * scale,
+        stage.x + DEMO_MENU_PAPER_ZONE * scale,
       );
       for (const name of [
         'เริ่มเกม',

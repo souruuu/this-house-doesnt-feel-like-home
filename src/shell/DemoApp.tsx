@@ -19,12 +19,7 @@ import { DemoControl } from '../ui/DemoControl';
 import { WorldHost } from '../world/WorldHost.tsx';
 import type { DemoWorldView } from '../world/GameBridge.ts';
 import { fitViewport } from './viewport.ts';
-import {
-  demoPortrait,
-  demoMenuPortrait,
-  demoGameplayLayout,
-  demoCharacterLayout,
-} from '../world/demoStage.ts';
+import { demoGameplayLayout } from '../world/demoStage.ts';
 import { resolveDemoCharacters } from '../world/demoCharacterCues';
 import { DialoguePanel } from '../ui/demo/DialoguePanel';
 import { useDemoPlayback } from '../ui/demo/useDemoPlayback';
@@ -52,10 +47,7 @@ const names: Record<string, string> = {
   none: '',
   player: 'เจ้าของร้าน',
 };
-const initialWorld: DemoWorldView = {
-  background: 'morning',
-  characterLabel: null,
-};
+const initialWorld: DemoWorldView = { background: 'morning' };
 
 function worldView(
   view: NarrativeView | null,
@@ -71,10 +63,6 @@ function worldView(
         : scene.endsWith('-03')
           ? 'evening'
           : 'morning',
-    characterLabel:
-      view.phase === 'line' && view.presentation.speaker !== 'player'
-        ? names[view.presentation.speaker] || null
-        : null,
     characterStage: {
       contextKey: `${view.sessionId}/${scene}`,
       characters: resolveDemoCharacters(view),
@@ -172,15 +160,13 @@ export function DemoApp() {
     blocked: paused,
     revealing: reveal.revealing,
     delaySeconds: preferences.autoForwardSeconds,
+    resetKey: `${bounds.width}x${bounds.height}`,
   });
   const scale = uiScale;
   const gameplay = demoGameplayLayout(scale);
-  const characterLayout = demoCharacterLayout(scale);
   const overlayStyle: CSSProperties & {
     [key: `--${'demo' | 'vn'}-${string}`]: string;
   } = {
-    '--demo-art-left': `${demoPortrait.x}px`,
-    '--demo-art-width': `${demoPortrait.width}px`,
     '--demo-body-size': `${Math.max(36, 17 / scale)}px`,
     '--demo-control-font': `${Math.max(30, 16 / scale)}px`,
     '--demo-small-size': `${Math.max(28, 14 / scale)}px`,
@@ -196,14 +182,14 @@ export function DemoApp() {
     '--vn-body-size': `${gameplay.bodySize}px`,
     '--vn-speaker-size': `${gameplay.speakerSize}px`,
     '--vn-footer-height': `${gameplay.footerHeight}px`,
-    '--vn-choice-top': `${gameplay.choiceTop}px`,
-    '--vn-choice-height': `${gameplay.choiceBottom - gameplay.choiceTop}px`,
+    '--vn-choice-left': `${gameplay.choice.x}px`,
+    '--vn-choice-width': `${gameplay.choice.width}px`,
+    '--vn-choice-top': `${gameplay.choice.top}px`,
+    '--vn-choice-height': `${gameplay.choice.bottom - gameplay.choice.top}px`,
+    '--vn-choice-dialogue-top': `${gameplay.choiceDialogue.y}px`,
+    '--vn-choice-dialogue-height': `${gameplay.choiceDialogue.height}px`,
     '--vn-menu-font': `${Math.max(42, 22 / scale)}px`,
-    '--vn-menu-art-left': `${demoMenuPortrait.x}px`,
-    '--vn-menu-art-width': `${demoMenuPortrait.width}px`,
     '--vn-heading-font': `${Math.max(80, 28 / scale)}px`,
-    '--vn-stage-choice-left': `${characterLayout.choiceLeft}px`,
-    '--vn-stage-choice-width': `${characterLayout.choiceWidth}px`,
   };
 
   useEffect(() => {
@@ -213,7 +199,6 @@ export function DemoApp() {
     const pointer = window.matchMedia('(pointer: coarse)');
     const measure = () => {
       invalidateInput();
-      stopAuto();
       const rect = shellRef.current!.getBoundingClientRect();
       setBounds(fitViewport(rect.width, rect.height));
       setPortraitTouch(orientation.matches);
@@ -226,24 +211,20 @@ export function DemoApp() {
     measure();
     const visibility = () => {
       invalidateInput();
-      if (document.hidden) stopAuto();
       setHidden(document.hidden);
     };
     const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
     const changeMotion = () => {
       invalidateInput();
-      stopAuto();
       setSystemReducedMotion(motion.matches);
     };
     const blur = () => {
       invalidateInput();
-      stopAuto();
       setFocused(false);
     };
     const focus = () => setFocused(true);
     const display = () => {
       invalidateInput();
-      stopAuto();
       setIsFullscreen(Boolean(document.fullscreenElement));
     };
     document.addEventListener('visibilitychange', visibility);
@@ -276,7 +257,6 @@ export function DemoApp() {
         if (!userPaused && document.activeElement instanceof HTMLElement)
           returnFocus.current = document.activeElement;
         invalidateInput();
-        stopAuto();
         setUserPaused(!userPaused);
       }
     };
@@ -342,7 +322,6 @@ export function DemoApp() {
   };
   function openPanel(next: DemoPanel) {
     invalidateInput();
-    stopAuto();
     // WebKit pointer clicks need not focus buttons. Restore the known opener,
     // rather than an unrelated previously focused control.
     const opener = session
@@ -386,13 +365,11 @@ export function DemoApp() {
       view.phase !== 'line'
     )
       return;
-    stopAuto();
     if (reveal.finish()) return;
     session.controller.continue(view);
   }
   function openPause() {
     invalidateInput();
-    stopAuto();
     if (document.activeElement instanceof HTMLElement)
       returnFocus.current = document.activeElement;
 
@@ -404,7 +381,6 @@ export function DemoApp() {
   }
   async function fullscreen(mode?: 'windowed' | 'fullscreen') {
     invalidateInput();
-    stopAuto();
     setFullscreenMessage('');
     try {
       if (mode === 'windowed') {

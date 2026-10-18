@@ -106,6 +106,13 @@ export function DialoguePanel({
         </DemoControl>
       </div>
     );
+  // D-5: three visible line kinds. Quotes/plates are presentation only (CSS),
+  // never added to the approved text content.
+  const lineKind = !speaker
+    ? 'narration'
+    : view.presentation.speaker === 'player'
+      ? 'player'
+      : 'speech';
   const canAuto =
     ['line', 'choice'].includes(view.phase) &&
     view.presentation.sceneId !== 'DEMO_END';
@@ -172,6 +179,7 @@ export function DialoguePanel({
       <div
         className={`demo-dialogue${view.phase === 'choice' ? ' demo-dialogue--choice' : ''}`}
         data-has-speaker={Boolean(speaker)}
+        data-line-kind={lineKind}
         data-ending={view.presentation.sceneId === 'DEMO_END'}
         data-can-continue={!paused && view.phase === 'line'}
         onPointerDown={begin}
@@ -234,25 +242,6 @@ export function DialoguePanel({
           {view.line?.text}
         </span>
         <footer className="demo-dialogue-footer" aria-label="ควบคุมบทสนทนา">
-          <span id="demo-skip-reason" className="demo-sr-only">
-            Skip ยังไม่พร้อม รอการอนุมัติระบบประวัติข้อความที่อ่านแล้ว
-          </span>
-          <DemoControl
-            {...guard}
-            className="demo-skip"
-            disabled={paused}
-            aria-disabled="true"
-            aria-describedby="demo-skip-reason"
-            aria-label="Skip — ยังไม่พร้อม"
-            onActivate={() => setNotice((previous) => previous + 1)}
-          >
-            Skip
-          </DemoControl>
-          {notice ? (
-            <span className="demo-skip-notice" role="status">
-              ยังไม่พร้อมใช้งาน
-            </span>
-          ) : null}
           <DemoControl
             {...guard}
             className="demo-auto"
@@ -275,6 +264,25 @@ export function DialoguePanel({
               <small className="demo-auto-wait">รอเลือก</small>
             ) : null}
           </DemoControl>
+          <span id="demo-skip-reason" className="demo-sr-only">
+            Skip ยังไม่พร้อม รอการอนุมัติระบบประวัติข้อความที่อ่านแล้ว
+          </span>
+          <DemoControl
+            {...guard}
+            className="demo-skip"
+            disabled={paused}
+            aria-disabled="true"
+            aria-describedby="demo-skip-reason"
+            aria-label="Skip — ยังไม่พร้อม"
+            onActivate={() => setNotice((previous) => previous + 1)}
+          >
+            Skip
+          </DemoControl>
+          {notice ? (
+            <span className="demo-skip-notice" role="status">
+              ยังไม่พร้อมใช้งาน
+            </span>
+          ) : null}
           {view.phase === 'ended' ? (
             <DemoControl
               {...guard}

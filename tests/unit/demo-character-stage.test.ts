@@ -12,7 +12,6 @@ import { DemoCharacterStage } from '../../src/world/DemoCharacterStage';
 import {
   demoCharacterLayout,
   demoGameplayLayout,
-  demoPortrait,
 } from '../../src/world/demoStage';
 import type { DemoWorldView } from '../../src/world/GameBridge';
 import provenance from '../../src/assets/demo-character-provenance.json';
@@ -136,18 +135,19 @@ describe('approved character participation, not speaker inference', () => {
     },
   );
   it.each([1, 2 / 3, 390 / 1080])(
-    'reserves separate portrait sprite/choice/dialogue bounds at %s',
+    'anchors the sprite to the artwork, independent of viewport scale %s',
     (scale) => {
-      const stage = demoCharacterLayout(scale);
-      expect(stage.left).toBeGreaterThan(demoPortrait.x);
-      expect(stage.bottom).toBeLessThan(demoGameplayLayout(scale).dialogue.y);
-      expect(stage.bottom - stage.height).toBeGreaterThan(100);
-      expect(stage.choiceLeft).toBeGreaterThan(stage.left + stage.height);
-      expect(stage.choiceLeft + stage.choiceWidth).toBeLessThan(
-        demoPortrait.x + demoPortrait.width,
+      const stage = demoCharacterLayout;
+      const gameplay = demoGameplayLayout(scale);
+      expect(gameplay.dialogue.y).toBeGreaterThan(665); // table back edge
+      if (!gameplay.compact)
+        expect(stage.baseline).toBeLessThan(gameplay.dialogue.y);
+      expect(stage.baseline - stage.height).toBeGreaterThan(100);
+      expect(stage.center.left + stage.height / 2).toBeLessThan(
+        gameplay.choice.x,
       );
-      expect(stage.height / 1080).toBeGreaterThanOrEqual(0.28);
-      expect(stage.height / 1080).toBeLessThanOrEqual(0.36);
+      expect(stage.height / 1080).toBeGreaterThanOrEqual(0.4);
+      expect(stage.height / 1080).toBeLessThanOrEqual(0.47);
     },
   );
   it('ships four original RGBA PNGs byte-for-byte and no unverified stage layers', () => {
@@ -261,7 +261,6 @@ function renderer() {
   ): DemoWorldView => ({
     layout: 'gameplay',
     background: 'morning',
-    characterLabel: null,
     characterStage: {
       contextKey: context,
       characters: [{ character, position: 'left' }],

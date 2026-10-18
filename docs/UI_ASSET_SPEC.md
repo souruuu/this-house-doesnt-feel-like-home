@@ -53,6 +53,17 @@ Owner Decisions Addendum D-2/D-2b/D-3/D-4/D-7 supersede, for these surfaces only
 - **Pause:** `src/ui/demo/PauseMenu.tsx` (presentation only; DemoApp keeps pause/Auto/focus logic). Left sign ≈ left 150 / top 110 / width 640 over `rgb(14 20 30 / 62%)` + 3px blur; heading พักเกม Mitr 700 84px; buttons ≥ 96 logical (≥ 44 css px): เล่นต่อ (amber), ตั้งค่า (bevel → existing Options), กลับหน้าหลัก (outlined `--danger`) + progress-loss note. Instant Text lives only in Options (same `preferences.instant`). The Pause note still states the current behaviour that Auto stops on pause; Phase 2 changes Auto (D-6) and that text.
 - Reduced motion: no transitions/animation on these surfaces and no press offset.
 
+### Responsive rule and UI Phase 2 — Owner decisions 18 October 2026
+
+Supersedes, for the demo, the earlier "max(logical, 44 / scale)" sizing, the portrait contain stage, the Phaser speaker chip and the "Auto stops on pause/blur/resize/manual input" wording above. U-01/U-02/U-03 stay OPEN; not Final Visual Acceptance.
+
+- **Responsive (3 levels):** (1) mouse/fine pointer — every surface lives inside the 16:9 stage and scales uniformly with `fitViewport` (looks like 1920×1080, only smaller; letterbox outside); (2) touch landscape below scale 0.6 — a designed compact layout (`data-compact`) with ≥ 44 css px targets (mock 7); (3) stage below scale 0.28 or touch portrait — a Thai guard (หมุนจอ / ขยายหน้าต่าง) pauses play and resumes without state loss. Long text scrolls inside fixed boxes. Checked by `tests/e2e/ui-responsive-*.spec.ts` (no overlap, inside stage, no overflow, mouse ±2 logical px).
+- **Stage (D-1):** 16:9 `counter_day.png`, tint for evening/night and polygon table occlusion — see [DEMO_CHARACTER_STAGE](DEMO_CHARACTER_STAGE.md).
+- **Dialogue (D-5, mocks 3/4):** box x 210–1710, y 836–1048, `rgb(22 32 46 / 94%)`, 3px `#86a5a8`, radius 16; text Bai Jamjuree 500 38px/1.6 (touch compact 52px). Kinds via `data-line-kind`: narration (no plate, 10px `#d7b27c` left edge, `#e9e1cf`, real Bai Jamjuree italic), speech (plate top-left `#d7b27c`/`#2a1c10` Mitr 600 32px, “ ” added by CSS pseudo-elements only), player (plate "เจ้าของร้าน" top-right `#8fd0dc`, dialogue label only). Approved text, `.demo-text` textContent, class names and ARIA are unchanged; `[กำกับการแสดง]`/`[กำกับระบบ]` are never displayed. Footer order Auto · Skip · ▶ (Auto pill shows "เปิด" when on).
+- **Choices (U-06, mock 5):** right column x 1010–1710 from y 400, cards ≥ 96, numbered by CSS counter on the existing aria-hidden mark, ≤ 2 lines (longer scrolls inside), amber focus edge + ring; the box shrinks to one line at y≈900 (h≈130).
+- **Auto (D-6):** clicking the box advances and keeps Auto on (fresh full delay); pause, panels, blur, hidden tab, resize and fullscreen suspend the timer and resume with a full delay; Auto turns off only via its button or at `DEMO_END`; it never chooses for the player.
+- **HUD/top buttons (mock 3):** "วันที่ N" pill with a dot (no time-of-day word: only approved runtime day labels), bevel พัก / เต็มจอ.
+
 ## Language และ UI surfaces
 
 **Thai only** สำหรับข้อความที่ผู้เล่นเห็น ชื่อ code/asset IDs คงภาษาอังกฤษได้ ไม่เพิ่ม localization ภาษาอังกฤษใน v1

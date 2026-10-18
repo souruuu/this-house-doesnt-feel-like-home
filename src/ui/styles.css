@@ -146,7 +146,7 @@ button {
 .demo-menu {
   position: absolute;
   left: 64px;
-  width: calc(var(--demo-art-left) - 128px);
+  width: 800px;
   top: 50%;
   transform: translateY(-50%);
   max-height: 950px;
@@ -316,8 +316,8 @@ button {
 }
 .demo-choice-region {
   position: absolute;
-  left: calc(var(--demo-art-left) + 34px);
-  width: calc(var(--demo-art-width) - 68px);
+  left: var(--vn-choice-left);
+  width: var(--vn-choice-width);
   top: var(--vn-choice-top);
   height: var(--vn-choice-height);
   display: flex;
@@ -387,7 +387,7 @@ button {
 .demo-day {
   position: absolute;
   top: 24px;
-  left: calc(var(--demo-art-left) + 24px);
+  left: 36px;
   padding: 10px 18px;
   border: 1px solid var(--vn-rule);
   border-bottom: 3px solid var(--vn-accent);
@@ -441,20 +441,6 @@ button {
 }
 .demo-shell[data-reduced-motion='true'] .demo-day-transition {
   animation: none;
-}
-.demo-shell[data-compact='true'] .demo-dialogue {
-  padding: 12px 18px;
-  gap: 6px;
-  border-radius: 16px;
-}
-.demo-shell[data-compact='true'] .demo-dialogue-footer .demo-skip {
-  min-width: 220px;
-}
-.demo-shell[data-compact='true'] .demo-dialogue-footer .demo-auto {
-  min-width: 180px;
-}
-.demo-shell[data-compact='true'] .demo-choices {
-  gap: 12px;
 }
 .demo-shell[data-menu-screen='false'] .demo-toolbar .ui-button {
   background: var(--vn-ink);
@@ -1284,19 +1270,6 @@ button {
   color: var(--vn-text);
   font-family: var(--vn-font);
 }
-.demo-shell[data-compact='true'] .demo-dialogue {
-  bottom: 14px;
-  padding: 12px 22px 4px;
-  gap: 6px;
-}
-.demo-shell[data-compact='true'] .demo-dialogue-footer .demo-skip,
-.demo-shell[data-compact='true'] .demo-dialogue-footer .demo-auto {
-  min-width: var(--vn-footer-height);
-}
-.demo-shell[data-compact='true'] .demo-dialogue-footer .ui-button {
-  padding-inline: 22px;
-  font-size: 40px;
-}
 .demo-shell[data-reduced-motion='true'] .demo-choices .ui-button {
   transition: none;
 }
@@ -1428,10 +1401,6 @@ button {
   width: 850px;
   top: 738px;
   height: 240px;
-}
-.demo-shell[data-stage-character='true'] .demo-choice-region {
-  left: var(--vn-stage-choice-left);
-  width: var(--vn-stage-choice-width);
 }
 .vn-options-content {
   align-self: start;
@@ -2036,17 +2005,6 @@ button {
   height: 300px;
   align-items: flex-start;
 }
-.demo-shell[data-compact='true']
-  .demo-narrative[data-scene-id='NOTICE']
-  .demo-dialogue {
-  top: 140px;
-  height: 400px;
-}
-.demo-shell[data-compact='true']
-  .demo-narrative[data-scene-id='NOTICE']
-  .demo-choice-region {
-  top: 580px;
-}
 
 /* Viewport guard (stage scale < 0.28 or touch portrait). */
 .demo-shell .rotate-prompt {
@@ -2126,4 +2084,464 @@ button {
 }
 .demo-shell[data-compact='true'] .demo-pause.vn-paper-sign h2 {
   font-size: 72px;
+}
+
+/* Notice compact (touch) — re-stated after the gameplay consolidation. */
+.demo-shell[data-compact='true']
+  .demo-narrative[data-scene-id='NOTICE']
+  .demo-dialogue {
+  top: 140px;
+  height: 400px;
+}
+.demo-shell[data-compact='true']
+  .demo-narrative[data-scene-id='NOTICE']
+  .demo-choice-region {
+  top: 580px;
+}
+
+/* UI Phase 2 (Owner D-1/D-5, mocks 3/4/5/7): gameplay over the 16:9 stage.
+   Positions come from demoGameplayLayout via --vn-* (logical px). */
+.demo-shell .demo-narrative:not([data-scene-id='NOTICE']) .demo-dialogue {
+  top: var(--vn-dialogue-top);
+  bottom: auto;
+  left: var(--vn-dialogue-left);
+  width: var(--vn-dialogue-width);
+  height: var(--vn-dialogue-height);
+  max-height: none;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 4px;
+  padding: 38px 64px 10px;
+  border: 3px solid #86a5a8;
+  border-radius: 16px;
+  background: rgb(22 32 46 / 94%);
+  box-shadow: none;
+  color: var(--vn-text);
+}
+.demo-shell
+  .demo-narrative:not([data-scene-id='NOTICE'])
+  .demo-dialogue::before {
+  content: none;
+}
+.demo-shell .demo-narrative:not([data-scene-id='NOTICE']) .demo-text-scroll {
+  max-height: none;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0 8px 0 0;
+}
+.demo-shell .demo-narrative:not([data-scene-id='NOTICE']) .demo-text {
+  max-width: none;
+  font-family: var(--font-body);
+  font-size: var(--vn-body-size);
+  font-weight: 500;
+  line-height: 1.6;
+}
+/* Speech/player: quotes are presentation only (textContent stays approved). */
+.demo-dialogue[data-line-kind='speech'] .demo-text::before,
+.demo-dialogue[data-line-kind='player'] .demo-text::before {
+  content: '“';
+}
+.demo-dialogue[data-line-kind='speech'] .demo-text::after,
+.demo-dialogue[data-line-kind='player'] .demo-text::after {
+  content: '”';
+}
+/* Speaker plate attached to the box edge (no on-stage chip). */
+.demo-shell .demo-narrative:not([data-scene-id='NOTICE']) .demo-speaker-header {
+  position: absolute;
+  top: calc(var(--vn-speaker-size) * -1.2);
+  left: 44px;
+  display: flex;
+  align-items: center;
+  height: calc(var(--vn-speaker-size) * 1.8);
+  padding: 0 30px;
+  border: 0;
+  border-radius: 12px 12px 12px 4px;
+  background: #d7b27c;
+  box-shadow: 4px 5px 0 rgb(0 0 0 / 35%);
+}
+.demo-shell .demo-narrative:not([data-scene-id='NOTICE']) .demo-speaker {
+  margin: 0;
+  color: #2a1c10;
+  font-family: var(--font-display);
+  font-size: var(--vn-speaker-size);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  line-height: 1.2;
+}
+.demo-shell
+  .demo-narrative:not([data-scene-id='NOTICE'])
+  .demo-dialogue[data-line-kind='player']
+  .demo-speaker-header {
+  left: auto;
+  right: 44px;
+  border-radius: 12px 12px 4px 12px;
+  background: #8fd0dc;
+}
+.demo-shell
+  .demo-narrative:not([data-scene-id='NOTICE'])
+  .demo-dialogue[data-line-kind='player']
+  .demo-speaker {
+  color: #0f2b33;
+}
+/* Narration: no plate, amber edge, real Bai Jamjuree italic. */
+.demo-shell
+  .demo-narrative:not([data-scene-id='NOTICE'])
+  .demo-dialogue[data-line-kind='narration'] {
+  border-color: rgb(134 165 168 / 55%);
+  border-left: 10px solid #d7b27c;
+  background: rgb(22 32 46 / 86%);
+}
+.demo-shell
+  .demo-narrative:not([data-scene-id='NOTICE'])
+  .demo-dialogue[data-line-kind='narration']
+  .demo-text {
+  color: #e9e1cf;
+  font-style: italic;
+  font-synthesis: none;
+}
+
+/* Footer: small Auto pill, faded Skip, amber ▶ (targets = footer height). */
+.demo-shell
+  .demo-narrative:not([data-scene-id='NOTICE'])
+  .demo-dialogue-footer {
+  display: flex;
+  gap: 14px;
+  justify-content: flex-end;
+  align-items: center;
+  min-height: var(--vn-footer-height);
+}
+.demo-shell
+  .demo-narrative:not([data-scene-id='NOTICE'])
+  .demo-dialogue-footer
+  .ui-button {
+  min-width: var(--vn-footer-height);
+  min-height: var(--vn-footer-height);
+  padding: 0 18px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  box-shadow: none;
+  color: #aab9c3;
+  font-family: var(--font-body);
+  font-size: calc(var(--vn-footer-height) * 0.5);
+  font-weight: 500;
+  line-height: 1.2;
+}
+.demo-shell
+  .demo-narrative:not([data-scene-id='NOTICE'])
+  .demo-dialogue-footer
+  .demo-skip {
+  opacity: 0.5;
+}
+.demo-shell
+  .demo-narrative:not([data-scene-id='NOTICE'])
+  .demo-dialogue-footer
+  .demo-auto {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  border: 2px solid #86a5a8;
+  color: var(--vn-text);
+  text-decoration: none;
+}
+.demo-shell .demo-narrative:not([data-scene-id='NOTICE']) .demo-auto-mark {
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  border: 0;
+  border-radius: 50%;
+  background: #86a5a8;
+}
+.demo-shell
+  .demo-narrative:not([data-scene-id='NOTICE'])
+  .demo-dialogue-footer
+  .demo-auto[aria-pressed='true'] {
+  border-color: #d7b27c;
+  background: #d7b27c;
+  color: #2a1c10;
+  font-weight: 700;
+  text-decoration: none;
+  box-shadow: none;
+}
+.demo-shell
+  .demo-narrative:not([data-scene-id='NOTICE'])
+  .demo-auto[aria-pressed='true']
+  .demo-auto-mark {
+  background: #2a1c10;
+}
+.demo-narrative:not([data-scene-id='NOTICE'])
+  .demo-auto[aria-pressed='true']::after {
+  content: ' เปิด';
+  white-space: pre;
+}
+.demo-shell
+  .demo-narrative:not([data-scene-id='NOTICE'])
+  .demo-dialogue-footer
+  .demo-continue {
+  color: #d7b27c;
+  font-size: calc(var(--vn-footer-height) * 0.62);
+}
+.demo-shell
+  .demo-narrative:not([data-scene-id='NOTICE'])
+  .demo-dialogue-footer
+  .ui-button:not(:disabled):hover {
+  background: rgb(134 165 168 / 16%);
+}
+.demo-shell
+  .demo-narrative:not([data-scene-id='NOTICE'])
+  .demo-dialogue-footer
+  .demo-auto[aria-pressed='true']:not(:disabled):hover {
+  background: #e3c08f;
+}
+.demo-shell
+  .demo-narrative:not([data-scene-id='NOTICE'])
+  .demo-dialogue-footer
+  .ui-button:focus-visible {
+  outline: 3px solid var(--vn-accent);
+  outline-offset: 2px;
+}
+
+/* Choices: right column, numbered cards, at most two lines each. */
+.demo-shell .demo-narrative:not([data-scene-id='NOTICE']) .demo-choice-region {
+  left: var(--vn-choice-left);
+  width: var(--vn-choice-width);
+  top: var(--vn-choice-top);
+  height: var(--vn-choice-height);
+  align-items: flex-start;
+}
+.demo-shell .demo-narrative:not([data-scene-id='NOTICE']) .demo-choices {
+  gap: 28px;
+  padding: 6px;
+  counter-reset: demo-choice;
+}
+.demo-shell
+  .demo-narrative:not([data-scene-id='NOTICE'])
+  .demo-choices
+  .ui-button {
+  counter-increment: demo-choice;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 18px;
+  min-height: max(96px, var(--vn-footer-height));
+  padding: 18px 30px;
+  border: 3px solid #86a5a8;
+  border-radius: 16px;
+  background: rgb(22 32 46 / 95%);
+  color: var(--vn-text);
+  font-family: var(--font-body);
+  font-size: calc(var(--vn-body-size) * 0.95);
+  font-weight: 500;
+  line-height: 1.45;
+  text-align: left;
+  box-shadow: none;
+  outline: none;
+}
+.demo-shell
+  .demo-narrative:not([data-scene-id='NOTICE'])
+  .demo-choices
+  .ui-button
+  > span:last-child {
+  max-height: 2.9em;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.demo-shell .demo-narrative:not([data-scene-id='NOTICE']) .demo-choice-mark,
+.demo-shell
+  .demo-narrative:not([data-scene-id='NOTICE'])
+  .demo-choices
+  .ui-button:hover
+  .demo-choice-mark,
+.demo-shell
+  .demo-narrative:not([data-scene-id='NOTICE'])
+  .demo-choices
+  .ui-button:focus
+  .demo-choice-mark {
+  position: static;
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #2c404b;
+  color: #d7b27c;
+  font-size: 0;
+  opacity: 1;
+}
+.demo-shell
+  .demo-narrative:not([data-scene-id='NOTICE'])
+  .demo-choice-mark::before {
+  content: counter(demo-choice);
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 700;
+}
+.demo-shell
+  .demo-narrative:not([data-scene-id='NOTICE'])
+  .demo-choices
+  .ui-button:hover {
+  background: rgb(32 46 62 / 96%);
+}
+.demo-shell
+  .demo-narrative:not([data-scene-id='NOTICE'])
+  .demo-choices
+  .ui-button:focus-visible,
+.demo-shell
+  .demo-narrative:not([data-scene-id='NOTICE'])
+  .demo-choices
+  .ui-button[data-committed='true'] {
+  border-color: #d7b27c;
+  box-shadow: 0 0 0 4px rgb(215 178 124 / 45%);
+  outline: none;
+}
+.demo-shell
+  .demo-narrative:not([data-scene-id='NOTICE'])
+  .demo-choices
+  .ui-button:focus-visible
+  .demo-choice-mark,
+.demo-shell
+  .demo-narrative:not([data-scene-id='NOTICE'])
+  .demo-choices
+  .ui-button[data-committed='true']
+  .demo-choice-mark {
+  background: #d7b27c;
+  color: #2a1c10;
+}
+.demo-shell
+  .demo-narrative:not([data-scene-id='NOTICE'])
+  .demo-choices
+  .ui-button:active {
+  background: #344c5b; /* pressed feedback (Checkpoint B), kept */
+}
+/* While choosing, the box shrinks to one line so the character stays visible. */
+.demo-shell
+  .demo-narrative:not([data-scene-id='NOTICE'])
+  .demo-dialogue.demo-dialogue--choice {
+  top: var(--vn-choice-dialogue-top);
+  height: var(--vn-choice-dialogue-height);
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: minmax(0, 1fr);
+  align-items: center;
+  padding: 30px 40px 12px 64px;
+}
+.demo-shell
+  .demo-narrative:not([data-scene-id='NOTICE'])
+  .demo-dialogue.demo-dialogue--choice
+  .demo-text {
+  font-size: calc(var(--vn-body-size) * 0.9);
+}
+.demo-shell
+  .demo-narrative:not([data-scene-id='NOTICE'])
+  .demo-dialogue--choice
+  .demo-speaker-header {
+  height: calc(var(--vn-speaker-size) * 1.6);
+  top: calc(var(--vn-speaker-size) * -1.06);
+}
+.demo-shell
+  .demo-narrative:not([data-scene-id='NOTICE'])
+  .demo-dialogue--choice
+  .demo-speaker {
+  font-size: calc(var(--vn-speaker-size) * 0.875);
+}
+
+/* HUD and top buttons (mock 3). */
+.demo-shell .demo-day {
+  top: 28px;
+  left: 36px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  height: 60px;
+  padding: 0 24px;
+  border: 0;
+  border-bottom: 4px solid #d7b27c;
+  border-radius: 10px;
+  background: rgb(24 34 48 / 82%);
+  color: var(--vn-text);
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 500;
+  line-height: 1;
+}
+.demo-shell .demo-day::before {
+  content: '';
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #f7d34a;
+}
+.demo-shell[data-menu-screen='false'] .demo-toolbar {
+  top: 28px;
+  right: 44px;
+  gap: 16px;
+}
+.demo-shell[data-menu-screen='false'] .demo-toolbar .ui-button {
+  min-width: max(64px, var(--vn-footer-height));
+  min-height: max(64px, var(--vn-footer-height));
+  padding: 0 28px;
+  border: 4px solid var(--bevel-edge);
+  border-radius: 0;
+  background: var(--bevel-fill);
+  color: #1f3138;
+  box-shadow:
+    inset 3px 3px 0 #f1f6fb,
+    inset -3px -3px 0 #93a6b6;
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 600;
+}
+.demo-shell[data-menu-screen='false'] .demo-toolbar .ui-button:hover {
+  background: #dde6ef;
+  border-color: var(--bevel-edge);
+}
+.demo-shell[data-menu-screen='false'] .demo-toolbar .ui-button:focus-visible {
+  background: #f3d9a0;
+  border-color: var(--amber-edge);
+  outline: 4px solid var(--amber-edge);
+  outline-offset: 4px;
+}
+
+/* Touch compact gameplay (mock 7): one wide box, controls on the right. */
+.demo-shell[data-compact='true']
+  .demo-narrative:not([data-scene-id='NOTICE'])
+  .demo-dialogue {
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: minmax(0, 1fr);
+  align-items: end;
+  column-gap: 20px;
+  padding: 56px 28px 16px 48px;
+}
+.demo-shell[data-compact='true']
+  .demo-narrative:not([data-scene-id='NOTICE'])
+  .demo-text-scroll {
+  align-self: stretch;
+}
+.demo-shell[data-compact='true']
+  .demo-narrative:not([data-scene-id='NOTICE'])
+  .demo-dialogue-footer {
+  gap: 8px;
+}
+.demo-shell[data-compact='true']
+  .demo-narrative:not([data-scene-id='NOTICE'])
+  .demo-dialogue-footer
+  .ui-button {
+  font-size: 40px;
+  padding: 0 22px;
+}
+.demo-shell[data-compact='true']
+  .demo-narrative:not([data-scene-id='NOTICE'])
+  .demo-choices
+  .ui-button {
+  font-size: 46px;
+}
+.demo-shell[data-compact='true'] .demo-day,
+.demo-shell[data-compact='true'][data-menu-screen='false']
+  .demo-toolbar
+  .ui-button {
+  height: auto;
+  min-height: var(--vn-footer-height);
+  font-size: 40px;
 }

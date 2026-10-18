@@ -53,14 +53,13 @@ export class DemoCharacterStage {
   }
 
   private place(slot: Slot, character: DemoCharacterId) {
-    const layout = demoCharacterLayout(this.latest?.viewportScale ?? 1);
+    // Anchored to the stage artwork: same baseline at every viewport.
+    const layout = demoCharacterLayout;
     const image = slot.image.setTexture(`demo.character.${character}`);
     image.setScale(layout.height / image.height);
     image.setPosition(
-      slot.position === 'left'
-        ? layout.left
-        : layout.right - image.displayWidth,
-      layout.bottom,
+      layout.center[slot.position] - image.displayWidth / 2,
+      layout.baseline,
     );
     slot.character = character;
   }
