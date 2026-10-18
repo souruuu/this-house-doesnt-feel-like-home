@@ -4,6 +4,7 @@ export interface DemoWorldView {
   readonly viewportScale?: number;
   readonly layout?: 'menu' | 'gameplay';
   readonly background: 'morning' | 'evening' | 'night';
+  readonly characterLabel: string | null;
   // Transient renderer projection only; never an Ink tag or saved domain fact.
   readonly characterStage?: {
     readonly contextKey: string;
@@ -17,7 +18,7 @@ export class GameBridge {
   private listeners = new Set<(paused: boolean) => void>();
   private paused = false;
   private disposed = false;
-  private view: DemoWorldView = { background: 'morning' };
+  private view: DemoWorldView = { background: 'morning', characterLabel: null };
   private viewListeners = new Set<(view: DemoWorldView) => void>();
 
   setPresentation(view: DemoWorldView) {

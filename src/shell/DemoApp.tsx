@@ -47,7 +47,11 @@ const names: Record<string, string> = {
   none: '',
   player: 'เจ้าของร้าน',
 };
-const initialWorld: DemoWorldView = { background: 'morning' };
+// characterLabel stays null: D-5 removed the on-stage speaker chip.
+const initialWorld: DemoWorldView = {
+  background: 'morning',
+  characterLabel: null,
+};
 
 function worldView(
   view: NarrativeView | null,
@@ -63,6 +67,7 @@ function worldView(
         : scene.endsWith('-03')
           ? 'evening'
           : 'morning',
+    characterLabel: null,
     characterStage: {
       contextKey: `${view.sessionId}/${scene}`,
       characters: resolveDemoCharacters(view),

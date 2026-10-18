@@ -261,6 +261,7 @@ function renderer() {
   ): DemoWorldView => ({
     layout: 'gameplay',
     background: 'morning',
+    characterLabel: null,
     characterStage: {
       contextKey: context,
       characters: [{ character, position: 'left' }],
