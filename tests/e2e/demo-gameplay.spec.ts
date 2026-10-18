@@ -31,9 +31,13 @@ async function resize(p: Page, width: number, height: number) {
   await p.setViewportSize({ width, height });
   if (!(await p.locator('.demo-shell').count())) return;
   const scale = Math.min(width / 1920, height / 1080);
+  // Owner rule 2026-10-18: compact only for a coarse (touch) pointer.
+  const coarse = await p.evaluate(
+    () => window.matchMedia('(pointer: coarse)').matches,
+  );
   await expect(p.locator('.demo-shell')).toHaveAttribute(
     'data-compact',
-    'false', // mouse page: uniform scaling, no compact layout
+    String(coarse && scale < 0.6),
   );
   await expect
     .poll(() =>
@@ -124,8 +128,10 @@ for (const viewport of [
       ).toBeGreaterThanOrEqual(16 / scale);
       for (const name of ['Skip — ยังไม่พร้อม', 'Auto', 'อ่านต่อ']) {
         const r = (await button(page, name).boundingBox())!;
-        expect(r.height).toBeGreaterThanOrEqual(43.9);
-        expect(r.width).toBeGreaterThanOrEqual(43.9);
+        // Touch: real 44 css px. Mouse: the 64-logical target scaled uniformly.
+        const min = viewport.width === 844 ? 43.9 : 64 * scale - 0.5;
+        expect(r.height).toBeGreaterThanOrEqual(min);
+        expect(r.width).toBeGreaterThanOrEqual(min);
         expect(r.x + r.width).toBeLessThanOrEqual(stage.x + stage.width);
       }
       await expect(button(page, 'Skip — ยังไม่พร้อม')).toHaveAttribute(

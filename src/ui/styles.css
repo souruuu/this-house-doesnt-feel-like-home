@@ -2119,7 +2119,7 @@ button {
 }
 .demo-shell[data-compact='true'] .demo-pause.vn-paper-sign {
   top: 30px;
-  width: 780px;
+  width: 740px; /* right edge 890: stays in the left paper zone */
   max-height: 1020px;
   padding: 28px 44px;
   gap: 14px;

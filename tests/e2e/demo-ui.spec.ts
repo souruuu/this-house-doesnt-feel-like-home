@@ -100,7 +100,10 @@ for (const viewport of [
       expect(metrics.scroll).toBeGreaterThan(metrics.height);
       expect(metrics.scrollWidth).toBeLessThanOrEqual(metrics.width + 1);
       const button = (await next(page).boundingBox())!;
-      expect(button.height).toBeGreaterThanOrEqual(43.9);
+      // Touch: real 44 css px. Mouse: the 64-logical target scaled uniformly.
+      expect(button.height).toBeGreaterThanOrEqual(
+        viewport.width === 844 ? 43.9 : 64 * scale - 0.5,
+      );
       expect(button.y + button.height).toBeLessThan(stage.y + stage.height);
       await expect(page.locator('.demo-speaker')).toBeVisible();
       await body.evaluate((el) => {
