@@ -95,7 +95,7 @@ for (const viewport of [
   test(`Post-AB four canonical characters and safe UI bounds ${viewport.width}`, async ({
     page,
   }, info) => {
-    test.setTimeout(360_000);
+    test.setTimeout(600_000); // Full editorial script adds 115 lines across nine scenes.
     const errors = audit(page);
     await page.setViewportSize(viewport);
     await page.goto(url);
@@ -201,7 +201,21 @@ for (const viewport of [
         await expect(page.locator('.demo-speaker-header')).toHaveCount(0);
         await shot(page, info, 'narrator-retains-character');
       }
-      if (id === 'demo.D101-L004' && phase === 'choice' && !choiceCaptured) {
+      if (id === 'demo.D101-EM3-I02' && phase === 'line') {
+        await expect(page.locator('.demo-speaker')).toHaveText('เจ้าของร้าน');
+        await expect(page.locator('.demo-text')).toHaveText('ตามสบาย');
+        await expect(
+          page.locator('[data-world-character-cue]'),
+        ).toHaveAttribute('data-world-character-cue', '');
+        await settled(page);
+        expect(
+          (await stage(page)).slots
+            .filter((s) => s.visible)
+            .map((s) => s.character),
+        ).toEqual(['manao']);
+        await shot(page, info, 'player-speech-retains-character');
+      }
+      if (id === 'demo.D101-EM3-I03' && phase === 'choice' && !choiceCaptured) {
         const s = await stage(page),
           actor = s.slots.find((s) => s.visible)!;
         const c = (await page.locator('.demo-choice-region').boundingBox())!;

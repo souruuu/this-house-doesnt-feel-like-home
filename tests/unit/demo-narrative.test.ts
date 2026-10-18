@@ -36,7 +36,8 @@ describe('approved emergency production narrative', () => {
         .update(readFileSync('sources/narrative_map_7_day_Updates.md'))
         .digest('hex'),
     ).toBe('b0ec03e7d54a4aaf1d7976d4cd585d8a982d83d415edabe3f1b272a5dee04cdb');
-    expect(validateDemo()).toEqual({ linesAndChoices: 152, runs: 64 });
+    // 262 independently parsed editorial rows - 1 React button + 6 Notice/Prologue.
+    expect(validateDemo()).toEqual({ linesAndChoices: 267, runs: 64 });
   });
 
   it.each([true, false])(

@@ -1,4 +1,11 @@
 import { expect, test } from '@playwright/test';
+import {
+  readApprovedDemoContent,
+  readEditorialRows,
+} from '../../scripts/demo-content';
+
+const approved = readApprovedDemoContent();
+const editorial = new Map(readEditorialRows().map((r) => [r.id, r]));
 
 for (const route of [
   'accept-and-name',
@@ -6,7 +13,7 @@ for (const route of [
   'budget-and-name',
 ]) {
   test(`production Day 1-3 completes: ${route}`, async ({ page }, testInfo) => {
-    test.setTimeout(360_000); // Full approved story, not a short component smoke test.
+    test.setTimeout(600_000); // Full 267-ID editorial story, not a short component smoke test.
     const errors: string[] = [];
     page.on('pageerror', (error) => errors.push(error.message));
     page.on('console', (message) => {
@@ -46,6 +53,17 @@ for (const route of [
       if (phase === 'line') {
         visited.add(id);
         expect(id).not.toBe(previous);
+        await expect(page.locator('.demo-text')).toHaveText(
+          approved.get(id.slice(5))!.text,
+        );
+        const row = editorial.get(id);
+        if (row?.speaker === 'player') {
+          await expect(page.locator('.demo-speaker')).toHaveText('เจ้าของร้าน');
+          await page.screenshot({
+            path: testInfo.outputPath(`player-${id}.png`),
+          });
+        } else if (row?.speaker === 'none')
+          await expect(page.locator('.demo-speaker-header')).toHaveCount(0);
         if (id === 'demo.D303-L010A')
           await expect(page.locator('.demo-speaker')).toHaveText(
             'เด็กชายที่ชายคา',
@@ -70,6 +88,19 @@ for (const route of [
           .not.toBe(`line:${id}`);
       } else if (phase === 'choice') {
         const options = page.locator('[data-demo-choice]');
+        for (const option of await options.all()) {
+          const optionId = (await option.getAttribute('data-demo-choice'))!;
+          await expect(option.locator('span:not([aria-hidden])')).toHaveText(
+            approved.get(optionId.slice(5))!.text,
+          );
+          await expect(option).toHaveAccessibleName(
+            approved.get(optionId.slice(5))!.text,
+          );
+          await expect(option.locator('.demo-choice-mark')).toHaveAttribute(
+            'aria-hidden',
+            'true',
+          );
+        }
         const first = (await options.first().getAttribute('data-demo-choice'))!;
         const group = first.slice(0, -2);
         let branch = 'A';
@@ -90,6 +121,13 @@ for (const route of [
       } else throw new Error(`Unexpected phase ${phase}`);
     }
     await expect(narrative).toHaveAttribute('data-phase', 'ended');
+    await testInfo.attach('approved-runtime-coverage', {
+      body: JSON.stringify({
+        lines: [...visited],
+        selectedChoices: [...choices],
+      }),
+      contentType: 'application/json',
+    });
     expect(visited.has('demo.D203-L003T')).toBe(
       route !== 'decline-and-anonymous',
     );

@@ -49,6 +49,7 @@ const names: Record<string, string> = {
   nut: 'นัท',
   kan: 'กันต์',
   none: '',
+  player: 'เจ้าของร้าน',
 };
 const initialWorld: DemoWorldView = {
   background: 'morning',
@@ -70,7 +71,9 @@ function worldView(
           ? 'evening'
           : 'morning',
     characterLabel:
-      view.phase === 'line' ? names[view.presentation.speaker] || null : null,
+      view.phase === 'line' && view.presentation.speaker !== 'player'
+        ? names[view.presentation.speaker] || null
+        : null,
     characterStage: {
       contextKey: `${view.sessionId}/${scene}`,
       characters: resolveDemoCharacters(view),

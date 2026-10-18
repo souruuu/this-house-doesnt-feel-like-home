@@ -154,11 +154,12 @@ for (const viewport of [
     await page.locator('.demo-text').evaluate((el, t) => {
       el.textContent = t;
     }, original);
-    await next(page);
+    await reach(page, 'demo.D101-L004'); // Authored insertions precede this narrator beat.
     await expect(page.locator('.demo-speaker-header')).toHaveCount(0);
     await expect(world).toHaveAttribute('data-world-character-cue', '');
     await shot(page, info, `narrator-${viewport.width}`);
     expect((await panel.boundingBox())!.height).toBeLessThan(bounds.height);
+    await next(page); // New authored girl dialogue, then the same original choice.
     await next(page);
     const choices = page.locator('[data-demo-choice]');
     await expect(choices).toHaveCount(2); // Actual approved first shop choice, not mockup count.
@@ -191,7 +192,11 @@ for (const viewport of [
       await shot(page, info, 'choice-pressed-1920');
       await page.mouse.up();
     }
-    await expect(view(page)).toHaveAttribute('data-line-id', 'demo.D101-L005B');
+    await expect(view(page)).toHaveAttribute(
+      'data-line-id',
+      'demo.D101-EM3-B01',
+    );
+    await reach(page, 'demo.D101-L005B');
     await expect(button(page, 'อ่านต่อ')).toBeFocused();
     expect(errors).toEqual([]);
   });
@@ -330,7 +335,7 @@ test('B Auto cancels without catch-up on pause/options, hidden, blur, portrait a
 test('B approved route proves day-only cards, named cues/knowledge guard, longest Thai line, wrapped choice and terminal line', async ({
   page,
 }, info) => {
-  test.setTimeout(180_000);
+  test.setTimeout(600_000); // Full authored route, including the newly approved dialogue.
   await resize(page, 1280, 720);
   await start(page);
   const errors: string[] = [];
