@@ -242,7 +242,10 @@ test('Pause sign: initial focus, focus trap, Esc closes and restores focus', asy
   await expect(button(page, 'เล่นต่อ')).toBeFocused();
   // Instant text moved to Options; Pause keeps only the truthful Auto note.
   await expect(dialog.getByRole('checkbox')).toHaveCount(0);
-  await expect(dialog).toContainText('Auto หยุดเมื่อพักเกม');
+  // Phase 2 (D-6): Auto suspends on pause and resumes on its own.
+  await expect(dialog).toContainText(
+    'Auto จะพักตอนพักเกมและกลับมาต่อเองเมื่อเล่นต่อ',
+  );
   await expect(dialog).toContainText('กลับหน้าหลักแล้วรอบนี้จะหายไป');
   await page.keyboard.press('Tab');
   await expect(button(page, 'ตั้งค่า')).toBeFocused();

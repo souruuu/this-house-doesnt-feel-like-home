@@ -48,6 +48,9 @@ export async function startGame(page: Page, { autoSeconds = 0 } = {}) {
 // character visible (gameplay scenes only). Never edits text or state.
 export async function advanceTo(page: Page, wanted: GameplayView) {
   for (let step = 0; step < 200; step++) {
+    // The day card (650 ms input guard) must be gone before any input.
+    await expect(page.locator('.demo-day-transition')).toHaveCount(0);
+    await expect(view(page)).not.toHaveAttribute('inert', '');
     const phase = await view(page).getAttribute('data-phase');
     const scene = await view(page).getAttribute('data-scene-id');
     if (scene !== 'NOTICE') {
