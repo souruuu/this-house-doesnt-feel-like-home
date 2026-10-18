@@ -25,18 +25,18 @@ describe('16:9 demo stage', () => {
       { x: 0, y: 0, width: 1920, height: 1080, scale: 1 },
     );
   });
-  it('maps every time of day to existing art; evening/night use the artist overlay values', () => {
+  it('maps every time of day to existing art; evening/night use strong multiply tints', () => {
     for (const time of ['morning', 'evening', 'night'] as const)
       expect(demoStageArt[time].path).toBe('assets/demo/stage/counter-day.png');
     expect(demoStageArt.morning.tint).toBeNull();
     expect(demoStageArt.evening.tint).toEqual({
-      color: 0xffb28d, // RGB(255,178,141)
-      alpha: 145 / 255,
+      color: 0xf08a50, // warm dusk, deepened from the artist overlay hue
+      alpha: 0.75,
       blend: 'multiply',
     });
     expect(demoStageArt.night.tint).toEqual({
-      color: 0x4256a9, // RGB(66,86,169)
-      alpha: 124 / 255,
+      color: 0x2c3c8c, // blue night, deepened from the artist overlay hue
+      alpha: 0.8,
       blend: 'multiply',
     });
   });

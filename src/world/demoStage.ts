@@ -14,8 +14,9 @@ export interface DemoStageTint {
 }
 
 // Stage manifest by time of day (Owner 2026-10-18: no further art; the tint
-// on counter_day is the production method). Values start from the artist's
-// flat overlay layers (เคลือบสีตอนเย็น/กลางคืน.PNG) and stay adjustable here.
+// on counter_day is the production method). Hues follow the artist's flat
+// overlay layers (เคลือบสีตอนเย็น/กลางคืน.PNG); Owner review asked for a
+// stronger read than the raw overlay, so colour/alpha are deepened here.
 // Multiply measured closer to the artist's evening/night composites than
 // normal (RMSE 44.3 vs 61.8 evening, 16.6 vs 34.4 night). The tint covers
 // the background and table only, never the characters.
@@ -35,12 +36,14 @@ export const demoStageArt: Record<
   evening: {
     texture: 'demo.stage.counter.day',
     path: 'assets/demo/stage/counter-day.png',
-    tint: { color: 0xffb28d, alpha: 145 / 255, blend: 'multiply' },
+    // Warm dusk: keeps reds, drops blue to ~half (multiply factor ≈ .96/.66/.49).
+    tint: { color: 0xf08a50, alpha: 0.75, blend: 'multiply' },
   },
   night: {
     texture: 'demo.stage.counter.day',
     path: 'assets/demo/stage/counter-day.png',
-    tint: { color: 0x4256a9, alpha: 124 / 255, blend: 'multiply' },
+    // Blue night: overall ~35–40% brightness, blue kept (factor ≈ .34/.39/.64).
+    tint: { color: 0x2c3c8c, alpha: 0.8, blend: 'multiply' },
   },
 };
 
