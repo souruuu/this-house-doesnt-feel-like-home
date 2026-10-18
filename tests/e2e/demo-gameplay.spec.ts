@@ -16,7 +16,7 @@ async function start(p: Page, instant = true, delay = 1) {
   await button(p, 'ตั้งค่า').click();
   if (instant)
     await p.getByRole('checkbox', { name: 'แสดงข้อความทันที' }).check();
-  const time = p.getByRole('slider', { name: 'Auto-Forward Time' });
+  const time = p.getByRole('slider', { name: 'เวลาเลื่อนอัตโนมัติ' });
   await time.focus();
   await p.keyboard.press('Home');
   if (delay === 2) {
@@ -33,7 +33,7 @@ async function resize(p: Page, width: number, height: number) {
   const scale = Math.min(width / 1920, height / 1080);
   await expect(p.locator('.demo-shell')).toHaveAttribute(
     'data-compact',
-    String(scale < 0.6),
+    'false', // mouse page: uniform scaling, no compact layout
   );
   await expect
     .poll(() =>
@@ -75,130 +75,142 @@ for (const viewport of [
   { width: 1280, height: 720 },
   { width: 844, height: 390 },
 ]) {
-  test(`B dialogue/choice composition and input ${viewport.width}x${viewport.height}`, async ({
-    page,
-  }, info) => {
-    test.setTimeout(60_000);
-    await page.setViewportSize(viewport);
-    const errors: string[] = [];
-    page.on('pageerror', (e) => errors.push(e.message));
-    page.on('console', (message) => {
-      if (message.type() === 'error') errors.push(message.text());
-    });
-    page.on('response', (r) => {
-      if (r.status() >= 400) errors.push(`${r.status()} ${r.url()}`);
-    });
-    await start(page);
-    await reach(page, 'demo.D101-L003');
-    await expect(page.locator('.demo-speaker')).toHaveText('เด็กหญิง');
-    const world = page.locator('[data-world-character-cue]');
-    await expect(world).toHaveAttribute(
-      'data-world-character-cue',
-      viewport.width === 844 ? '' : 'เด็กหญิง',
-    );
-    const panel = page.locator('.demo-dialogue'),
-      footer = page.locator('.demo-dialogue-footer');
-    const stage = (await page.locator('.logical-stage').boundingBox())!;
-    const scale = stage.width / 1920;
-    const header = (await page.locator('.demo-speaker-header').boundingBox())!;
-    const body = page.locator('.demo-text-scroll');
-    const text = (await body.boundingBox())!;
-    const foot = (await footer.boundingBox())!;
-    const bounds = (await panel.boundingBox())!;
-    expect(header.y + header.height).toBeLessThanOrEqual(text.y);
-    expect(text.y + text.height).toBeLessThanOrEqual(foot.y);
-    expect(foot.y + foot.height).toBeLessThanOrEqual(bounds.y + bounds.height);
-    expect(bounds.height).toBeLessThan(viewport.height * 0.34);
-    expect(
-      await page
-        .locator('.demo-text')
-        .evaluate((el) => parseFloat(getComputedStyle(el).fontSize)),
-    ).toBeGreaterThanOrEqual(16 / scale);
-    for (const name of ['Skip — ยังไม่พร้อม', 'Auto', 'อ่านต่อ']) {
-      const r = (await button(page, name).boundingBox())!;
-      expect(r.height).toBeGreaterThanOrEqual(43.9);
-      expect(r.width).toBeGreaterThanOrEqual(43.9);
-      expect(r.x + r.width).toBeLessThanOrEqual(stage.x + stage.width);
-    }
-    await expect(button(page, 'Skip — ยังไม่พร้อม')).toHaveAttribute(
-      'aria-disabled',
-      'true',
-    );
-    await expect(button(page, 'Auto')).toHaveAttribute('aria-pressed', 'false');
-    await shot(page, info, `speaker-${viewport.width}`);
-    // CSS stress only; Instant mode avoids timer writes during the temporary DOM mutation.
-    const original = await page.locator('.demo-text').textContent();
-    await page.locator('.demo-text').evaluate((el) => {
-      el.textContent =
-        'ข้อความทดสอบการเลื่อนภาษาไทยพร้อมสระและวรรณยุกต์ '.repeat(120);
-    });
-    const size = await body.evaluate((el) => ({
-      client: el.clientHeight,
-      scroll: el.scrollHeight,
-      width: el.clientWidth,
-      scrollWidth: el.scrollWidth,
-    }));
-    expect(size.scroll).toBeGreaterThan(size.client);
-    expect(size.scrollWidth).toBeLessThanOrEqual(size.width + 1);
-    const headerBeforeScroll = (await page
-      .locator('.demo-speaker-header')
-      .boundingBox())!;
-    await body.evaluate((el) => {
-      el.scrollTop = el.scrollHeight;
-    });
-    expect(await body.evaluate((el) => el.scrollTop)).toBeGreaterThan(0);
-    expect((await footer.boundingBox())!.y).toBe(foot.y);
-    expect((await page.locator('.demo-speaker-header').boundingBox())!.y).toBe(
-      headerBeforeScroll.y,
-    );
-    await page.locator('.demo-text').evaluate((el, t) => {
-      el.textContent = t;
-    }, original);
-    await reach(page, 'demo.D101-L004'); // Authored insertions precede this narrator beat.
-    await expect(page.locator('.demo-speaker-header')).toHaveCount(0);
-    await expect(world).toHaveAttribute('data-world-character-cue', '');
-    await shot(page, info, `narrator-${viewport.width}`);
-    expect((await panel.boundingBox())!.height).toBeLessThan(bounds.height);
-    await next(page); // New authored girl dialogue, then the same original choice.
-    await next(page);
-    const choices = page.locator('[data-demo-choice]');
-    await expect(choices).toHaveCount(2); // Actual approved first shop choice, not mockup count.
-    const cb = (await page.locator('.demo-choices').boundingBox())!;
-    expect(cb.x).toBeGreaterThan(stage.x + demoPortrait.x * scale);
-    expect(cb.x + cb.width).toBeLessThan(
-      stage.x + (demoPortrait.x + demoPortrait.width) * scale,
-    );
-    expect(cb.y + cb.height).toBeLessThan((await panel.boundingBox())!.y);
-    await expect(choices.first()).toBeFocused();
-    await expect(button(page, 'Auto')).toBeEnabled();
-    await expect(button(page, 'อ่านต่อ')).toBeDisabled();
-    await view(page).focus();
-    await page.keyboard.press('Enter');
-    await expect(view(page)).toHaveAttribute('data-phase', 'choice');
-    await choices.first().focus();
-    await page.keyboard.press('ArrowDown');
-    await expect(choices.nth(1)).toBeFocused();
-    await shot(page, info, `choice-focus-${viewport.width}`);
-    if (viewport.width === 844) await choices.nth(1).tap();
-    else if (viewport.width === 1280) await page.keyboard.press('Space');
-    else {
-      const pos = (await choices.nth(1).boundingBox())!;
-      await page.mouse.move(pos.x + 20, pos.y + 20);
-      await page.mouse.down();
-      await expect(choices.nth(1)).toHaveCSS(
-        'background-color',
-        'rgb(52, 76, 91)',
+  test.describe(`${viewport.width}x${viewport.height}`, () => {
+    // Owner rule 2026-10-18: 844x390 is the touch-phone compact case; mouse
+    // windows scale uniformly (covered by ui-responsive-*.spec.ts).
+    if (viewport.width === 844) test.use({ hasTouch: true, isMobile: true });
+    test(`B dialogue/choice composition and input ${viewport.width}x${viewport.height}`, async ({
+      page,
+    }, info) => {
+      test.setTimeout(60_000);
+      await page.setViewportSize(viewport);
+      const errors: string[] = [];
+      page.on('pageerror', (e) => errors.push(e.message));
+      page.on('console', (message) => {
+        if (message.type() === 'error') errors.push(message.text());
+      });
+      page.on('response', (r) => {
+        if (r.status() >= 400) errors.push(`${r.status()} ${r.url()}`);
+      });
+      await start(page);
+      await reach(page, 'demo.D101-L003');
+      await expect(page.locator('.demo-speaker')).toHaveText('เด็กหญิง');
+      const world = page.locator('[data-world-character-cue]');
+      await expect(world).toHaveAttribute(
+        'data-world-character-cue',
+        viewport.width === 844 ? '' : 'เด็กหญิง',
       );
-      await shot(page, info, 'choice-pressed-1920');
-      await page.mouse.up();
-    }
-    await expect(view(page)).toHaveAttribute(
-      'data-line-id',
-      'demo.D101-EM3-B01',
-    );
-    await reach(page, 'demo.D101-L005B');
-    await expect(button(page, 'อ่านต่อ')).toBeFocused();
-    expect(errors).toEqual([]);
+      const panel = page.locator('.demo-dialogue'),
+        footer = page.locator('.demo-dialogue-footer');
+      const stage = (await page.locator('.logical-stage').boundingBox())!;
+      const scale = stage.width / 1920;
+      const header = (await page
+        .locator('.demo-speaker-header')
+        .boundingBox())!;
+      const body = page.locator('.demo-text-scroll');
+      const text = (await body.boundingBox())!;
+      const foot = (await footer.boundingBox())!;
+      const bounds = (await panel.boundingBox())!;
+      expect(header.y + header.height).toBeLessThanOrEqual(text.y);
+      expect(text.y + text.height).toBeLessThanOrEqual(foot.y);
+      expect(foot.y + foot.height).toBeLessThanOrEqual(
+        bounds.y + bounds.height,
+      );
+      expect(bounds.height).toBeLessThan(viewport.height * 0.34);
+      expect(
+        await page
+          .locator('.demo-text')
+          .evaluate((el) => parseFloat(getComputedStyle(el).fontSize)),
+      ).toBeGreaterThanOrEqual(16 / scale);
+      for (const name of ['Skip — ยังไม่พร้อม', 'Auto', 'อ่านต่อ']) {
+        const r = (await button(page, name).boundingBox())!;
+        expect(r.height).toBeGreaterThanOrEqual(43.9);
+        expect(r.width).toBeGreaterThanOrEqual(43.9);
+        expect(r.x + r.width).toBeLessThanOrEqual(stage.x + stage.width);
+      }
+      await expect(button(page, 'Skip — ยังไม่พร้อม')).toHaveAttribute(
+        'aria-disabled',
+        'true',
+      );
+      await expect(button(page, 'Auto')).toHaveAttribute(
+        'aria-pressed',
+        'false',
+      );
+      await shot(page, info, `speaker-${viewport.width}`);
+      // CSS stress only; Instant mode avoids timer writes during the temporary DOM mutation.
+      const original = await page.locator('.demo-text').textContent();
+      await page.locator('.demo-text').evaluate((el) => {
+        el.textContent =
+          'ข้อความทดสอบการเลื่อนภาษาไทยพร้อมสระและวรรณยุกต์ '.repeat(120);
+      });
+      const size = await body.evaluate((el) => ({
+        client: el.clientHeight,
+        scroll: el.scrollHeight,
+        width: el.clientWidth,
+        scrollWidth: el.scrollWidth,
+      }));
+      expect(size.scroll).toBeGreaterThan(size.client);
+      expect(size.scrollWidth).toBeLessThanOrEqual(size.width + 1);
+      const headerBeforeScroll = (await page
+        .locator('.demo-speaker-header')
+        .boundingBox())!;
+      await body.evaluate((el) => {
+        el.scrollTop = el.scrollHeight;
+      });
+      expect(await body.evaluate((el) => el.scrollTop)).toBeGreaterThan(0);
+      expect((await footer.boundingBox())!.y).toBe(foot.y);
+      expect(
+        (await page.locator('.demo-speaker-header').boundingBox())!.y,
+      ).toBe(headerBeforeScroll.y);
+      await page.locator('.demo-text').evaluate((el, t) => {
+        el.textContent = t;
+      }, original);
+      await reach(page, 'demo.D101-L004'); // Authored insertions precede this narrator beat.
+      await expect(page.locator('.demo-speaker-header')).toHaveCount(0);
+      await expect(world).toHaveAttribute('data-world-character-cue', '');
+      await shot(page, info, `narrator-${viewport.width}`);
+      expect((await panel.boundingBox())!.height).toBeLessThan(bounds.height);
+      await next(page); // New authored girl dialogue, then the same original choice.
+      await next(page);
+      const choices = page.locator('[data-demo-choice]');
+      await expect(choices).toHaveCount(2); // Actual approved first shop choice, not mockup count.
+      const cb = (await page.locator('.demo-choices').boundingBox())!;
+      expect(cb.x).toBeGreaterThan(stage.x + demoPortrait.x * scale);
+      expect(cb.x + cb.width).toBeLessThan(
+        stage.x + (demoPortrait.x + demoPortrait.width) * scale,
+      );
+      expect(cb.y + cb.height).toBeLessThan((await panel.boundingBox())!.y);
+      await expect(choices.first()).toBeFocused();
+      await expect(button(page, 'Auto')).toBeEnabled();
+      await expect(button(page, 'อ่านต่อ')).toBeDisabled();
+      await view(page).focus();
+      await page.keyboard.press('Enter');
+      await expect(view(page)).toHaveAttribute('data-phase', 'choice');
+      await choices.first().focus();
+      await page.keyboard.press('ArrowDown');
+      await expect(choices.nth(1)).toBeFocused();
+      await shot(page, info, `choice-focus-${viewport.width}`);
+      if (viewport.width === 844) await choices.nth(1).tap();
+      else if (viewport.width === 1280) await page.keyboard.press('Space');
+      else {
+        const pos = (await choices.nth(1).boundingBox())!;
+        await page.mouse.move(pos.x + 20, pos.y + 20);
+        await page.mouse.down();
+        await expect(choices.nth(1)).toHaveCSS(
+          'background-color',
+          'rgb(52, 76, 91)',
+        );
+        await shot(page, info, 'choice-pressed-1920');
+        await page.mouse.up();
+      }
+      await expect(view(page)).toHaveAttribute(
+        'data-line-id',
+        'demo.D101-EM3-B01',
+      );
+      await reach(page, 'demo.D101-L005B');
+      await expect(button(page, 'อ่านต่อ')).toBeFocused();
+      expect(errors).toEqual([]);
+    });
   });
 }
 
@@ -252,7 +264,7 @@ test('Auto waits full reveal and delay, retains choice intent, resumes after man
   // prologue before the manual key reaches the browser. Keep the same assertions.
   await button(page, 'พัก').click();
   await button(page, 'ตั้งค่า').click();
-  await page.getByRole('slider', { name: 'Text Speed' }).focus();
+  await page.getByRole('slider', { name: 'ความเร็วข้อความ' }).focus();
   await page.keyboard.press('Home');
   await button(page, 'กลับเมนูเกม').click();
   await button(page, 'กลับหน้าหลัก').click();

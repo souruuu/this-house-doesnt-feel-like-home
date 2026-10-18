@@ -902,49 +902,6 @@ button {
   align-self: start;
   margin-top: 40px;
 }
-.demo-shell[data-compact='true'] .vn-main-menu h1 {
-  top: 48px;
-  font-size: 76px;
-  line-height: 1.3;
-}
-.demo-shell[data-compact='true'] .vn-menu-nav {
-  top: 290px;
-  gap: 0;
-}
-.demo-shell[data-compact='true'] .vn-menu-note {
-  bottom: 22px;
-}
-.demo-shell[data-compact='true'] .vn-screen {
-  padding: 28px 36px;
-}
-.demo-shell[data-compact='true'] .vn-screen-header {
-  padding-bottom: 22px;
-  gap: 28px;
-}
-.demo-shell[data-compact='true'] .vn-screen-header p {
-  max-width: 700px;
-}
-.demo-shell[data-compact='true'] .vn-options-layout {
-  grid-template-columns: 260px minmax(0, 1fr);
-  gap: 32px;
-}
-.demo-shell[data-compact='true'] .vn-options-nav {
-  padding-right: 22px;
-  gap: 4px;
-}
-.demo-shell[data-compact='true'] .vn-options-content {
-  gap: 45px;
-  padding-right: 18px;
-}
-.demo-shell[data-compact='true'] .vn-info-content {
-  margin-inline: 45px;
-}
-.demo-shell[data-compact='true'] .vn-info-content h3 {
-  font-size: 64px;
-}
-.demo-shell[data-compact='true'] .vn-return-context {
-  display: none;
-}
 .demo-shell[data-reduced-motion='true'] .vn-nav-item {
   transition: none;
 }
@@ -1327,30 +1284,6 @@ button {
   color: var(--vn-text);
   font-family: var(--vn-font);
 }
-.demo-shell[data-compact='true'] .vn-main-menu h1 {
-  top: 44px;
-  font-size: 78px;
-  width: 800px;
-  line-height: 1.45;
-}
-.demo-shell[data-compact='true'] .vn-menu-nav {
-  top: 300px;
-  gap: 0;
-}
-.demo-shell[data-compact='true'] .vn-menu-note {
-  bottom: 24px;
-}
-.demo-shell[data-compact='true'] .vn-options-content {
-  padding: 18px 28px;
-}
-.demo-shell[data-compact='true'] .vn-info-content {
-  margin-inline: 0;
-  padding: 32px;
-  max-width: 1150px;
-}
-.demo-shell[data-compact='true'] .vn-info-content h3 {
-  font-size: 60px;
-}
 .demo-shell[data-compact='true'] .demo-dialogue {
   bottom: 14px;
   padding: 12px 22px 4px;
@@ -1389,14 +1322,6 @@ button {
 .vn-menu-nav {
   top: 370px;
 }
-.demo-shell[data-compact='true'] .vn-main-menu h1 {
-  top: 82px;
-  font-size: 94px;
-  width: 840px;
-}
-.demo-shell[data-compact='true'] .vn-menu-nav {
-  top: 280px;
-}
 .vn-info-screen {
   position: absolute;
   left: 80px;
@@ -1407,8 +1332,7 @@ button {
   border: 0;
   background: rgb(16 29 45 / 96%);
 }
-.vn-info-content,
-.demo-shell[data-compact='true'] .vn-info-content {
+.vn-info-content {
   margin: auto 0;
   padding: 24px 0;
   min-height: 0;
@@ -1537,14 +1461,14 @@ button {
   background-repeat: no-repeat;
   background-blend-mode: multiply;
 }
-.demo-shell .vn-main-menu h1,
-.demo-shell[data-compact='true'] .vn-main-menu h1 {
+.demo-shell .vn-main-menu h1 {
   top: 84px;
   left: 96px;
-  width: auto;
-  max-width: 784px;
+  width: max-content;
+  max-width: none;
   font-family: var(--font-title);
-  font-size: 112px;
+  /* 112px (mock) measures 798px wide → right edge 894; 108px keeps it ≤ 880. */
+  font-size: 108px;
   font-weight: 400;
   line-height: 1.3;
   letter-spacing: 0;
@@ -1554,19 +1478,11 @@ button {
   paint-order: stroke fill;
   text-shadow: 6px 7px 0 var(--sky);
 }
-.demo-shell[data-compact='true'] .vn-main-menu h1 {
-  top: 36px;
-}
-.demo-shell .vn-menu-nav,
-.demo-shell[data-compact='true'] .vn-menu-nav {
+.demo-shell .vn-menu-nav {
   top: 330px;
   left: 150px;
   width: auto;
   gap: 28px;
-}
-.demo-shell[data-compact='true'] .vn-menu-nav {
-  top: 214px;
-  gap: 12px;
 }
 .demo-shell .ui-button.vn-bevel {
   position: relative;
@@ -1673,8 +1589,7 @@ button {
 .demo-shell[data-panel-open='true'] .vn-menu-characters {
   visibility: visible;
 }
-.demo-shell .vn-menu-note,
-.demo-shell[data-compact='true'] .vn-menu-note {
+.demo-shell .vn-menu-note {
   left: 130px;
   bottom: 30px;
   width: auto;
@@ -1686,9 +1601,6 @@ button {
   font-family: var(--font-body);
   font-size: max(24px, var(--vn-footnote-size));
   line-height: 1.5;
-}
-.demo-shell[data-compact='true'] .vn-menu-note {
-  bottom: 14px;
 }
 .demo-shell[data-menu-screen='true'] .demo-toolbar .ui-button,
 .demo-shell:has(.demo-narrative[data-scene-id='NOTICE'])
@@ -1775,8 +1687,7 @@ button {
 .demo-shell .vn-screen-header p {
   color: #5a4636;
 }
-.demo-shell .vn-info-content,
-.demo-shell[data-compact='true'] .vn-info-content {
+.demo-shell .vn-info-content {
   overscroll-behavior: contain;
   scrollbar-color: var(--wood) var(--paper-2);
 }
@@ -1886,8 +1797,8 @@ button {
 /* Pause: a sign on the left, not a centered modal (mock 6). */
 .demo-shell .demo-pause-backdrop {
   display: block;
+  /* No backdrop blur: Chromium flattens it to grey inside the scaled stage. */
   background: rgb(14 20 30 / 62%);
-  backdrop-filter: blur(3px);
 }
 .demo-shell .demo-pause.vn-paper-sign {
   position: absolute;
@@ -1901,12 +1812,6 @@ button {
   gap: 24px;
   scrollbar-color: var(--wood) var(--paper-2);
 }
-.demo-shell[data-compact='true'] .demo-pause.vn-paper-sign {
-  top: 36px;
-  max-height: 1008px;
-  padding: 30px 44px;
-  gap: 16px;
-}
 .demo-shell .demo-pause.vn-paper-sign h2 {
   color: var(--ink-brown);
   font-family: var(--font-display);
@@ -1915,9 +1820,6 @@ button {
   line-height: 1.1;
   text-align: center;
   text-shadow: 4px 4px 0 #bfe3f4;
-}
-.demo-shell[data-compact='true'] .demo-pause.vn-paper-sign h2 {
-  font-size: 72px;
 }
 .vn-dashed-rule {
   flex-shrink: 0;
@@ -2000,10 +1902,7 @@ button {
 }
 
 /* Notice (in-session, before Day 1): same paper zone as the menu panels. */
-.demo-narrative[data-scene-id='NOTICE'] .demo-dialogue,
-.demo-shell[data-compact='true']
-  .demo-narrative[data-scene-id='NOTICE']
-  .demo-dialogue {
+.demo-narrative[data-scene-id='NOTICE'] .demo-dialogue {
   left: 60px;
   width: 820px;
   border: 8px solid var(--wood);
@@ -2103,4 +2002,128 @@ button {
   .demo-shell .vn-pause-action:active {
     transform: none;
   }
+}
+
+/* Part A (Owner 2026-10-18): Load stays clickable but visibly unavailable
+   (mock tone; text darkened from #6b7478 to #5f686c to keep >= 4.5:1). */
+.demo-shell .ui-button.vn-bevel[data-unavailable='true'] {
+  background: #e4e8ec;
+  border-color: #9aa8ad;
+  color: #5f686c;
+  box-shadow:
+    inset 4px 4px 0 #f4f6f8,
+    inset -4px -4px 0 #ccd3d7,
+    6px 8px 0 rgb(60 45 30 / 14%);
+}
+.demo-shell .vn-bevel[data-unavailable='true'] .vn-availability {
+  color: #5f686c;
+}
+
+/* Notice: one fixed box in the paper zone; the start choice sits under it. */
+.demo-shell .demo-narrative[data-scene-id='NOTICE'] .demo-dialogue {
+  top: 150px;
+  bottom: auto;
+  left: 150px;
+  width: 720px;
+  /* Fixed size: lines never move the box; long text scrolls inside. */
+  height: 260px;
+  max-height: none;
+}
+.demo-shell .demo-narrative[data-scene-id='NOTICE'] .demo-choice-region {
+  top: 440px;
+  left: 150px;
+  width: 720px;
+  height: 300px;
+  align-items: flex-start;
+}
+.demo-shell[data-compact='true']
+  .demo-narrative[data-scene-id='NOTICE']
+  .demo-dialogue {
+  top: 140px;
+  height: 400px;
+}
+.demo-shell[data-compact='true']
+  .demo-narrative[data-scene-id='NOTICE']
+  .demo-choice-region {
+  top: 580px;
+}
+
+/* Viewport guard (stage scale < 0.28 or touch portrait). */
+.demo-shell .rotate-prompt {
+  z-index: 10;
+  padding: 16px;
+  background: var(--paper);
+  color: var(--ink-brown);
+  font-family: var(--font-body);
+}
+.rotate-prompt-card {
+  max-width: 440px;
+  padding: 20px 24px;
+  border: 4px solid var(--wood);
+  border-radius: 14px;
+  background: var(--paper-2);
+  box-shadow: 0 0 0 3px #d7b27c;
+  font-size: 16px;
+  line-height: 1.6;
+}
+.rotate-prompt-card p {
+  margin: 0;
+}
+.rotate-prompt-card .rotate-prompt-title {
+  margin-bottom: 8px;
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 600;
+}
+
+/* Touch compact (pointer: coarse, landscape, scale < 0.6) — the only
+   compact layout for menu/panels/pause. Sizes come from the shared
+   --demo-control-size (= 44 css px at the current scale). */
+.demo-shell[data-compact='true'] .vn-main-menu h1 {
+  top: 30px;
+}
+.demo-shell[data-compact='true'] .vn-menu-nav {
+  top: 206px;
+  gap: 12px;
+}
+.demo-shell[data-compact='true'] .vn-menu-note {
+  bottom: 12px;
+  padding: 6px 18px;
+  line-height: 1.35;
+}
+.demo-shell[data-compact='true'] .vn-screen {
+  padding: 28px 36px;
+}
+.demo-shell[data-compact='true'] .vn-screen-header {
+  gap: 28px;
+}
+.demo-shell[data-compact='true'] .vn-screen-header p {
+  max-width: 700px;
+}
+.demo-shell[data-compact='true'] .vn-options-layout {
+  grid-template-columns: 300px minmax(0, 1fr);
+  gap: 32px;
+}
+.demo-shell[data-compact='true'] .vn-options-nav {
+  padding-right: 22px;
+  gap: 4px;
+}
+.demo-shell[data-compact='true'] .vn-options-content {
+  padding: 18px 28px;
+}
+.demo-shell[data-compact='true'] .vn-return-context {
+  display: none;
+}
+.demo-shell[data-compact='true'] .vn-info-content h3 {
+  font-size: 60px;
+}
+.demo-shell[data-compact='true'] .demo-pause.vn-paper-sign {
+  top: 30px;
+  width: 780px;
+  max-height: 1020px;
+  padding: 28px 44px;
+  gap: 14px;
+}
+.demo-shell[data-compact='true'] .demo-pause.vn-paper-sign h2 {
+  font-size: 72px;
 }

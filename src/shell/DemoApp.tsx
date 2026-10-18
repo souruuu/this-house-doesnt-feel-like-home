@@ -99,7 +99,10 @@ export function DemoApp() {
   const [bounds, setBounds] = useState(() =>
     fitViewport(window.innerWidth, window.innerHeight),
   );
-  const [portrait, setPortrait] = useState(false);
+  const [portraitTouch, setPortraitTouch] = useState(false);
+  const [coarsePointer, setCoarsePointer] = useState(
+    () => window.matchMedia('(pointer: coarse)').matches,
+  );
   const [hidden, setHidden] = useState(document.hidden);
   const [userPaused, setUserPaused] = useState(false);
   const [preferences, setPreferences] = useState(createDemoPreferences);
@@ -115,6 +118,14 @@ export function DemoApp() {
   );
   const [fullscreenMessage, setFullscreenMessage] = useState('');
   const reducedMotion = systemReducedMotion || preferences.reduceMotion;
+  // Responsive rule (Owner 2026-10-18): mouse windows scale the 1920x1080
+  // design uniformly; only touch landscape below 0.6 uses the compact layout
+  // (targets >= 44 css px); a stage below 0.28 or touch portrait shows a guard.
+  const stageScale = bounds.scale || 1;
+  const tooSmall = stageScale < 0.28;
+  const portrait = portraitTouch || tooSmall;
+  const touchCompact = coarsePointer && stageScale < 0.6;
+  const uiScale = touchCompact ? stageScale : 1;
   const view = useSyncExternalStore(
     session?.controller.subscribe ?? noSubscribe,
     session?.controller.getSnapshot ?? noSnapshot,
@@ -135,10 +146,10 @@ export function DemoApp() {
         !session || view?.presentation.sceneId === 'NOTICE'
           ? 'menu'
           : 'gameplay',
-      viewportScale: bounds.scale || 1,
+      viewportScale: uiScale,
       reducedMotion,
     }),
-    [view, session, bounds.scale, reducedMotion],
+    [view, session, uiScale, reducedMotion],
   );
   const lineKey = `${view?.sessionId ?? 'menu'}/${view?.presentation.sceneId ?? ''}/${view?.line?.id ?? ''}`;
   const reveal = useDialogueReveal({
@@ -162,7 +173,7 @@ export function DemoApp() {
     revealing: reveal.revealing,
     delaySeconds: preferences.autoForwardSeconds,
   });
-  const scale = bounds.scale || 1;
+  const scale = uiScale;
   const gameplay = demoGameplayLayout(scale);
   const characterLayout = demoCharacterLayout(scale);
   const overlayStyle: CSSProperties & {
@@ -199,16 +210,19 @@ export function DemoApp() {
     const orientation = window.matchMedia(
       '(orientation: portrait) and (any-pointer: coarse)',
     );
+    const pointer = window.matchMedia('(pointer: coarse)');
     const measure = () => {
       invalidateInput();
       stopAuto();
       const rect = shellRef.current!.getBoundingClientRect();
       setBounds(fitViewport(rect.width, rect.height));
-      setPortrait(orientation.matches);
+      setPortraitTouch(orientation.matches);
+      setCoarsePointer(pointer.matches);
     };
     const observer = new ResizeObserver(measure);
     observer.observe(shellRef.current!);
     orientation.addEventListener('change', measure);
+    pointer.addEventListener('change', measure);
     measure();
     const visibility = () => {
       invalidateInput();
@@ -240,6 +254,7 @@ export function DemoApp() {
     return () => {
       observer.disconnect();
       orientation.removeEventListener('change', measure);
+      pointer.removeEventListener('change', measure);
       document.removeEventListener('visibilitychange', visibility);
       motion.removeEventListener('change', changeMotion);
       window.removeEventListener('blur', blur);
@@ -429,7 +444,10 @@ export function DemoApp() {
       data-menu-screen={!session}
       data-panel-open={panel !== null}
       data-pause-open={userPaused}
-      data-compact={scale < 0.6}
+      data-compact={touchCompact}
+      data-viewport-guard={
+        portraitTouch ? 'rotate' : tooSmall ? 'small' : 'none'
+      }
       data-reduced-motion={reducedMotion}
       data-stage-character={Boolean(
         presentation.characterStage?.characters.length,
@@ -578,8 +596,14 @@ export function DemoApp() {
       </div>
       {portrait ? (
         <div className="rotate-prompt" role="alert">
-          <p>กรุณาหมุนอุปกรณ์เป็นแนวนอนเพื่อเล่น</p>
-          <p>พักการแสดงผลไว้แล้ว</p>
+          <div className="rotate-prompt-card">
+            <p className="rotate-prompt-title">
+              {portraitTouch
+                ? 'กรุณาหมุนอุปกรณ์เป็นแนวนอนเพื่อเล่น'
+                : 'ขยายหน้าต่างให้ใหญ่ขึ้นเพื่อเล่นต่อ'}
+            </p>
+            <p>พักการแสดงผลไว้แล้ว เกมจะเล่นต่อเองเมื่อหน้าจอพอดี</p>
+          </div>
         </div>
       ) : null}
     </div>

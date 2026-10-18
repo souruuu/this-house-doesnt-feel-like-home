@@ -182,45 +182,50 @@ for (const viewport of [
   { width: 1280, height: 720 },
   { width: 844, height: 390 },
 ]) {
-  test(`touch targets and paper-zone panels ${viewport.width}x${viewport.height}`, async ({
-    page,
-  }) => {
-    await page.setViewportSize(viewport);
-    await ready(page);
-    for (const entry of ['Start', 'Load', 'Options', 'Gallery', 'About']) {
-      const box = await logical(page, `[data-menu-entry="${entry}"]`);
-      expect(box.cssHeight).toBeGreaterThanOrEqual(43.9);
-      expect(box.right).toBeLessThan(1000);
-    }
-    const note = await logical(page, '.vn-menu-note');
-    const about = await logical(page, '[data-menu-entry="About"]');
-    expect(note.y).toBeGreaterThan(about.bottom);
-    expect(note.bottom).toBeLessThanOrEqual(1080);
-    for (const [entry, name] of [
-      ['Load', 'โหลดเกม'],
-      ['Gallery', 'แกลเลอรี'],
-      ['About', 'เกี่ยวกับ'],
-    ] as const) {
-      await page.locator(`[data-menu-entry="${entry}"]`).click();
-      await expect(page.getByRole('dialog', { name })).toBeVisible();
-      const panel = await logical(page, '.vn-info-screen');
-      expect(panel.right).toBeLessThanOrEqual(900);
-      await expectContainedScroll(page, '.vn-info-content');
-      await button(page, 'กลับหน้าหลัก').click();
-    }
-    await button(page, 'เริ่มเกม').click();
-    await expect(view(page)).toHaveAttribute('data-scene-id', 'NOTICE');
-    const notice = await logical(page, '.demo-dialogue');
-    expect(notice.right).toBeLessThanOrEqual(900);
-    await button(page, 'พัก').click();
-    for (const name of ['เล่นต่อ', 'ตั้งค่า', 'กลับหน้าหลัก']) {
-      const box = (await button(page, name).boundingBox())!;
-      expect(box.height).toBeGreaterThanOrEqual(43.9);
-    }
-    const sign = await logical(page, '.demo-pause');
-    expect(sign.x).toBeLessThan(200);
-    expect(sign.right).toBeLessThanOrEqual(900);
-    expect(sign.bottom).toBeLessThanOrEqual(1080);
+  test.describe(`${viewport.width}x${viewport.height}`, () => {
+    // Owner rule 2026-10-18: 844x390 is the touch-phone compact case; mouse
+    // windows scale uniformly (covered by ui-responsive-*.spec.ts).
+    if (viewport.width === 844) test.use({ hasTouch: true, isMobile: true });
+    test(`touch targets and paper-zone panels ${viewport.width}x${viewport.height}`, async ({
+      page,
+    }) => {
+      await page.setViewportSize(viewport);
+      await ready(page);
+      for (const entry of ['Start', 'Load', 'Options', 'Gallery', 'About']) {
+        const box = await logical(page, `[data-menu-entry="${entry}"]`);
+        expect(box.cssHeight).toBeGreaterThanOrEqual(43.9);
+        expect(box.right).toBeLessThan(1000);
+      }
+      const note = await logical(page, '.vn-menu-note');
+      const about = await logical(page, '[data-menu-entry="About"]');
+      expect(note.y).toBeGreaterThan(about.bottom);
+      expect(note.bottom).toBeLessThanOrEqual(1080);
+      for (const [entry, name] of [
+        ['Load', 'โหลดเกม'],
+        ['Gallery', 'แกลเลอรี'],
+        ['About', 'เกี่ยวกับ'],
+      ] as const) {
+        await page.locator(`[data-menu-entry="${entry}"]`).click();
+        await expect(page.getByRole('dialog', { name })).toBeVisible();
+        const panel = await logical(page, '.vn-info-screen');
+        expect(panel.right).toBeLessThanOrEqual(900);
+        await expectContainedScroll(page, '.vn-info-content');
+        await button(page, 'กลับหน้าหลัก').click();
+      }
+      await button(page, 'เริ่มเกม').click();
+      await expect(view(page)).toHaveAttribute('data-scene-id', 'NOTICE');
+      const notice = await logical(page, '.demo-dialogue');
+      expect(notice.right).toBeLessThanOrEqual(900);
+      await button(page, 'พัก').click();
+      for (const name of ['เล่นต่อ', 'ตั้งค่า', 'กลับหน้าหลัก']) {
+        const box = (await button(page, name).boundingBox())!;
+        expect(box.height).toBeGreaterThanOrEqual(43.9);
+      }
+      const sign = await logical(page, '.demo-pause');
+      expect(sign.x).toBeLessThan(200);
+      expect(sign.right).toBeLessThanOrEqual(900);
+      expect(sign.bottom).toBeLessThanOrEqual(1080);
+    });
   });
 }
 

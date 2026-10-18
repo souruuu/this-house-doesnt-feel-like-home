@@ -74,11 +74,11 @@ export function OptionsScreen({
                 </h3>
                 <label className="vn-range-setting">
                   <span>
-                    Text Speed{' '}
+                    ความเร็วข้อความ{' '}
                     <output>{preferences.textSpeed} กลุ่มอักษร/วินาที</output>
                   </span>
                   <input
-                    aria-label="Text Speed"
+                    aria-label="ความเร็วข้อความ"
                     type="range"
                     min="25"
                     max="60"
@@ -98,11 +98,11 @@ export function OptionsScreen({
                 </label>
                 <label className="vn-range-setting">
                   <span>
-                    Auto-Forward Time{' '}
+                    เวลาเลื่อนอัตโนมัติ{' '}
                     <output>{preferences.autoForwardSeconds} วินาที</output>
                   </span>
                   <input
-                    aria-label="Auto-Forward Time"
+                    aria-label="เวลาเลื่อนอัตโนมัติ"
                     type="range"
                     min="1"
                     max="6"
@@ -147,14 +147,14 @@ export function OptionsScreen({
                     aria-pressed={!fullscreen}
                     onActivate={() => onDisplay('windowed')}
                   >
-                    Windowed
+                    หน้าต่าง
                   </DemoControl>
                   <DemoControl
                     {...guard}
                     aria-pressed={fullscreen}
                     onActivate={() => onDisplay('fullscreen')}
                   >
-                    Fullscreen
+                    เต็มจอ
                   </DemoControl>
                 </div>
                 <label className="vn-toggle-setting">
@@ -188,7 +188,7 @@ export function OptionsScreen({
               <h3 id="options-audio" tabIndex={-1}>
                 เสียง
               </h3>
-              {['Music Volume', 'Sound Volume'].map((label) => (
+              {['เสียงเพลง', 'เสียงประกอบ'].map((label) => (
                 <label
                   key={label}
                   className="vn-range-setting vn-unavailable-setting"

@@ -9,7 +9,7 @@ test('safe dialogue clicks exclude selection, drag, scroll and controls; first r
 }, info) => {
   await page.goto(url);
   await button(page, 'ตั้งค่า').click();
-  await page.getByRole('slider', { name: 'Text Speed' }).focus();
+  await page.getByRole('slider', { name: 'ความเร็วข้อความ' }).focus();
   await page.keyboard.press('Home');
   await button(page, 'กลับหน้าหลัก').click();
   // Revocation also spans a menu-only cycle with no Controller revision yet.
@@ -158,7 +158,10 @@ for (const viewport of [
       await expect(button(page, name)).toBeFocused();
     }
     await button(page, 'ตั้งค่า').click();
-    const speed = page.getByRole('slider', { name: 'Text Speed', exact: true });
+    const speed = page.getByRole('slider', {
+      name: 'ความเร็วข้อความ',
+      exact: true,
+    });
     await speed.click();
     await expect(speed).toBeFocused();
     const instant = page.getByRole('checkbox', {

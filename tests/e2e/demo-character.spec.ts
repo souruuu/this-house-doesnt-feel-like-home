@@ -92,170 +92,181 @@ for (const viewport of [
   { width: 1280, height: 720 },
   { width: 844, height: 390 },
 ]) {
-  test(`Post-AB four canonical characters and safe UI bounds ${viewport.width}`, async ({
-    page,
-  }, info) => {
-    test.setTimeout(600_000); // Full editorial script adds 115 lines across nine scenes.
-    const errors = audit(page);
-    await page.setViewportSize(viewport);
-    await page.goto(url);
-    await expect(page.locator('[data-world-state="ready"]')).toHaveCount(1);
-    await expect(page.getByRole('heading', { level: 1 })).toHaveText(
-      'หลังเคาน์เตอร์',
-    );
-    expect((await stage(page)).slots.every((s) => !s.visible)).toBe(true);
-    await shot(page, info, 'title-no-menu-characters');
-    const rect = (await page.locator('.logical-stage').boundingBox())!;
-    const scale = rect.width / 1920;
-    for (const name of ['แกลเลอรี', 'เกี่ยวกับ', 'โหลดเกม']) {
-      await button(page, name).click();
-      const panel = page.getByRole('dialog', { name, exact: true });
-      const r = (await panel.boundingBox())!;
-      expect(r.x).toBeGreaterThanOrEqual(rect.x);
-      expect(r.x + r.width).toBeLessThan(rect.x + demoMenuPortrait.x * scale);
-      expect(r.y + r.height).toBeLessThanOrEqual(rect.y + rect.height);
-      await shot(page, info, name.toLowerCase() + '-safe-bounds');
-      const back = button(page, 'กลับหน้าหลัก');
-      await back.hover();
-      await expect(back).toHaveCSS('text-shadow', 'none');
-      await expect(back).toHaveCSS('text-decoration-line', 'none');
-      await expect(back).toHaveCSS('box-shadow', 'none');
-      await page.keyboard.press('Tab');
-      await expect(back).toBeFocused();
-      expect(await back.evaluate((el) => el.matches(':focus-visible'))).toBe(
-        true,
+  test.describe(`${viewport.width}x${viewport.height}`, () => {
+    // Owner rule 2026-10-18: 844x390 is the touch-phone compact case; mouse
+    // windows scale uniformly (covered by ui-responsive-*.spec.ts).
+    if (viewport.width === 844) test.use({ hasTouch: true, isMobile: true });
+    test(`Post-AB four canonical characters and safe UI bounds ${viewport.width}`, async ({
+      page,
+    }, info) => {
+      test.setTimeout(600_000); // Full editorial script adds 115 lines across nine scenes.
+      const errors = audit(page);
+      await page.setViewportSize(viewport);
+      await page.goto(url);
+      await expect(page.locator('[data-world-state="ready"]')).toHaveCount(1);
+      await expect(page.getByRole('heading', { level: 1 })).toHaveText(
+        'หลังเคาน์เตอร์',
       );
-      await expect(back).toHaveCSS('outline-style', 'solid');
-      await shot(page, info, name.toLowerCase() + '-back-keyboard-focus');
-      await back.click();
-      await expect(button(page, name)).toBeFocused();
-    }
-    await button(page, 'ตั้งค่า').click();
-    for (const [name, pane] of [
-      ['การอ่าน', 'reading'],
-      ['หน้าจอ', 'display'],
-      ['เสียง', 'audio'],
-    ]) {
-      await button(page, name).click();
-      await expect(page.locator('[data-options-pane]')).toHaveAttribute(
-        'data-options-pane',
-        pane,
+      expect((await stage(page)).slots.every((s) => !s.visible)).toBe(true);
+      await shot(page, info, 'title-no-menu-characters');
+      const rect = (await page.locator('.logical-stage').boundingBox())!;
+      const scale = rect.width / 1920;
+      for (const name of ['แกลเลอรี', 'เกี่ยวกับ', 'โหลดเกม']) {
+        await button(page, name).click();
+        const panel = page.getByRole('dialog', { name, exact: true });
+        const r = (await panel.boundingBox())!;
+        expect(r.x).toBeGreaterThanOrEqual(rect.x);
+        expect(r.x + r.width).toBeLessThan(rect.x + demoMenuPortrait.x * scale);
+        expect(r.y + r.height).toBeLessThanOrEqual(rect.y + rect.height);
+        await shot(page, info, name.toLowerCase() + '-safe-bounds');
+        const back = button(page, 'กลับหน้าหลัก');
+        await back.hover();
+        await expect(back).toHaveCSS('text-shadow', 'none');
+        await expect(back).toHaveCSS('text-decoration-line', 'none');
+        await expect(back).toHaveCSS('box-shadow', 'none');
+        await page.keyboard.press('Tab');
+        await expect(back).toBeFocused();
+        expect(await back.evaluate((el) => el.matches(':focus-visible'))).toBe(
+          true,
+        );
+        await expect(back).toHaveCSS('outline-style', 'solid');
+        await shot(page, info, name.toLowerCase() + '-back-keyboard-focus');
+        await back.click();
+        await expect(button(page, name)).toBeFocused();
+      }
+      await button(page, 'ตั้งค่า').click();
+      for (const [name, pane] of [
+        ['การอ่าน', 'reading'],
+        ['หน้าจอ', 'display'],
+        ['เสียง', 'audio'],
+      ]) {
+        await button(page, name).click();
+        await expect(page.locator('[data-options-pane]')).toHaveAttribute(
+          'data-options-pane',
+          pane,
+        );
+        await shot(page, info, 'options-' + pane);
+      }
+      await button(page, 'การอ่าน').click();
+      await page
+        .getByRole('checkbox', { name: 'แสดงข้อความทันที', exact: true })
+        .check();
+      await button(page, 'กลับหน้าหลัก').click();
+      await button(page, 'เริ่มเกม').click();
+      const notice = (await page.locator('.demo-dialogue').boundingBox())!;
+      expect(notice.x + notice.width).toBeLessThan(
+        rect.x + demoMenuPortrait.x * scale,
       );
-      await shot(page, info, 'options-' + pane);
-    }
-    await button(page, 'การอ่าน').click();
-    await page
-      .getByRole('checkbox', { name: 'แสดงข้อความทันที', exact: true })
-      .check();
-    await button(page, 'กลับหน้าหลัก').click();
-    await button(page, 'เริ่มเกม').click();
-    const notice = (await page.locator('.demo-dialogue').boundingBox())!;
-    expect(notice.x + notice.width).toBeLessThan(
-      rect.x + demoMenuPortrait.x * scale,
-    );
-    await shot(page, info, 'notice-safe-bounds');
-    const captures: Record<string, string> = {
-      'demo.D101-L003': 'manao',
-      'demo.D102-L003': 'som',
-      'demo.D103-L003': 'nut',
-      'demo.D303-L004': 'kant',
-      'demo.D203-L003T': 'nut-evening',
-      'demo.D302-L004': 'nut-night',
-    };
-    const evidence = [];
-    const seen = new Set<string>();
-    let named = false,
-      choiceCaptured = false;
-    for (let i = 0; i < 250; i++) {
-      const phase = await view(page).getAttribute('data-phase');
-      const id = (await view(page).getAttribute('data-line-id'))!;
-      if (phase === 'ended') break;
-      expect(phase).not.toBe('error');
-      if (id === 'demo.D303-L010A') named = true;
-      if (!named) await expect(view(page)).not.toContainText('กันต์');
-      if (phase === 'line' && captures[id] && !seen.has(captures[id])) {
-        await settled(page);
-        const s = await stage(page),
-          visible = s.slots.filter((s) => s.visible);
-        const expected = captures[id].split('-')[0];
-        expect(visible).toHaveLength(1);
-        expect(visible[0].character).toBe(expected);
-        const actor = visible[0];
-        expect(actor.position).toBe('left');
-        expect(actor.x).toBeGreaterThan(demoPortrait.x);
-        expect(actor.x + actor.width).toBeLessThan(
-          demoPortrait.x + demoPortrait.width,
-        );
-        expect(actor.y).toBeGreaterThan(0);
-        const dialogue = (await page.locator('.demo-dialogue').boundingBox())!;
-        expect(rect.y + (actor.y + actor.height) * scale).toBeLessThan(
-          dialogue.y,
-        );
-        await shot(page, info, 'character-' + captures[id]);
-        evidence.push({ id, renderer: s });
-        seen.add(captures[id]);
-      }
-      if (id === 'demo.D101-L004' && phase === 'line') {
-        await settled(page);
-        expect((await stage(page)).slots[0].character).toBe('manao');
-        await expect(page.locator('.demo-speaker-header')).toHaveCount(0);
-        await shot(page, info, 'narrator-retains-character');
-      }
-      if (id === 'demo.D101-EM3-I02' && phase === 'line') {
-        await expect(page.locator('.demo-speaker')).toHaveText('เจ้าของร้าน');
-        await expect(page.locator('.demo-text')).toHaveText('ตามสบาย');
-        await expect(
-          page.locator('[data-world-character-cue]'),
-        ).toHaveAttribute('data-world-character-cue', '');
-        await settled(page);
+      await shot(page, info, 'notice-safe-bounds');
+      const captures: Record<string, string> = {
+        'demo.D101-L003': 'manao',
+        'demo.D102-L003': 'som',
+        'demo.D103-L003': 'nut',
+        'demo.D303-L004': 'kant',
+        'demo.D203-L003T': 'nut-evening',
+        'demo.D302-L004': 'nut-night',
+      };
+      const evidence = [];
+      const seen = new Set<string>();
+      let named = false,
+        choiceCaptured = false;
+      for (let i = 0; i < 250; i++) {
+        const phase = await view(page).getAttribute('data-phase');
+        const id = (await view(page).getAttribute('data-line-id'))!;
+        if (phase === 'ended') break;
+        expect(phase).not.toBe('error');
+        if (id === 'demo.D303-L010A') named = true;
+        if (!named) await expect(view(page)).not.toContainText('กันต์');
+        if (phase === 'line' && captures[id] && !seen.has(captures[id])) {
+          await settled(page);
+          const s = await stage(page),
+            visible = s.slots.filter((s) => s.visible);
+          const expected = captures[id].split('-')[0];
+          expect(visible).toHaveLength(1);
+          expect(visible[0].character).toBe(expected);
+          const actor = visible[0];
+          expect(actor.position).toBe('left');
+          expect(actor.x).toBeGreaterThan(demoPortrait.x);
+          expect(actor.x + actor.width).toBeLessThan(
+            demoPortrait.x + demoPortrait.width,
+          );
+          expect(actor.y).toBeGreaterThan(0);
+          const dialogue = (await page
+            .locator('.demo-dialogue')
+            .boundingBox())!;
+          expect(rect.y + (actor.y + actor.height) * scale).toBeLessThan(
+            dialogue.y,
+          );
+          await shot(page, info, 'character-' + captures[id]);
+          evidence.push({ id, renderer: s });
+          seen.add(captures[id]);
+        }
+        if (id === 'demo.D101-L004' && phase === 'line') {
+          await settled(page);
+          expect((await stage(page)).slots[0].character).toBe('manao');
+          await expect(page.locator('.demo-speaker-header')).toHaveCount(0);
+          await shot(page, info, 'narrator-retains-character');
+        }
+        if (id === 'demo.D101-EM3-I02' && phase === 'line') {
+          await expect(page.locator('.demo-speaker')).toHaveText('เจ้าของร้าน');
+          await expect(page.locator('.demo-text')).toHaveText('ตามสบาย');
+          await expect(
+            page.locator('[data-world-character-cue]'),
+          ).toHaveAttribute('data-world-character-cue', '');
+          await settled(page);
+          expect(
+            (await stage(page)).slots
+              .filter((s) => s.visible)
+              .map((s) => s.character),
+          ).toEqual(['manao']);
+          await shot(page, info, 'player-speech-retains-character');
+        }
+        if (
+          id === 'demo.D101-EM3-I03' &&
+          phase === 'choice' &&
+          !choiceCaptured
+        ) {
+          const s = await stage(page),
+            actor = s.slots.find((s) => s.visible)!;
+          const c = (await page.locator('.demo-choice-region').boundingBox())!;
+          expect(c.x).toBeGreaterThan(rect.x + (actor.x + actor.width) * scale);
+          expect(c.x + c.width).toBeLessThan(
+            rect.x + (demoPortrait.x + demoPortrait.width) * scale,
+          );
+          const revision = await view(page).getAttribute('data-view-revision');
+          await shot(page, info, 'choice-beside-character');
+          await expect(view(page)).toHaveAttribute(
+            'data-view-revision',
+            revision!,
+          );
+          expect((await stage(page)).slots[0].character).toBe('manao');
+          choiceCaptured = true;
+        }
+        if (
+          ['demo.D103-L008', 'demo.D103-L011'].includes(id) &&
+          phase === 'line'
+        ) {
+          await settled(page);
+          expect((await stage(page)).slots.every((s) => !s.visible)).toBe(true);
+        }
         expect(
-          (await stage(page)).slots
-            .filter((s) => s.visible)
-            .map((s) => s.character),
-        ).toEqual(['manao']);
-        await shot(page, info, 'player-speech-retains-character');
+          (await stage(page)).slots.filter((s) => s.visible).length,
+        ).toBeLessThanOrEqual(1);
+        await next(page);
       }
-      if (id === 'demo.D101-EM3-I03' && phase === 'choice' && !choiceCaptured) {
-        const s = await stage(page),
-          actor = s.slots.find((s) => s.visible)!;
-        const c = (await page.locator('.demo-choice-region').boundingBox())!;
-        expect(c.x).toBeGreaterThan(rect.x + (actor.x + actor.width) * scale);
-        expect(c.x + c.width).toBeLessThan(
-          rect.x + (demoPortrait.x + demoPortrait.width) * scale,
-        );
-        const revision = await view(page).getAttribute('data-view-revision');
-        await shot(page, info, 'choice-beside-character');
-        await expect(view(page)).toHaveAttribute(
-          'data-view-revision',
-          revision!,
-        );
-        expect((await stage(page)).slots[0].character).toBe('manao');
-        choiceCaptured = true;
-      }
-      if (
-        ['demo.D103-L008', 'demo.D103-L011'].includes(id) &&
-        phase === 'line'
-      ) {
-        await settled(page);
-        expect((await stage(page)).slots.every((s) => !s.visible)).toBe(true);
-      }
-      expect(
-        (await stage(page)).slots.filter((s) => s.visible).length,
-      ).toBeLessThanOrEqual(1);
-      await next(page);
-    }
-    await expect(view(page)).toHaveAttribute('data-phase', 'ended');
-    await settled(page);
-    expect((await stage(page)).slots.every((s) => !s.visible)).toBe(true);
-    expect([...seen].sort()).toEqual(
-      ['kant', 'manao', 'nut', 'nut-evening', 'nut-night', 'som'].sort(),
-    );
-    expect(choiceCaptured).toBe(true);
-    await info.attach('actual-character-bounds', {
-      body: JSON.stringify(evidence, null, 2),
-      contentType: 'application/json',
+      await expect(view(page)).toHaveAttribute('data-phase', 'ended');
+      await settled(page);
+      expect((await stage(page)).slots.every((s) => !s.visible)).toBe(true);
+      expect([...seen].sort()).toEqual(
+        ['kant', 'manao', 'nut', 'nut-evening', 'nut-night', 'som'].sort(),
+      );
+      expect(choiceCaptured).toBe(true);
+      await info.attach('actual-character-bounds', {
+        body: JSON.stringify(evidence, null, 2),
+        contentType: 'application/json',
+      });
+      expect(errors).toEqual([]);
     });
-    expect(errors).toEqual([]);
   });
 }
 

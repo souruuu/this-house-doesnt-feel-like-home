@@ -11,118 +11,127 @@ for (const viewport of [
   { width: 1280, height: 720 },
   { width: 844, height: 390 },
 ]) {
-  test(`checkpoint A menu/options composition ${viewport.width}x${viewport.height}`, async ({
-    page,
-  }, info) => {
-    await page.setViewportSize(viewport);
-    const errors: string[] = [];
-    page.on('pageerror', (e) => errors.push(e.message));
-    page.on('console', (message) => {
-      if (message.type() === 'error') errors.push(message.text());
-    });
-    page.on('response', (r) => {
-      if (r.status() >= 400) errors.push(`${r.status()} ${r.url()}`);
-    });
-    await page.goto(url);
-    await expect(page).toHaveTitle('หลังเคาน์เตอร์');
-    await expect(page.locator('[data-world-state="ready"]')).toHaveCount(1);
-    const stage = (await page.locator('.logical-stage').boundingBox())!;
-    const scale = stage.width / 1920;
-    const title = (await page
-      .getByRole('heading', { level: 1 })
-      .boundingBox())!;
-    expect(title.x + title.width).toBeLessThan(
-      stage.x + demoMenuPortrait.x * scale,
-    );
-    for (const name of [
-      'เริ่มเกม',
-      'โหลดเกม',
-      'ตั้งค่า',
-      'แกลเลอรี',
-      'เกี่ยวกับ',
-    ]) {
-      await expect(button(page, name)).toBeVisible();
-      expect(
-        (await button(page, name).boundingBox())!.height,
-      ).toBeGreaterThanOrEqual(43.9);
-    }
-    await page.mouse.click(stage.x + 25 * scale, stage.y + 25 * scale);
-    await page.screenshot({
-      path: info.outputPath(`menu-${viewport.width}x${viewport.height}.png`),
-    });
-    const before = await button(page, 'ตั้งค่า').evaluate(
-      (el) => getComputedStyle(el).backgroundColor,
-    );
-    await button(page, 'ตั้งค่า').hover();
-    await expect
-      .poll(() =>
-        button(page, 'ตั้งค่า').evaluate(
-          (el) => getComputedStyle(el).backgroundColor,
+  test.describe(`${viewport.width}x${viewport.height}`, () => {
+    // Owner rule 2026-10-18: 844x390 is the touch-phone compact case; mouse
+    // windows scale uniformly (covered by ui-responsive-*.spec.ts).
+    if (viewport.width === 844) test.use({ hasTouch: true, isMobile: true });
+    test(`checkpoint A menu/options composition ${viewport.width}x${viewport.height}`, async ({
+      page,
+    }, info) => {
+      await page.setViewportSize(viewport);
+      const errors: string[] = [];
+      page.on('pageerror', (e) => errors.push(e.message));
+      page.on('console', (message) => {
+        if (message.type() === 'error') errors.push(message.text());
+      });
+      page.on('response', (r) => {
+        if (r.status() >= 400) errors.push(`${r.status()} ${r.url()}`);
+      });
+      await page.goto(url);
+      await expect(page).toHaveTitle('หลังเคาน์เตอร์');
+      await expect(page.locator('[data-world-state="ready"]')).toHaveCount(1);
+      const stage = (await page.locator('.logical-stage').boundingBox())!;
+      const scale = stage.width / 1920;
+      const title = (await page
+        .getByRole('heading', { level: 1 })
+        .boundingBox())!;
+      expect(title.x + title.width).toBeLessThan(
+        stage.x + demoMenuPortrait.x * scale,
+      );
+      for (const name of [
+        'เริ่มเกม',
+        'โหลดเกม',
+        'ตั้งค่า',
+        'แกลเลอรี',
+        'เกี่ยวกับ',
+      ]) {
+        await expect(button(page, name)).toBeVisible();
+        expect(
+          (await button(page, name).boundingBox())!.height,
+        ).toBeGreaterThanOrEqual(43.9);
+      }
+      await page.mouse.click(stage.x + 25 * scale, stage.y + 25 * scale);
+      await page.screenshot({
+        path: info.outputPath(`menu-${viewport.width}x${viewport.height}.png`),
+      });
+      const before = await button(page, 'ตั้งค่า').evaluate(
+        (el) => getComputedStyle(el).backgroundColor,
+      );
+      await button(page, 'ตั้งค่า').hover();
+      await expect
+        .poll(() =>
+          button(page, 'ตั้งค่า').evaluate(
+            (el) => getComputedStyle(el).backgroundColor,
+          ),
+        )
+        .not.toBe(before);
+      await expect(button(page, 'ตั้งค่า')).toHaveCSS('text-shadow', 'none');
+      await page.screenshot({
+        path: info.outputPath(`hover-${viewport.width}x${viewport.height}.png`),
+      });
+      await button(page, 'เริ่มเกม').focus();
+      await page.keyboard.press('Tab');
+      await expect(button(page, 'โหลดเกม')).toBeFocused();
+      await page.keyboard.press('Tab');
+      await expect(button(page, 'ตั้งค่า')).toBeFocused();
+      await page.screenshot({
+        path: info.outputPath(`focus-${viewport.width}x${viewport.height}.png`),
+      });
+      await page.keyboard.press('Enter');
+      await expect(
+        page.getByRole('dialog', { name: 'ตั้งค่า', exact: true }),
+      ).toBeVisible();
+      await expect(page.locator('.demo-main-surface')).toHaveAttribute(
+        'inert',
+        '',
+      );
+      await expect(
+        page.getByRole('slider', { name: 'เสียงเพลง', exact: true }),
+      ).toHaveCount(0);
+      await expect(
+        page.getByRole('checkbox', { name: 'ลดการเคลื่อนไหว', exact: true }),
+      ).toHaveCount(0);
+      await button(page, 'เสียง').click();
+      await expect(
+        page.getByRole('slider', { name: 'เสียงเพลง', exact: true }),
+      ).toBeDisabled();
+      await expect(
+        page.getByRole('slider', { name: 'เสียงประกอบ', exact: true }),
+      ).toBeDisabled();
+      await expect(
+        page.getByText('เดโมนี้ยังไม่มีระบบเสียง', { exact: false }),
+      ).toBeVisible();
+      await page.screenshot({
+        path: info.outputPath(
+          `options-${viewport.width}x${viewport.height}.png`,
         ),
-      )
-      .not.toBe(before);
-    await expect(button(page, 'ตั้งค่า')).toHaveCSS('text-shadow', 'none');
-    await page.screenshot({
-      path: info.outputPath(`hover-${viewport.width}x${viewport.height}.png`),
+      });
+      await button(page, 'หน้าจอ').click();
+      await expect(
+        page.getByRole('slider', { name: 'เสียงเพลง', exact: true }),
+      ).toHaveCount(0);
+      await expect(
+        page.getByRole('slider', { name: 'ความเร็วข้อความ', exact: true }),
+      ).toHaveCount(0);
+      await expect(
+        page.getByRole('checkbox', { name: 'ลดการเคลื่อนไหว', exact: true }),
+      ).toBeVisible();
+      await page.screenshot({
+        path: info.outputPath(
+          `display-${viewport.width}x${viewport.height}.png`,
+        ),
+      });
+      await button(page, 'การอ่าน').focus();
+      await page.keyboard.press('Shift+Tab');
+      await expect(
+        page.getByRole('checkbox', { name: 'ลดการเคลื่อนไหว', exact: true }),
+      ).toBeFocused();
+      await page.keyboard.press('Tab');
+      await expect(button(page, 'การอ่าน')).toBeFocused();
+      await page.keyboard.press('Escape');
+      await expect(button(page, 'ตั้งค่า')).toBeFocused();
+      expect(errors).toEqual([]);
     });
-    await button(page, 'เริ่มเกม').focus();
-    await page.keyboard.press('Tab');
-    await expect(button(page, 'โหลดเกม')).toBeFocused();
-    await page.keyboard.press('Tab');
-    await expect(button(page, 'ตั้งค่า')).toBeFocused();
-    await page.screenshot({
-      path: info.outputPath(`focus-${viewport.width}x${viewport.height}.png`),
-    });
-    await page.keyboard.press('Enter');
-    await expect(
-      page.getByRole('dialog', { name: 'ตั้งค่า', exact: true }),
-    ).toBeVisible();
-    await expect(page.locator('.demo-main-surface')).toHaveAttribute(
-      'inert',
-      '',
-    );
-    await expect(
-      page.getByRole('slider', { name: 'Music Volume', exact: true }),
-    ).toHaveCount(0);
-    await expect(
-      page.getByRole('checkbox', { name: 'ลดการเคลื่อนไหว', exact: true }),
-    ).toHaveCount(0);
-    await button(page, 'เสียง').click();
-    await expect(
-      page.getByRole('slider', { name: 'Music Volume', exact: true }),
-    ).toBeDisabled();
-    await expect(
-      page.getByRole('slider', { name: 'Sound Volume', exact: true }),
-    ).toBeDisabled();
-    await expect(
-      page.getByText('เดโมนี้ยังไม่มีระบบเสียง', { exact: false }),
-    ).toBeVisible();
-    await page.screenshot({
-      path: info.outputPath(`options-${viewport.width}x${viewport.height}.png`),
-    });
-    await button(page, 'หน้าจอ').click();
-    await expect(
-      page.getByRole('slider', { name: 'Music Volume', exact: true }),
-    ).toHaveCount(0);
-    await expect(
-      page.getByRole('slider', { name: 'Text Speed', exact: true }),
-    ).toHaveCount(0);
-    await expect(
-      page.getByRole('checkbox', { name: 'ลดการเคลื่อนไหว', exact: true }),
-    ).toBeVisible();
-    await page.screenshot({
-      path: info.outputPath(`display-${viewport.width}x${viewport.height}.png`),
-    });
-    await button(page, 'การอ่าน').focus();
-    await page.keyboard.press('Shift+Tab');
-    await expect(
-      page.getByRole('checkbox', { name: 'ลดการเคลื่อนไหว', exact: true }),
-    ).toBeFocused();
-    await page.keyboard.press('Tab');
-    await expect(button(page, 'การอ่าน')).toBeFocused();
-    await page.keyboard.press('Escape');
-    await expect(button(page, 'ตั้งค่า')).toBeFocused();
-    expect(errors).toEqual([]);
   });
 }
 
@@ -153,9 +162,12 @@ test('reading preferences are functional, pause return is safe, and profile pers
 }) => {
   await page.goto(url);
   await button(page, 'ตั้งค่า').click();
-  const speed = page.getByRole('slider', { name: 'Text Speed', exact: true });
+  const speed = page.getByRole('slider', {
+    name: 'ความเร็วข้อความ',
+    exact: true,
+  });
   const delay = page.getByRole('slider', {
-    name: 'Auto-Forward Time',
+    name: 'เวลาเลื่อนอัตโนมัติ',
     exact: true,
   });
   await expect(speed).toHaveValue('40');
@@ -211,7 +223,10 @@ test('selected text speed changes the actual revealed line duration', async ({
   const elapsed: number[] = [];
   for (const speed of [25, 60]) {
     await button(page, 'ตั้งค่า').click();
-    const input = page.getByRole('slider', { name: 'Text Speed', exact: true });
+    const input = page.getByRole('slider', {
+      name: 'ความเร็วข้อความ',
+      exact: true,
+    });
     await input.focus();
     await page.keyboard.press(speed === 25 ? 'Home' : 'End');
     await expect(input).toHaveValue(String(speed));
@@ -236,11 +251,11 @@ test('fullscreen follows native state or reports browser rejection; failure does
   await page.goto(url);
   await button(page, 'ตั้งค่า').click();
   await button(page, 'หน้าจอ').click();
-  await expect(button(page, 'Windowed')).toHaveAttribute(
+  await expect(button(page, 'หน้าต่าง')).toHaveAttribute(
     'aria-pressed',
     'true',
   );
-  await button(page, 'Fullscreen').click();
+  await button(page, 'เต็มจอ').click();
   await expect
     .poll(
       async () =>
@@ -256,15 +271,15 @@ test('fullscreen follows native state or reports browser rejection; failure does
       : 'browser reported rejection/unavailable',
   });
   if (native) {
-    await expect(button(page, 'Fullscreen')).toHaveAttribute(
+    await expect(button(page, 'เต็มจอ')).toHaveAttribute(
       'aria-pressed',
       'true',
     );
-    await button(page, 'Windowed').click();
+    await button(page, 'หน้าต่าง').click();
     await expect
       .poll(() => page.evaluate(() => Boolean(document.fullscreenElement)))
       .toBe(false);
-    await expect(button(page, 'Windowed')).toHaveAttribute(
+    await expect(button(page, 'หน้าต่าง')).toHaveAttribute(
       'aria-pressed',
       'true',
     );
@@ -328,11 +343,11 @@ test('OS reduced motion wins, native fullscreen denial is truthful, external han
   ).toEqual({ sameBlur: true, sameFocus: true, externalCalls: 1 });
   await button(page, 'ตั้งค่า').click();
   await button(page, 'หน้าจอ').click();
-  await button(page, 'Fullscreen').click();
+  await button(page, 'เต็มจอ').click();
   await expect(page.locator('p[role="status"]')).toContainText(
     'ไม่สามารถแสดงเต็มจอ',
   );
-  await expect(button(page, 'Windowed')).toHaveAttribute(
+  await expect(button(page, 'หน้าต่าง')).toHaveAttribute(
     'aria-pressed',
     'true',
   );
