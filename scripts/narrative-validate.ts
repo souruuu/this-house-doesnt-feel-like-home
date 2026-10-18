@@ -1,5 +1,6 @@
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
+import { validateDemo } from './narrative-production.ts';
 import { Story } from 'inkjs';
 import { fixtureOutput, fixtureSource } from './narrative-compile.ts';
 import {
@@ -207,7 +208,8 @@ export function validateFixture() {
   for (const id of references.assets) {
     if (!Object.hasOwn(manifest, id)) throw new Error(`Unknown asset: ${id}`);
   }
-  for (const asset of Object.values(manifest)) {
+  for (const id of references.assets) {
+    const asset = manifest[id];
     if (asset.status !== 'placeholder')
       throw new Error('M0 accepts technical placeholders only');
     assertAssetPath(asset.path);
@@ -224,6 +226,6 @@ if (
   import.meta.url === pathToFileURL(process.argv[1]).href
 ) {
   console.log(
-    `Validated technical fixture only: ${JSON.stringify(validateFixture())}; release story not present.`,
+    `Validated isolated technical fixture: ${JSON.stringify(validateFixture())}; production demo: ${JSON.stringify(validateDemo())}`,
   );
 }

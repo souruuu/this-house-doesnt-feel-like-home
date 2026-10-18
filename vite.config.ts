@@ -2,6 +2,7 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { compileFixture } from './scripts/narrative-compile.ts';
 import { validateFixture } from './scripts/narrative-validate.ts';
+import { compileDemo, validateDemo } from './scripts/narrative-production.ts';
 
 export default defineConfig({
   base: './',
@@ -12,12 +13,17 @@ export default defineConfig({
       configureServer(server) {
         const refresh = () => {
           compileFixture();
+          compileDemo();
           validateFixture();
+          validateDemo();
         };
         refresh();
-        server.watcher.add('narrative/fixtures/technical_fixture.ink');
+        server.watcher.add('narrative/**/*.ink');
         server.watcher.on('change', (path) => {
-          if (!path.replaceAll('\\', '/').includes('narrative/fixtures/'))
+          if (
+            !path.replaceAll('\\', '/').includes('/narrative/') ||
+            !path.endsWith('.ink')
+          )
             return;
           try {
             refresh();

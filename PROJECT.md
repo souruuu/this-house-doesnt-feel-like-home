@@ -2,6 +2,12 @@
 
 ไฟล์นี้เป็น Source of Truth ของ concept, goals และ scope ส่วนเหตุและผลรายฉากให้ใช้ [Narrative Design Source of Truth](sources/narrative_map_7_day_Updates.md) โดยตรง ไม่ใช้สรุปนี้แทน Scene Map
 
+## Emergency Demo — Owner Approval 17 October 2026
+
+สำหรับ Emergency Day 1–3 demo ให้ใช้ [Active Approved Narrative Handoff](sources/emergency-demo-2026-10-17/README.md) และ CR-NAR-001 v0.2 เป็นข้อยกเว้นเฉพาะส่วนที่เปลี่ยนจาก map เดิม: เด็กสี่คน มะนาว/ส้ม/นัท/กันต์; ไม่มีบาสหรือ repair puzzle ในเดโม บาสเริ่ม Day 4 รถ Day 5 กล่องดนตรีคง Day 7 Production Save/Resume เลื่อนออกเฉพาะ emergency build และต้องแจ้งการสูญเสียความคืบหน้าหลัง refresh/close
+
+ข้อความ Prototype/ฉากรถ/ตัวละครใน baseline ด้านล่างที่ขัดกันเป็นข้อกำหนดเดิมซึ่งถูก supersede เฉพาะ emergency scope ตาม CR; Original Narrative Map เก็บ bytes/provenance เดิม ไม่ใช้สองฉบับเป็น authority ที่ขัดกัน บทจริงใช้ P1 v0.3/P2 v0.2/P3 v0.3 ไม่ใช้สรุปเขียนแทน ไม่เปลี่ยน full-game technical contracts, DoD หรือประกาศ M0–M7 DONE
+
 ## แหล่งข้อมูลและสถานะ
 
 - Narrative source: [narrative_map_7_day_Updates.md](sources/narrative_map_7_day_Updates.md)

@@ -1,7 +1,15 @@
 import { useEffect, useRef } from 'react';
-import { GameBridge } from './GameBridge';
+import { GameBridge, type DemoWorldView } from './GameBridge';
 
-export function WorldHost({ paused }: { paused: boolean }) {
+export function WorldHost({
+  paused,
+  presentation,
+  demo = false,
+}: {
+  paused: boolean;
+  presentation?: DemoWorldView;
+  demo?: boolean;
+}) {
   const hostRef = useRef<HTMLDivElement>(null);
   const bridgeRef = useRef<GameBridge | null>(null);
   useEffect(() => {
@@ -15,7 +23,7 @@ export function WorldHost({ paused }: { paused: boolean }) {
     let destroy: (() => void) | undefined;
     void import('./createWorld')
       .then(({ createWorld }) => {
-        if (active) destroy = createWorld(parent, bridge);
+        if (active) destroy = createWorld(parent, bridge, demo);
       })
       .catch(() => {
         if (active) parent.dataset.worldState = 'error';
@@ -27,7 +35,10 @@ export function WorldHost({ paused }: { paused: boolean }) {
       bridge.dispose();
       parent.remove();
     };
-  }, []);
+  }, [demo]);
+  useEffect(() => {
+    if (presentation) bridgeRef.current?.setPresentation(presentation);
+  }, [presentation, demo]);
   useEffect(() => {
     bridgeRef.current?.setPaused(paused);
   }, [paused]);

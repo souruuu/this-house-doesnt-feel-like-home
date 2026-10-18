@@ -3,7 +3,7 @@ import { Path } from 'inkjs/engine/Path';
 import { validateNarrativeSnapshot } from '../save/validateSave.ts';
 import type { EventRegistry } from './EventRegistry.ts';
 import {
-  bindFixtureQueries,
+  bindNarrativeQueries,
   type NarrativeQueryPort,
 } from './NarrativeQueryPort.ts';
 import { parseOutput, resetPresentation } from './tags.ts';
@@ -29,28 +29,43 @@ export class NarrativeController {
   private operationHeld = false;
   private backlog: readonly TranscriptEntry[] = Object.freeze([]);
   private view: NarrativeView;
+  private readonly references: FixtureReferences;
+  private readonly registry: EventRegistry;
+  private readonly presentation: FixturePresentationPort;
+  private readonly domain: FixtureDomainPort;
 
   constructor(
     compiled: string,
-    private readonly references: FixtureReferences,
-    private readonly registry: EventRegistry,
+    references: FixtureReferences,
+    registry: EventRegistry,
     queries: NarrativeQueryPort,
-    private readonly presentation: FixturePresentationPort,
-    private readonly domain: FixtureDomainPort = {
+    presentation: FixturePresentationPort,
+    domain: FixtureDomainPort = {
       commit(events) {
         if (events.length) throw new Error('Missing fixture domain port');
         return { notificationError: null };
       },
     },
+    options: { scope: 'emergency-demo-day1-day3' } | undefined = undefined,
   ) {
-    if (references.scope !== 'technical-fixture-only')
+    this.references = references;
+    this.registry = registry;
+    this.presentation = presentation;
+    this.domain = domain;
+    if (references.scope !== (options?.scope ?? 'technical-fixture-only'))
       throw new Error('Controller only accepts technical fixtures');
     this.story = new Story(compiled);
-    bindFixtureQueries(this.story, queries);
+    bindNarrativeQueries(
+      this.story,
+      queries,
+      options ? 'demo_flag' : 'fixture_flag',
+    );
     const initialScene = Object.keys(references.scenes)[0];
     if (!initialScene) throw new Error('Fixture needs a scene');
     this.view = {
-      sessionId: `fixture-session-${++nextSession}`,
+      sessionId: options
+        ? `demo-session-${crypto.randomUUID()}`
+        : `fixture-session-${++nextSession}`,
       revision: 0,
       phase: 'idle',
       paused: false,

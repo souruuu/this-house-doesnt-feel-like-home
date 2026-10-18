@@ -5,7 +5,7 @@ test('fixture branch/rejoin uses keyboard and stable identities without errors',
 }) => {
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
-  await page.goto('/');
+  await page.goto('/?fixture=1');
   const region = page.getByRole('region', { name: 'ทดสอบระบบข้อความ' });
   await expect(region).toHaveAttribute('data-line-id', 'fixture_start_001');
   await region.focus();
@@ -54,7 +54,7 @@ test('fixture branch/rejoin uses keyboard and stable identities without errors',
 test('StrictMode, double input and UI remount preserve a run; explicit new run isolates it', async ({
   page,
 }) => {
-  await page.goto('/');
+  await page.goto('/?fixture=1');
   const region = page.getByRole('region', { name: 'ทดสอบระบบข้อความ' });
   await expect(region).toHaveAttribute('data-line-id', 'fixture_start_001');
   await expect(region).toHaveAttribute('data-notifications', '0');
@@ -109,7 +109,7 @@ test('touch portrait, pause, hidden state and key repeats guard fixture input', 
     hasTouch: true,
   });
   const page = await context.newPage();
-  await page.goto('http://127.0.0.1:4173/');
+  await page.goto('http://127.0.0.1:4173/?fixture=1');
   await expect(page.getByRole('alert')).toContainText(
     'กรุณาหมุนอุปกรณ์เป็นแนวนอนเพื่อเล่น',
   );

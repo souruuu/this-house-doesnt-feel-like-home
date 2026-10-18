@@ -6,6 +6,20 @@ Interactive Game Website — M0 scaffold + M1 technical fixture (dev/QA)
 
 **Checkpoint:** คง implementation และ dependency versions ปัจจุบัน หยุดทดลอง Phaser internals/startup override/failure-injection และไม่มี lifecycle fix ใหม่ ผล probe กับ Phaser 4.2.1 จริงยืนยันว่า ManagedGame ลบ external visibilitychange listener จาก postBoot โดยไม่ตั้งใจ 3/3 รอบ ส่วน pre-READY boot failure เป็น residual risk ที่ยังไม่พิสูจน์ด้วย runtime failure-injection ดูหลักฐานแยกกันใน MASTER_PLAN ไม่เปลี่ยน Definition of Done และไม่ถือว่า checkpoint ผ่าน lifecycle gate
 
+## Emergency Day 1–3 Demo — 17 October 2026
+
+Owner อนุมัติ emergency implementation จาก main `6a44b987fc0f512400f784a2d4cb8e8611b68509` บน `codex/emergency-day1-day3-playable-demo` ไม่รวม PR #7/#8 ดู [Content Authority / CR Provenance](sources/emergency-demo-2026-10-17/README.md) ข้อความสถานะ batch เก่าด้านบน/ล่างเป็นประวัติ ไม่ใช่สถานะ emergency build
+
+Production entry คือ Main Menu → Notice/Prologue → Day 1–3 เก้าฉาก → Demo End ไม่ใช้ technical fixture เป็น production story Owner UI Correction / Checkpoint A เพิ่ม Main Menu ครบ Start/Load/Options/Gallery/About และ Options จริง; Load แจ้งว่า Production Save/Load ยังไม่พร้อม, Gallery เป็น empty state, Music/Sound sliders disabled เพราะไม่มีระบบเสียง ไม่อ้างว่ามีระบบเบื้องหลังเหล่านี้
+
+Reading preferences อยู่ใน app session: Text Speed 25–60 graphemes/s (default 40), Typewriter default ON พร้อม Instant Text/reduced-motion fallback, Auto-Forward Time 1–6 วินาที (default 2) เชื่อม Auto ของ Checkpoint B: รอ reveal จบแล้วจึงเริ่ม delay และส่ง Continue ผ่าน Controller ครั้งเดียวต่อ intention; Auto หยุดเมื่อ choice/pause/menu/hidden/blur/portrait/day transition/error/ending และไม่กลับ ON เอง ส่วน Skip แสดง unavailable เพราะยังติด D1 production read-profile decision ไม่มี persistence หรือ Production Save/Resume รีเฟรช/ปิดหน้าเริ่มเล่นใหม่และ preferences กลับค่าทดลองตั้งต้น A ได้ Conditional Visual Direction Approval; B ยังรอ Owner Visual/UX Review พร้อมภาพ/คลิปจริง ไม่ปิด U-01/U-02/U-03 หรือ Final Visual Acceptance และยังไม่เริ่ม Checkpoint C/packaging/release
+
+Development fixture regression ใช้ `/?fixture=1` เท่านั้นและยังแยกจาก production bundle `npm run narrative:compile` และ `npm run narrative:validate` ตรวจทั้ง fixture และ production แยก scopes; production validation ตรวจ SHA-256 ของ approved handoff และข้อความ/ชื่อผู้พูดครบ 152 Line/Choice IDs ผ่าน controller จริงใน 64 deterministic runs ไม่ใช่การอ้าง exhaustive combination ทั้งหมด
+
+รัน `npm run build` แล้วสร้าง static ZIP ด้วย `powershell -NoProfile -File scripts/package-demo.ps1` (Windows) ZIP อยู่ TEMP นอก repository มี root `index.html` และตรวจ bytes ทุก entry เทียบ `dist` ใช้ artifact เดียวกันสำหรับ Vercel preview/itch.io ไม่รวม source/tests/narrative compiler
+
+Firefox M0–M1 Exception ไม่ใช่ Production Release Exception ต้องรายงาน browser results แยกตามจริง ไม่มี Full E2E/CI PASS หรือ M0–M7 DONE โดยอัตโนมัติ ManagedGame/Firefox/A-01 และ pre-READY risk คงเดิม Production artwork เป็น composite ของทีมตาม manifest ไม่ invent final identity
+
 ## เริ่มใช้งานเอกสาร
 
 อ่าน [PROJECT.md](PROJECT.md) → [MASTER_PLAN.md](MASTER_PLAN.md) → [ARCHITECTURE.md](ARCHITECTURE.md); [AGENTS.md](AGENTS.md) เป็นแผนที่อ่านตามงาน
@@ -169,3 +183,11 @@ npm run preview
 
 Baseline ไม่ได้แปลว่า production content พร้อมทั้งหมด A-01 และผลตรวจ M0/M1 ให้ดู ARCHITECTURE/MASTER_PLAN ส่วน G-01/N-03/U-01–U-03/P-01–P-02 เป็น OPEN QUESTION ตาม gate เดิม Batch ถัดไปรอ Owner Review/approval และไม่ commit/push โดยไม่มี approval
 
+
+### Dusty Midnight Blue A+B correction (Owner-approved experiment)
+
+The emergency demo uses exclusive Reading/Display/Audio Options panes, safe dialogue click-to-reveal/continue and compact Skip/Auto/▶ controls. Skip reports unavailable (D1 remains blocked). Auto retains ON intent while waiting for a manual choice, then resumes only after full reveal and a fresh configured delay; Pause/menu/blur/hidden/rotate/end require explicit reactivation. Preferences remain app-session-only. Original artist portrait artwork is unchanged; AI visual targets are references only. No production Save/Load/audio/gallery implementation or final U-01/U-02/U-03 approval. Full relevant verification and visual evidence must pass the scoped conditional Git gate; never infer release/three-browser/CI PASS. See [UI contract](docs/UI_ASSET_SPEC.md) and [batch plan](MASTER_PLAN.md).
+
+### Post-A+B gameplay characters (Owner-approved experiment)
+
+Player-facing demo title: **หลังเคาน์เตอร์**. The internal repository/story identity is unchanged. Four original transparent cutouts are presented by Phaser in explicit approved scene/line windows, independently of the current speaker. No Main Menu characters or new cover. See [presentation mapping and limitations](docs/DEMO_CHARACTER_STAGE.md) and [asset provenance](src/assets/demo-character-provenance.json). Runtime copies preserve the approved PNG bytes; unused stage exports are not shipped. Character transitions are disposable view state, cancel on pause/context teardown and become static with reduced motion. Options/reading/Auto and technical fixture contracts remain unchanged. Owner Final Visual Acceptance is pending; this is not a release or full three-browser/CI PASS claim.

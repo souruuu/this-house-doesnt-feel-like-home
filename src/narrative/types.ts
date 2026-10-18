@@ -27,11 +27,20 @@ export type FixtureDomainAction =
   | { readonly kind: 'select-branch'; readonly branch: 'a' | 'b' }
   | { readonly kind: 'record-rejoin' };
 
+// Emergency demo facts are evidence-backed observations/disclosures, not G-01 formulas.
+export interface DemoFactAction {
+  readonly kind: 'record-demo-fact';
+  readonly fact: string;
+  readonly evidenceLineId: string;
+  readonly owner: string;
+  readonly knowledge: 'seen' | 'told';
+}
+
 export interface DomainEvent {
   readonly id: string;
   readonly sceneId: string;
   readonly category: 'domain';
-  readonly action: FixtureDomainAction;
+  readonly action: FixtureDomainAction | DemoFactAction;
 }
 
 export type NarrativeEvent = PresentationEvent | DomainEvent;

@@ -2,6 +2,14 @@
 
 Source of Truth ของ Ink/inkjs integration และสัญญาระหว่าง narrative กับ app ข้อเท็จจริงและ choices ของเรื่องเป็นของ [Narrative Map](../sources/narrative_map_7_day_Updates.md); durable semantics เป็นของ [GAME_STATE](GAME_STATE.md)
 
+## Emergency Day 1–3 content authority
+
+Owner อนุมัติ production content และ concrete implementation plan เมื่อ 17 October 2026 ดู [Active Handoff/CR precedence](../sources/emergency-demo-2026-10-17/README.md) N-03 content-ready เฉพาะ P1-D1-v0.3/P2-D2-v0.2/P3-D3-v0.3 ไม่ใช่การรับบทหรือ domain rules ของ Day 4–7 ทั้งหมด ข้อความ pending handoff ด้านล่างเป็นสถานะ baseline ก่อน approval นี้
+
+Production ใช้ `narrative/main.ink`, `prologue.ink`, `days/day01.ink`–`day03.ink`, shared helpers และ production references แยกจาก fixture Stable IDs `demo.<content-ref>` ตรวจย้อนกลับถึงข้อความ section B/B0 โดย validator เช็ก checksums/ข้อความ/ชื่อผู้พูดและ traverse ผ่าน controller จริง Scene IDs ใช้ SC-D1-01…SC-D3-03 ตาม CR ไม่ reinterpret D1-B/D2-A ของรถ
+
+Controller/Registry รับ production scope ผ่าน typed configuration โดยรักษา validation-before-commit, atomic ledger, read-only query timing และ stale-input guards เดิม ไม่มี tag เพิ่ม Query `demo_flag` ผูกด้วย `lookaheadSafe=false`; อย่าเรียก query ตรงใน choice text/quoted string ตามข้อจำกัด inkjs เดิม Production Save/Resume deferred ไม่ใช้ fixture save identity
+
 ## Ink owns branching, app owns durable facts
 
 Ink จัด dialogue, choices, flow และจุดกลับเส้นหลัก inkjs เป็น runtime ใน browser; `NarrativeController` เป็นทางเข้าระบบเดียว React และ Phaser ไม่เดิน `Story` เอง
